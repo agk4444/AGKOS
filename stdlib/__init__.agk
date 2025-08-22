@@ -1,20 +1,48 @@
 # AGK Standard Library
 # This file provides an overview of all available modules
 
-# Available modules:
+# Core Libraries:
 # - math: Mathematical functions and constants
 # - string: String manipulation functions
 # - list: List operations and utilities
 # - io: Input/output functions
+
+# Advanced Libraries:
+# - llm: Large Language Model integration (AI)
+# - gto: Game Theory Optimization algorithms
+# - web: Web interface and HTTP capabilities
 
 # Example usage:
 # import math
 # import string
 # import list
 # import io
+# import llm
+# import gto
+# import web
 
-# Then use functions like:
+# Basic usage:
 # math.sqrt(16.0)
 # string.length("hello")
 # list.append(my_list, "new_item")
 # io.print("Hello World")
+
+# Advanced AI usage:
+# create client as LLMClient
+# set client to llm.create_llm_client("api_key", llm.gpt4())
+# create response as String
+# set response to llm.ask_llm(client, "Explain quantum physics")
+
+# Game theory usage:
+# create game as Game
+# set game to gto.create_prisoners_dilemma()
+# create equilibrium as List
+# set equilibrium to gto.find_nash_equilibrium(game)
+
+# Web development usage:
+# create server as WebServer
+# set server to web.create_server(8080)
+# create route as Route
+# set route to web.create_route("/", "GET")
+# set server to web.add_route(server, route, my_handler)
+# web.start_server(server)
