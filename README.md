@@ -4,7 +4,7 @@ A revolutionary compiler that combines the best features of C++, Java, and Pytho
 
 ## Vision
 
-AGK (pronounced "awk") is a programming language that aims to be:
+AGK (pronounced "agk") is a programming language that aims to be:
 - **Powerful**: Combines performance of C++, safety of Java, and expressiveness of Python
 - **Natural**: Uses English-like syntax that's intuitive to read and write
 - **Modern**: Supports contemporary programming paradigms and best practices
