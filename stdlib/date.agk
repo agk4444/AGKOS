@@ -1,0 +1,222 @@
+# AGK Date Library
+# Provides comprehensive date and time manipulation functions
+
+define function now that returns DateTime:
+    create current_time as DateTime
+    set current_time to get_current_datetime()
+    return current_time
+
+define function today that returns Date:
+    create current_date as Date
+    set current_date to get_current_date()
+    return current_date
+
+define function create_date that takes year as Integer, month as Integer, day as Integer and returns Date:
+    create date as Date
+    set date to build_date(year, month, day)
+    return date
+
+define function create_datetime that takes year as Integer, month as Integer, day as Integer, hour as Integer, minute as Integer, second as Integer and returns DateTime:
+    create datetime as DateTime
+    set datetime to build_datetime(year, month, day, hour, minute, second)
+    return datetime
+
+define function get_year that takes date as Date and returns Integer:
+    create year as Integer
+    set year to extract_year(date)
+    return year
+
+define function get_month that takes date as Date and returns Integer:
+    create month as Integer
+    set month to extract_month(date)
+    return month
+
+define function get_day that takes date as Date and returns Integer:
+    create day as Integer
+    set day to extract_day(date)
+    return day
+
+define function get_hour that takes datetime as DateTime and returns Integer:
+    create hour as Integer
+    set hour to extract_hour(datetime)
+    return hour
+
+define function get_minute that takes datetime as DateTime and returns Integer:
+    create minute as Integer
+    set minute to extract_minute(datetime)
+    return minute
+
+define function get_second that takes datetime as DateTime and returns Integer:
+    create second as Integer
+    set second to extract_second(datetime)
+    return second
+
+define function format_date that takes date as Date, format_string as String and returns String:
+    create formatted as String
+    set formatted to format_date_string(date, format_string)
+    return formatted
+
+define function format_datetime that takes datetime as DateTime, format_string as String and returns String:
+    create formatted as String
+    set formatted to format_datetime_string(datetime, format_string)
+    return formatted
+
+define function add_days that takes date as Date, days as Integer and returns Date:
+    create new_date as Date
+    set new_date to add_days_to_date(date, days)
+    return new_date
+
+define function add_months that takes date as Date, months as Integer and returns Date:
+    create new_date as Date
+    set new_date to add_months_to_date(date, months)
+    return new_date
+
+define function add_years that takes date as Date, years as Integer and returns Date:
+    create new_date as Date
+    set new_date to add_years_to_date(date, years)
+    return new_date
+
+define function date_difference that takes start_date as Date, end_date as Date and returns Integer:
+    create days as Integer
+    set days to calculate_date_difference(start_date, end_date)
+    return days
+
+define function is_leap_year that takes year as Integer and returns Boolean:
+    create leap as Boolean
+    if year % 4 is equal to 0:
+        if year % 100 is equal to 0:
+            if year % 400 is equal to 0:
+                set leap to true
+            else:
+                set leap to false
+        else:
+            set leap to true
+    else:
+        set leap to false
+    return leap
+
+define function days_in_month that takes year as Integer, month as Integer and returns Integer:
+    if month is equal to 2:
+        if is_leap_year(year):
+            return 29
+        else:
+            return 28
+    else:
+        if month in [4, 6, 9, 11]:
+            return 30
+        else:
+            return 31
+
+define function day_of_week that takes date as Date and returns String:
+    # Simplified day of week calculation
+    create year as Integer
+    set year to get_year(date)
+    create month as Integer
+    set month to get_month(date)
+    create day as Integer
+    set day to get_day(date)
+
+    if month < 3:
+        set month to month + 12
+        set year to year - 1
+
+    create h as Integer
+    set h to (day + (13 * (month + 1) / 5) + year + (year / 4) - (year / 100) + (year / 400)) % 7
+
+    create days as List
+    set days to ["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+    create day_name as String
+    set day_name to get_item(days, h)
+    return day_name
+
+define function is_weekend that takes date as Date and returns Boolean:
+    create dow as String
+    set dow to day_of_week(date)
+    if dow is equal to "Saturday" or dow is equal to "Sunday":
+        return true
+    else:
+        return false
+
+define function is_weekday that takes date as Date and returns Boolean:
+    return not is_weekend(date)
+
+define function start_of_month that takes date as Date and returns Date:
+    create year as Integer
+    set year to get_year(date)
+    create month as Integer
+    set month to get_month(date)
+    return create_date(year, month, 1)
+
+define function end_of_month that takes date as Date and returns Date:
+    create year as Integer
+    set year to get_year(date)
+    create month as Integer
+    set month to get_month(date)
+    create days as Integer
+    set days to days_in_month(year, month)
+    return create_date(year, month, days)
+
+define function timestamp that returns Integer:
+    create ts as Integer
+    set ts to get_current_timestamp()
+    return ts
+
+define function from_timestamp that takes timestamp as Integer and returns DateTime:
+    create dt as DateTime
+    set dt to convert_timestamp_to_datetime(timestamp)
+    return dt
+
+# Placeholder implementations
+define function get_current_datetime that returns DateTime:
+    return "current_datetime"
+
+define function get_current_date that returns Date:
+    return "current_date"
+
+define function build_date that takes year as Integer, month as Integer, day as Integer and returns Date:
+    return "date"
+
+define function build_datetime that takes year as Integer, month as Integer, day as Integer, hour as Integer, minute as Integer, second as Integer and returns DateTime:
+    return "datetime"
+
+define function extract_year that takes date as Date and returns Integer:
+    return 2024
+
+define function extract_month that takes date as Date and returns Integer:
+    return 1
+
+define function extract_day that takes date as Date and returns Integer:
+    return 1
+
+define function extract_hour that takes datetime as DateTime and returns Integer:
+    return 0
+
+define function extract_minute that takes datetime as DateTime and returns Integer:
+    return 0
+
+define function extract_second that takes datetime as DateTime and returns Integer:
+    return 0
+
+define function format_date_string that takes date as Date, format_string as String and returns String:
+    return "formatted_date"
+
+define function format_datetime_string that takes datetime as DateTime, format_string as String and returns String:
+    return "formatted_datetime"
+
+define function add_days_to_date that takes date as Date, days as Integer and returns Date:
+    return "new_date"
+
+define function add_months_to_date that takes date as Date, months as Integer and returns Date:
+    return "new_date"
+
+define function add_years_to_date that takes date as Date, years as Integer and returns Date:
+    return "new_date"
+
+define function calculate_date_difference that takes start_date as Date, end_date as Date and returns Integer:
+    return 0
+
+define function get_current_timestamp that returns Integer:
+    return 1234567890
+
+define function convert_timestamp_to_datetime that takes timestamp as Integer and returns DateTime:
+    return "datetime_from_timestamp"

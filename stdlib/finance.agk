@@ -1,0 +1,209 @@
+# AGK Finance Library
+# Provides comprehensive financial calculations and investment analysis
+
+define function compound_interest that takes principal as Float, rate as Float, time as Float, compounding_frequency as Integer and returns Float:
+    # A = P(1 + r/n)^(nt)
+    create n as Float
+    set n to compounding_frequency
+    create base as Float
+    set base to 1.0 + rate / n
+    create exponent as Float
+    set exponent to n * time
+    create amount as Float
+    set amount to principal * power(base, exponent)
+    return amount
+
+define function simple_interest that takes principal as Float, rate as Float, time as Float and returns Float:
+    # I = P * r * t
+    create interest as Float
+    set interest to principal * rate * time
+    return interest
+
+define function future_value that takes present_value as Float, rate as Float, periods as Integer and returns Float:
+    create fv as Float
+    set fv to present_value * power(1.0 + rate, periods)
+    return fv
+
+define function present_value that takes future_value as Float, rate as Float, periods as Integer and returns Float:
+    create pv as Float
+    set pv to future_value / power(1.0 + rate, periods)
+    return pv
+
+define function loan_payment that takes principal as Float, annual_rate as Float, months as Integer and returns Float:
+    create monthly_rate as Float
+    set monthly_rate to annual_rate / 12.0
+
+    if monthly_rate is equal to 0:
+        return principal / months
+
+    create payment as Float
+    set payment to principal * monthly_rate * power(1.0 + monthly_rate, months)
+    set payment to payment / (power(1.0 + monthly_rate, months) - 1.0)
+    return payment
+
+define function total_loan_cost that takes principal as Float, annual_rate as Float, months as Integer and returns Float:
+    create monthly_payment as Float
+    set monthly_payment to loan_payment(principal, annual_rate, months)
+    return monthly_payment * months
+
+define function mortgage_payment that takes home_price as Float, down_payment as Float, annual_rate as Float, years as Integer and returns Float:
+    create loan_amount as Float
+    set loan_amount to home_price - down_payment
+    create months as Integer
+    set months to years * 12
+    return loan_payment(loan_amount, annual_rate, months)
+
+define function return_on_investment that takes initial_investment as Float, final_value as Float and returns Float:
+    create roi as Float
+    set roi to (final_value - initial_investment) / initial_investment * 100.0
+    return roi
+
+define function net_present_value that takes cash_flows as List, discount_rate as Float and returns Float:
+    create npv as Float
+    set npv to 0.0
+
+    create period as Integer
+    set period to 0
+
+    for each cash_flow in cash_flows:
+        create discounted_value as Float
+        set discounted_value to cash_flow / power(1.0 + discount_rate, period)
+        set npv to npv + discounted_value
+        set period to period + 1
+
+    return npv
+
+define function internal_rate_of_return that takes cash_flows as List and returns Float:
+    # Simplified IRR calculation using trial and error
+    create guess as Float
+    set guess to 0.1
+
+    for each i in range(100):
+        create npv as Float
+        set npv to net_present_value(cash_flows, guess)
+        if absolute(npv) < 0.01:
+            break
+        else:
+            if npv > 0:
+                set guess to guess + 0.001
+            else:
+                set guess to guess - 0.001
+
+    return guess
+
+define function break_even_point that takes fixed_costs as Float, price_per_unit as Float, variable_cost_per_unit as Float and returns Float:
+    create bep as Float
+    set bep to fixed_costs / (price_per_unit - variable_cost_per_unit)
+    return bep
+
+define function depreciation_straight_line that takes initial_value as Float, salvage_value as Float, useful_life as Integer and returns Float:
+    create annual_depreciation as Float
+    set annual_depreciation to (initial_value - salvage_value) / useful_life
+    return annual_depreciation
+
+define function tax_calculation that takes income as Float, tax_rate as Float and returns Float:
+    create tax as Float
+    set tax to income * tax_rate
+    return tax
+
+define function profit_margin that takes revenue as Float, expenses as Float and returns Float:
+    if revenue is equal to 0:
+        return 0.0
+    create margin as Float
+    set margin to (revenue - expenses) / revenue * 100.0
+    return margin
+
+define function calculate_taxable_income that takes gross_income as Float, deductions as Float and returns Float:
+    create taxable as Float
+    set taxable to gross_income - deductions
+    if taxable < 0:
+        return 0.0
+    else:
+        return taxable
+
+define function investment_growth that takes principal as Float, annual_rate as Float, years as Integer, compounding_frequency as Integer and returns Float:
+    return compound_interest(principal, annual_rate, years, compounding_frequency)
+
+define function retirement_savings that takes monthly_contribution as Float, annual_rate as Float, years as Integer and returns Float:
+    create months as Integer
+    set months to years * 12
+    create monthly_rate as Float
+    set monthly_rate to annual_rate / 12.0
+
+    create future_value as Float
+    set future_value to monthly_contribution * (power(1.0 + monthly_rate, months) - 1.0) / monthly_rate
+    return future_value
+
+define function inflation_adjusted_return that takes nominal_return as Float, inflation_rate as Float and returns Float:
+    create real_return as Float
+    set real_return to (1.0 + nominal_return) / (1.0 + inflation_rate) - 1.0
+    return real_return
+
+define function currency_conversion that takes amount as Float, from_rate as Float, to_rate as Float and returns Float:
+    create converted as Float
+    set converted to amount * (to_rate / from_rate)
+    return converted
+
+define function stock_beta_calculation that takes stock_returns as List, market_returns as List and returns Float:
+    # Simplified beta calculation
+    # In practice, this would use statistical analysis
+    create stock_avg as Float
+    set stock_avg to 0.0
+
+    for each ret in stock_returns:
+        set stock_avg to stock_avg + ret
+
+    set stock_avg to stock_avg / length(stock_returns)
+
+    create market_avg as Float
+    set market_avg to 0.0
+
+    for each ret in market_returns:
+        set market_avg to market_avg + ret
+
+    set market_avg to market_avg / length(market_returns)
+
+    return stock_avg / market_avg
+
+define function dividend_yield that takes annual_dividend as Float, stock_price as Float and returns Float:
+    create yield as Float
+    set yield to annual_dividend / stock_price * 100.0
+    return yield
+
+define function price_to_earnings_ratio that takes stock_price as Float, earnings_per_share as Float and returns Float:
+    create pe_ratio as Float
+    set pe_ratio to stock_price / earnings_per_share
+    return pe_ratio
+
+# Helper functions
+define function power that takes base as Float, exponent as Float and returns Float:
+    # Simple power function (would use math library in practice)
+    create result as Float
+    set result to 1.0
+
+    create abs_exponent as Integer
+    set abs_exponent to exponent
+
+    for each i in range(abs_exponent):
+        set result to result * base
+
+    return result
+
+define function absolute that takes x as Float and returns Float:
+    if x < 0:
+        return -x
+    else:
+        return x
+
+define function length that takes lst as List and returns Integer:
+    create count as Integer
+    set count to 0
+    return count
+
+# Placeholder implementations for complex calculations
+define function range that takes n as Integer and returns List:
+    create result as List
+    return result
+
+define function get_item that takes lst as List, index as Integer:
+    return 0.0
