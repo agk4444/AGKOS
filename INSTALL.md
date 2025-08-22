@@ -25,6 +25,110 @@ A revolutionary compiler that transforms natural language programming into execu
    chmod +x agk_compiler.py
    ```
 
+## 🐳 Docker Installation (Alternative Method)
+
+Docker provides a consistent environment across all platforms and eliminates dependency issues.
+
+### Docker Prerequisites
+
+- **Docker Desktop** or **Docker Engine**
+- **Git** (for cloning the repository)
+
+### Docker Installation Steps
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/hnethery/zen-mcp-modified.git
+   cd zen-mcp-modified
+   ```
+
+2. **Build the Docker image:**
+   ```bash
+   docker build -t agk-compiler .
+   ```
+
+   This will create a Docker image with all necessary dependencies and the AGK compiler ready to use.
+
+3. **Verify the installation:**
+   ```bash
+   docker run --rm agk-compiler
+   ```
+
+   You should see the help information for the AGK compiler.
+
+### Using Docker
+
+#### Compile a Single File
+```bash
+docker run --rm -v $(pwd):/app/workspace agk-compiler python agk_compiler.py workspace/your_program.agk
+```
+
+#### Start Interactive REPL
+```bash
+docker run --rm -it agk-compiler python agk_compiler.py --repl
+```
+
+#### Save Generated Code to File
+```bash
+docker run --rm -v $(pwd):/app/workspace agk-compiler python agk_compiler.py workspace/input.agk workspace/output.py
+```
+
+#### Example Docker Session
+```bash
+# Create a simple AGK program
+echo 'define function hello that returns String:
+    return "Hello from Docker!"' > hello.agk
+
+# Compile using Docker
+docker run --rm -v $(pwd):/app/workspace agk-compiler python agk_compiler.py workspace/hello.agk
+
+# Compile and save output
+docker run --rm -v $(pwd):/app/workspace agk-compiler python agk_compiler.py workspace/hello.agk workspace/hello.py
+
+# Run the generated Python code
+python hello.py
+```
+
+### Docker Benefits
+
+- **Consistent Environment**: Works identically on Windows, macOS, and Linux
+- **No Dependencies**: All requirements are included in the container
+- **Isolated**: Doesn't interfere with your system Python installation
+- **Reproducible**: Same results every time
+- **Easy Cleanup**: Remove the container when done
+
+### Docker Troubleshooting
+
+**Build Issues:**
+```bash
+# Force rebuild without cache
+docker build --no-cache -t agk-compiler .
+
+# View build logs
+docker build -t agk-compiler . 2>&1 | tee build.log
+```
+
+**Permission Issues:**
+```bash
+# On Linux/Mac
+sudo docker run --rm -v $(pwd):/app/workspace agk-compiler python agk_compiler.py workspace/your_program.agk
+
+# On Windows (PowerShell)
+docker run --rm -v ${PWD}:/app/workspace agk-compiler python agk_compiler.py workspace/your_program.agk
+```
+
+**Container Cleanup:**
+```bash
+# Remove the image
+docker rmi agk-compiler
+
+# Remove all unused containers
+docker container prune
+
+# Remove all unused images
+docker image prune
+```
+
 ## 📖 Usage
 
 ### Basic Compilation
