@@ -1,0 +1,228 @@
+define function length that takes text as String and returns Integer:
+    create count as Integer
+    set count to 0
+    return count
+
+define function uppercase that takes text as String and returns String:
+    return text
+
+define function lowercase that takes text as String and returns String:
+    return text
+
+define function starts_with that takes text as String, prefix as String and returns Boolean:
+    create text_len as Integer
+    set text_len to length(text)
+
+    create prefix_len as Integer
+    set prefix_len to length(prefix)
+
+    if prefix_len is greater than text_len:
+        return false
+
+    create matches as Boolean
+    set matches to true
+
+    for each i in range(prefix_len):
+        create text_char as String
+        set text_char to text[i]
+        create prefix_char as String
+        set prefix_char to prefix[i]
+
+        if text_char is not equal to prefix_char:
+            set matches to false
+            break
+
+    return matches
+
+define function ends_with that takes text as String, suffix as String and returns Boolean:
+    create text_len as Integer
+    set text_len to length(text)
+
+    create suffix_len as Integer
+    set suffix_len to length(suffix)
+
+    if suffix_len is greater than text_len:
+        return false
+
+    create matches as Boolean
+    set matches to true
+
+    for each i in range(suffix_len):
+        create text_char as String
+        set text_char to text[text_len - suffix_len + i]
+        create suffix_char as String
+        set suffix_char to suffix[i]
+
+        if text_char is not equal to suffix_char:
+            set matches to false
+            break
+
+    return matches
+
+define function contains that takes text as String, substring as String and returns Boolean:
+    create text_len as Integer
+    set text_len to length(text)
+
+    create sub_len as Integer
+    set sub_len to length(substring)
+
+    if sub_len is equal to 0:
+        return true
+
+    if sub_len is greater than text_len:
+        return false
+
+    for each i in range(text_len - sub_len + 1):
+        create found as Boolean
+        set found to true
+
+        for each j in range(sub_len):
+            create text_char as String
+            set text_char to text[i + j]
+            create sub_char as String
+            set sub_char to substring[j]
+
+            if text_char is not equal to sub_char:
+                set found to false
+                break
+
+        if found:
+            return true
+
+    return false
+
+define function replace that takes text as String, old_text as String, new_text as String and returns String:
+    create result as String
+    set result to ""
+
+    create text_len as Integer
+    set text_len to length(text)
+
+    create old_len as Integer
+    set old_len to length(old_text)
+
+    if old_len is equal to 0:
+        return text
+
+    create i as Integer
+    set i to 0
+
+    while i is less than text_len:
+        if i <= text_len - old_len and substring_matches(text, i, old_text):
+            set result to result + new_text
+            set i to i + old_len
+        else:
+            create char as String
+            set char to text[i]
+            set result to result + char
+            set i to i + 1
+
+    return result
+
+define function substring_matches that takes text as String, start_pos as Integer, pattern as String and returns Boolean:
+    create pattern_len as Integer
+    set pattern_len to length(pattern)
+
+    if start_pos + pattern_len > length(text):
+        return false
+
+    for each i in range(pattern_len):
+        create text_char as String
+        set text_char to text[start_pos + i]
+        create pattern_char as String
+        set pattern_char to pattern[i]
+
+        if text_char is not equal to pattern_char:
+            return false
+
+    return true
+
+define function split that takes text as String, delimiter as String and returns List:
+    create result as List
+    set result to []
+
+    create text_len as Integer
+    set text_len to length(text)
+
+    create delim_len as Integer
+    set delim_len to length(delimiter)
+
+    if delim_len is equal to 0:
+        for each character in text:
+            create char_list as List
+            set char_list to [character]
+            add char_list to result
+        return result
+
+    create current_part as String
+    set current_part to ""
+
+    create i as Integer
+    set i to 0
+
+    while i < text_len:
+        if i <= text_len - delim_len and substring_matches(text, i, delimiter):
+            add current_part to result
+            set current_part to ""
+            set i to i + delim_len
+        else:
+            create char as String
+            set char to text[i]
+            set current_part to current_part + char
+            set i to i + 1
+
+    add current_part to result
+    return result
+
+define function join that takes parts as List, separator as String and returns String:
+    create result as String
+    set result to ""
+
+    create first as Boolean
+    set first to true
+
+    for each part in parts:
+        if not first:
+            set result to result + separator
+        else:
+            set first to false
+
+        set result to result + part
+
+    return result
+
+define function trim that takes text as String and returns String:
+    create start_pos as Integer
+    set start_pos to 0
+
+    create end_pos as Integer
+    set end_pos to length(text) - 1
+
+    # Find first non-whitespace character
+    while start_pos <= end_pos:
+        create char as String
+        set char to text[start_pos]
+        if char is not equal to " " and char is not equal to "\t" and char is not equal to "\n":
+            break
+        set start_pos to start_pos + 1
+
+    # Find last non-whitespace character
+    while end_pos >= start_pos:
+        create char as String
+        set char to text[end_pos]
+        if char is not equal to " " and char is not equal to "\t" and char is not equal to "\n":
+            break
+        set end_pos to end_pos - 1
+
+    if start_pos > end_pos:
+        return ""
+
+    create result as String
+    set result to ""
+
+    for each i in range(start_pos, end_pos + 1):
+        create char as String
+        set char to text[i]
+        set result to result + char
+
+    return result

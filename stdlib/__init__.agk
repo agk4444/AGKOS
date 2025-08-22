@@ -1,0 +1,20 @@
+# AGK Standard Library
+# This file provides an overview of all available modules
+
+# Available modules:
+# - math: Mathematical functions and constants
+# - string: String manipulation functions
+# - list: List operations and utilities
+# - io: Input/output functions
+
+# Example usage:
+# import math
+# import string
+# import list
+# import io
+
+# Then use functions like:
+# math.sqrt(16.0)
+# string.length("hello")
+# list.append(my_list, "new_item")
+# io.print("Hello World")
