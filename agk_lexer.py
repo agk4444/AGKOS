@@ -14,6 +14,7 @@ class TokenType(Enum):
     # Keywords
     DEFINE = "DEFINE"
     FUNCTION = "FUNCTION"
+    EXTERNAL = "EXTERNAL"
     CLASS = "CLASS"
     INTERFACE = "INTERFACE"
     ABSTRACT = "ABSTRACT"
@@ -151,6 +152,7 @@ class AGKLexer:
         self.keywords = {
             'define': TokenType.DEFINE,
             'function': TokenType.FUNCTION,
+            'external': TokenType.EXTERNAL,
             'class': TokenType.CLASS,
             'interface': TokenType.INTERFACE,
             'abstract': TokenType.ABSTRACT,
@@ -236,6 +238,13 @@ class AGKLexer:
         # Skip whitespace
         if char.isspace() and char != '\n':
             self.column += 1
+            return
+
+        # Skip comments
+        if char == '#':
+            while not self.is_at_end() and self.peek() != '\n':
+                self.advance()
+                self.column += 1
             return
 
         # Single character tokens

@@ -1,0 +1,124 @@
+# AGK Desktop Application Template
+# A complete desktop application with graphics, user interaction, and game loop
+# Perfect for: Games, Utilities, Educational Software, Data Visualization
+
+import graphics
+import io
+import string
+import math
+
+# Application configuration
+define function main:
+    # Create main application window
+    create window as graphics.Window
+    set window to graphics.create_window(800, 600, "AGK Desktop App")
+
+    # Create drawing canvas
+    create canvas as graphics.Canvas
+    set canvas to graphics.create_canvas(800, 600)
+
+    # Application state
+    create running as Boolean
+    set running to true
+
+    create mouse_x as Integer
+    set mouse_x to 0
+
+    create mouse_y as Integer
+    set mouse_y to 0
+
+    create click_count as Integer
+    set click_count to 0
+
+    # Main application loop
+    while running:
+        # Handle user input
+        create events as Object
+        set events to graphics.handle_mouse_events(window)
+
+        if events:
+            # Update mouse position
+            if events contains "x":
+                set mouse_x to events["x"]
+            if events contains "y":
+                set mouse_y to events["y"]
+
+            # Handle mouse clicks
+            if events contains "click" and events["click"]:
+                set click_count to click_count + 1
+
+        # Clear canvas with background color
+        graphics.draw_rectangle(canvas, 0, 0, 800, 600, graphics.color_white(), true)
+
+        # Draw application title
+        graphics.draw_text(canvas, 350, 50, "AGK Desktop Application", graphics.color_black(), 24)
+
+        # Draw interactive elements
+        create button_color as String
+        if mouse_x >= 350 and mouse_x <= 450 and mouse_y >= 200 and mouse_y <= 250:
+            set button_color to graphics.color_green()
+        else:
+            set button_color to graphics.color_blue()
+
+        # Draw button
+        graphics.draw_rectangle(canvas, 350, 200, 100, 50, button_color, true)
+        graphics.draw_text(canvas, 370, 215, "Click Me!", graphics.color_white(), 16)
+
+        # Draw mouse position
+        create pos_text as String
+        set pos_text to "Mouse: (" + string.format(mouse_x) + ", " + string.format(mouse_y) + ")"
+        graphics.draw_text(canvas, 20, 570, pos_text, graphics.color_gray(), 12)
+
+        # Draw click counter
+        create click_text as String
+        set click_text to "Clicks: " + string.format(click_count)
+        graphics.draw_text(canvas, 20, 550, click_text, graphics.color_purple(), 14)
+
+        # Draw some animated elements
+        create time_value as Float
+        set time_value to click_count * 0.1  # Use click count as animation time
+
+        # Animated circle
+        create circle_x as Integer
+        set circle_x to 400 + math.sin(time_value) * 100
+        create circle_y as Integer
+        set circle_y to 350 + math.cos(time_value) * 50
+        graphics.draw_circle(canvas, circle_x, circle_y, 30, graphics.color_red(), false)
+
+        # Display instructions
+        graphics.draw_text(canvas, 20, 20, "Instructions:", graphics.color_black(), 14)
+        graphics.draw_text(canvas, 20, 40, "- Move mouse to interact", graphics.color_gray(), 12)
+        graphics.draw_text(canvas, 20, 60, "- Click the button to increment counter", graphics.color_gray(), 12)
+        graphics.draw_text(canvas, 20, 80, "- Watch the animated circle", graphics.color_gray(), 12)
+        graphics.draw_text(canvas, 20, 100, "- Press ESC to exit", graphics.color_gray(), 12)
+
+        # Update window (in a real implementation, this would render to screen)
+        # graphics.render_canvas_to_window(canvas, window)
+
+        # Simple frame delay simulation
+        create frame_delay as Integer
+        set frame_delay to 16  # ~60 FPS
+
+        # Check for exit condition (in real app, check for ESC key or window close)
+        if click_count > 100:  # Exit after 100 clicks for demo
+            set running to false
+
+    # Cleanup
+    graphics.close_window(window)
+    io.print("Desktop application ended. Total clicks: " + string.format(click_count))
+    return click_count
+
+# Helper functions for your application
+define function calculate_distance that takes x1 as Integer, y1 as Integer, x2 as Integer, y2 as Integer and returns Float:
+    create dx as Float
+    set dx to x2 - x1
+    create dy as Float
+    set dy to y2 - y1
+    return math.sqrt(dx * dx + dy * dy)
+
+define function is_point_in_rect that takes px as Integer, py as Integer, rx as Integer, ry as Integer, rw as Integer, rh as Integer and returns Boolean:
+    create in_x as Boolean
+    set in_x to px >= rx and px <= rx + rw
+    create in_y as Boolean
+    set in_y to py >= ry and py <= ry + rh
+    return in_x and in_y

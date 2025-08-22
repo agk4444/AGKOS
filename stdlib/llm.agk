@@ -73,6 +73,33 @@ define function generate_code that takes client as LLMClient, description as Str
     set prompt to "Please generate " + language + " code for the following:\n\n" + description
     return ask_llm(client, prompt)
 
+# Error handling functions
+define function get_last_api_error that returns APIError:
+    create error as APIError
+    set error to retrieve_last_api_error()
+    return error
+
+define function retry_last_request that takes client as LLMClient and returns String:
+    create response as String
+    set response to retry_failed_llm_request(client)
+    return response
+
+define function get_error_statistics that takes service_name as String and returns Object:
+    create stats as Object
+    set stats to get_api_error_stats(service_name)
+    return stats
+
+define function clear_error_history that takes service_name as String:
+    clear_api_error_history(service_name)
+
+define function set_retry_policy that takes service_name as String, max_retries as Integer, base_delay as Float:
+    configure_retry_policy(service_name, max_retries, base_delay)
+
+define function get_retry_policy that takes service_name as String and returns Object:
+    create policy as Object
+    set policy to get_current_retry_policy(service_name)
+    return policy
+
 # Placeholder implementations (will be replaced by actual API calls in code generator)
 define function initialize_llm_client that takes api_key as String, model as String and returns LLMClient:
     return api_key
@@ -97,3 +124,56 @@ define function add_message_to_conversation that takes conv as Conversation, rol
 
 define function get_conversation_response that takes conv as Conversation and returns String:
     return "Conversation response"
+
+# Error handling placeholder implementations
+define function retrieve_last_api_error that returns APIError:
+    return "Last API Error"
+
+define function retry_failed_llm_request that takes client as LLMClient and returns String:
+    return "Retried LLM Response"
+
+define function get_api_error_stats that takes service_name as String and returns Object:
+    return "Error Statistics"
+
+define function clear_api_error_history that takes service_name as String:
+    pass
+
+define function configure_retry_policy that takes service_name as String, max_retries as Integer, base_delay as Float:
+    pass
+
+define function get_current_retry_policy that takes service_name as String and returns Object:
+    return "Retry Policy"
+
+# Caching placeholder implementations
+define function configure_cache_for_service that takes service_name as String, ttl as Float:
+    pass
+
+define function disable_cache_for_service that takes service_name as String:
+    pass
+
+define function retrieve_cache_stats that takes service_name as String and returns Object:
+    return "Cache Statistics"
+
+define function clear_service_cache that takes service_name as String:
+    pass
+
+define function warm_up_service_cache that takes service_name as String, endpoints as List:
+    pass
+
+# Caching functions
+define function enable_response_cache that takes service_name as String, ttl as Float:
+    configure_cache_for_service(service_name, ttl)
+
+define function disable_response_cache that takes service_name as String:
+    disable_cache_for_service(service_name)
+
+define function get_cache_statistics that takes service_name as String and returns Object:
+    create stats as Object
+    set stats to retrieve_cache_stats(service_name)
+    return stats
+
+define function clear_response_cache that takes service_name as String:
+    clear_service_cache(service_name)
+
+define function warm_up_cache that takes service_name as String, endpoints as List:
+    warm_up_service_cache(service_name, endpoints)

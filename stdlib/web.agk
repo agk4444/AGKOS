@@ -42,6 +42,43 @@ define function make_delete_request that takes url as String and returns String:
     set response to send_delete_request(url)
     return response
 
+# Async HTTP request functions
+define function make_async_get_request that takes url as String and returns Future:
+    create task_id as String
+    set task_id to start_async_get_request(url)
+    return task_id
+
+define function make_async_post_request that takes url as String, data as String and returns Future:
+    create task_id as String
+    set task_id to start_async_post_request(url, data)
+    return task_id
+
+define function make_async_put_request that takes url as String, data as String and returns Future:
+    create task_id as String
+    set task_id to start_async_put_request(url, data)
+    return task_id
+
+define function make_async_delete_request that takes url as String and returns Future:
+    create task_id as String
+    set task_id to start_async_delete_request(url)
+    return task_id
+
+define function await_http_response that takes task_id as String and returns String:
+    create response as String
+    set response to wait_for_http_response(task_id)
+    return response
+
+define function await_all_http_responses that takes task_ids as List and returns List:
+    create responses as List
+    set responses to wait_for_all_http_responses(task_ids)
+    return responses
+
+define function create_http_context that takes context_id as String:
+    initialize_async_context(context_id)
+
+define function cleanup_http_context that takes context_id as String:
+    destroy_async_context(context_id)
+
 # JSON utilities
 define function parse_json that takes json_string as String and returns Object:
     create parsed_object as Object
@@ -232,3 +269,28 @@ define function add_cors_headers_to_response that takes response as String and r
 
 define function validate_authentication_token that takes token as String and returns Boolean:
     return true
+
+# Async HTTP placeholder implementations
+define function start_async_get_request that takes url as String and returns String:
+    return "async_get_task_123"
+
+define function start_async_post_request that takes url as String, data as String and returns String:
+    return "async_post_task_123"
+
+define function start_async_put_request that takes url as String, data as String and returns String:
+    return "async_put_task_123"
+
+define function start_async_delete_request that takes url as String and returns String:
+    return "async_delete_task_123"
+
+define function wait_for_http_response that takes task_id as String and returns String:
+    return "async response data"
+
+define function wait_for_all_http_responses that takes task_ids as List and returns List:
+    return task_ids
+
+define function initialize_async_context that takes context_id as String:
+    pass
+
+define function destroy_async_context that takes context_id as String:
+    pass

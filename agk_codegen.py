@@ -7,7 +7,7 @@ Generates target code from the validated AST.
 
 from typing import Dict, List, Optional, Set
 from agk_ast import (
-    ASTNode, Program, Import, TypeNode, Parameter, FunctionDef, ClassDef,
+    ASTNode, Program, Import, TypeNode, Parameter, FunctionDef, ExternalFunctionDef, ClassDef,
     ConstructorDef, InterfaceDef, VariableDecl, Assignment, IfStatement,
     ForStatement, WhileStatement, ReturnStatement, BreakStatement,
     ContinueStatement, TryCatchStatement, ThrowStatement, BinaryOp,
@@ -37,6 +37,10 @@ class CodeGenerator:
         # Generate imports
         self.generate_imports(program.imports)
 
+        # Add FFI imports if external functions are used
+        if self.has_external_functions(program):
+            self.generate_ffi_imports()
+
         # Generate program statements
         for statement in program.statements:
             self.generate_statement(statement)
@@ -60,10 +64,24 @@ class CodeGenerator:
         if imports:
             self.add_line("")
 
+    def generate_ffi_imports(self):
+        """Generate FFI-related imports"""
+        self.add_line("from agk_ffi import register_external_function, call_external_function")
+        self.add_line("")
+
+    def has_external_functions(self, program: Program) -> bool:
+        """Check if program contains external function definitions"""
+        for statement in program.statements:
+            if isinstance(statement, ExternalFunctionDef):
+                return True
+        return False
+
     def generate_statement(self, node: ASTNode):
         """Generate code for a statement"""
         if isinstance(node, FunctionDef):
             self.generate_function_def(node)
+        elif isinstance(node, ExternalFunctionDef):
+            self.generate_external_function_def(node)
         elif isinstance(node, ClassDef):
             self.generate_class_def(node)
         elif isinstance(node, InterfaceDef):
@@ -125,6 +143,48 @@ class CodeGenerator:
             self.generate_statement(statement)
         self.indent_level -= 1
 
+        self.add_line("")
+
+    def generate_external_function_def(self, node: ExternalFunctionDef):
+        """Generate external function definition"""
+        # Generate function registration
+        func_def_str = f'"external function {node.name}('
+
+        params = []
+        for param in node.parameters:
+            param_type = self.map_type(param.type_node) if param.type_node else "any"
+            params.append(f'{param.name} as {param_type}')
+
+        func_def_str += ', '.join(params)
+        func_def_str += f') from \\"{node.library_path}\\" as {self.map_type(node.return_type)}"'
+
+        self.add_line(f"register_external_function({func_def_str})")
+        self.add_line("")
+
+        # Generate Python function wrapper
+        params = []
+        for param in node.parameters:
+            param_str = param.name
+            if param.type_node:
+                param_str += f": {self.map_type(param.type_node)}"
+            params.append(param_str)
+
+        params_str = ", ".join(params)
+        return_type = f" -> {self.map_type(node.return_type)}" if node.return_type else ""
+
+        self.add_line(f"def {node.name}({params_str}){return_type}:")
+        self.indent_level += 1
+
+        # Generate function body that calls the external function
+        args = [param.name for param in node.parameters]
+        args_str = ", ".join(args)
+
+        if node.return_type and node.return_type.name.lower() != 'void':
+            self.add_line(f"return call_external_function('{node.name}', [{args_str}])")
+        else:
+            self.add_line(f"call_external_function('{node.name}', [{args_str}])")
+
+        self.indent_level -= 1
         self.add_line("")
 
     def generate_class_def(self, node: ClassDef):

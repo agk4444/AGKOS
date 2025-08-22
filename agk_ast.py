@@ -95,6 +95,16 @@ class FunctionDef(ASTNode):
 
 
 @dataclass
+class ExternalFunctionDef(ASTNode):
+    """External function declaration for FFI"""
+    name: str
+    parameters: List[Parameter]
+    return_type: Optional[TypeNode]
+    library_path: str
+    visibility: str = "public"
+
+
+@dataclass
 class ClassDef(ASTNode):
     """Class definition"""
     name: str
@@ -315,6 +325,9 @@ class ASTVisitor(ABC):
     def visit_functiondef(self, node: FunctionDef):
         self.generic_visit(node)
 
+    def visit_externalfunctiondef(self, node: 'ExternalFunctionDef'):
+        self.generic_visit(node)
+
     def visit_classdef(self, node: ClassDef):
         self.generic_visit(node)
 
@@ -416,6 +429,11 @@ class ASTPrinter(ASTVisitor):
         for stmt in node.body:
             stmt.accept(self)
         self.indent_level -= 1
+
+    def visit_externalfunctiondef(self, node: 'ExternalFunctionDef'):
+        params_str = ", ".join([f"{p.name}: {p.type_node.name if p.type_node else 'Any'}" for p in node.parameters])
+        return_str = f" -> {node.return_type.name}" if node.return_type else ""
+        print(f"{self.indent()}ExternalFunctionDef: {node.name}({params_str}){return_str} from '{node.library_path}'")
 
     def visit_classdef(self, node: ClassDef):
         print(f"{self.indent()}ClassDef: {node.name}")

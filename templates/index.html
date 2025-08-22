@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGK Web App Template</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            margin: 8px 0;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f5e8;
+            border-radius: 5px;
+            border-left: 5px solid #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 AGK Web Application Template</h1>
+        <p>Welcome to your AGK-powered web application!</p>
+
+        <h2>Features:</h2>
+        <ul>
+            <li>✅ Built with AGK Language</li>
+            <li>✅ Modern web interface</li>
+            <li>✅ Responsive design</li>
+            <li>✅ Ready for customization</li>
+        </ul>
+
+        <div>
+            <h3>Try the Calculator:</h3>
+            <input type="number" id="num1" class="input-field" placeholder="Enter first number">
+            <input type="number" id="num2" class="input-field" placeholder="Enter second number">
+            <button class="button" onclick="calculate()">Calculate Sum</button>
+        </div>
+
+        <div id="result" class="result" style="display: none;"></div>
+
+        <div style="margin-top: 30px;">
+            <h3>Built with:</h3>
+            <p>🟢 AGK Language Compiler</p>
+            <p>🟢 Modern Web Technologies</p>
+            <p>🟢 Responsive Design</p>
+        </div>
+    </div>
+
+    <script>
+        function calculate() {
+            const num1 = parseFloat(document.getElementById('num1').value);
+            const num2 = parseFloat(document.getElementById('num2').value);
+
+            if (isNaN(num1) || isNaN(num2)) {
+                alert('Please enter valid numbers');
+                return;
+            }
+
+            const sum = num1 + num2;
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `<strong>Result:</strong> ${num1} + ${num2} = ${sum}`;
+            resultDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

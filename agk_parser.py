@@ -8,7 +8,7 @@ Parses natural language tokens into an Abstract Syntax Tree (AST).
 from typing import List, Optional, Dict, Any
 from agk_lexer import AGKLexer, Token, TokenType
 from agk_ast import (
-    Program, Import, TypeNode, Parameter, FunctionDef, ClassDef,
+    Program, Import, TypeNode, Parameter, FunctionDef, ExternalFunctionDef, ClassDef,
     ConstructorDef, InterfaceDef, VariableDecl, Assignment, IfStatement,
     ForStatement, WhileStatement, ReturnStatement, BreakStatement,
     ContinueStatement, TryCatchStatement, ThrowStatement, BinaryOp,
@@ -54,6 +54,11 @@ class AGKParser:
                     statements.append(self.parse_interface())
                 else:
                     raise ParserError(f"Expected function, class, or interface after 'define'", self.peek())
+            elif self.match(TokenType.EXTERNAL):
+                if self.check(TokenType.FUNCTION):
+                    statements.append(self.parse_external_function())
+                else:
+                    raise ParserError(f"Expected function after 'external'", self.peek())
             elif self.match(TokenType.PRIVATE, TokenType.PUBLIC, TokenType.PROTECTED):
                 visibility = self.previous().value
                 if self.match(TokenType.VARIABLE):
@@ -157,6 +162,63 @@ class AGKParser:
                 break
 
         return FunctionDef(name, parameters, return_type, body, [], visibility, is_static, is_final)
+
+    def parse_external_function(self) -> ExternalFunctionDef:
+        """Parse external function declaration"""
+        visibility = "public"
+
+        # Handle modifiers
+        while self.match(TokenType.PUBLIC, TokenType.PRIVATE, TokenType.PROTECTED):
+            visibility = self.previous().value
+
+        self.consume(TokenType.FUNCTION, "Expected 'function' keyword")
+        name = self.consume(TokenType.IDENTIFIER, "Expected function name").value
+
+        # Parse parameters - support both syntaxes
+        parameters = []
+        if self.match(TokenType.LPAREN):
+            # Simple syntax: function_name(param as type, ...)
+            parameters = self.parse_simple_parameters()
+            self.consume(TokenType.RPAREN, "Expected ')' after parameters")
+        elif self.match(TokenType.THAT):
+            # Natural language syntax: that takes param as type
+            self.consume(TokenType.TAKES, "Expected 'takes' after 'that'")
+            parameters = self.parse_parameters()
+
+        # Parse "from" clause
+        self.consume(TokenType.FROM, "Expected 'from' after function parameters")
+        library_path = self.consume(TokenType.STRING, "Expected library path after 'from'").value
+        library_path = library_path[1:-1]  # Remove quotes
+
+        # Parse return type
+        self.consume(TokenType.AS, "Expected 'as' before return type")
+        return_type = self.parse_type()
+
+        return ExternalFunctionDef(name, parameters, return_type, library_path, visibility)
+
+    def parse_simple_parameters(self) -> List[Parameter]:
+        """Parse parameter list in simple syntax: (param as type, ...)"""
+        parameters = []
+
+        if not self.check(TokenType.RPAREN):  # Empty parameter list
+            param_name = self.consume(TokenType.IDENTIFIER, "Expected parameter name").value
+            param_type = None
+
+            if self.match(TokenType.AS):
+                param_type = self.parse_type()
+
+            parameters.append(Parameter(param_name, param_type))
+
+            while self.match(TokenType.COMMA):
+                param_name = self.consume(TokenType.IDENTIFIER, "Expected parameter name").value
+                param_type = None
+
+                if self.match(TokenType.AS):
+                    param_type = self.parse_type()
+
+                parameters.append(Parameter(param_name, param_type))
+
+        return parameters
 
     def parse_class(self) -> ClassDef:
         """Parse class definition"""

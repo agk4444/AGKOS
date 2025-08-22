@@ -1,0 +1,56 @@
+# FFI Test Example - AGK Language Foreign Function Interface
+# This demonstrates calling external C library functions from AGK
+
+import math
+import string
+
+# Example external function declarations
+external function calculate_factorial(num as int) from "libmath.so" as int
+external function get_system_time() from "libc.so" as int
+external function hash_string(text as string) from "libcrypto.dll" as string
+
+# Regular AGK function using external libraries
+define function test_ffi_integration:
+    create num as int
+    set num to 5
+
+    # Call external function
+    create fact as int
+    set fact to calculate_factorial(num)
+
+    # Display result using AGK's built-in functions
+    print to console "Factorial of " + string.format(num) + " is " + string.format(fact)
+
+    # Get system time from external library
+    create current_time as int
+    set current_time to get_system_time()
+    print to console "Current system time: " + string.format(current_time)
+
+    # Hash a string using external crypto library
+    create text as string
+    set text to "Hello, World!"
+    create hash as string
+    set hash to hash_string(text)
+    print to console "Hash of '" + text + "': " + hash
+
+    return fact
+
+# Function demonstrating mixed usage of AGK and external functions
+define function advanced_ffi_demo:
+    create values as list
+    create i as int
+
+    # Calculate factorials for numbers 1-5 using external function
+    set i to 1
+    while i is less than 6:
+        create fact as int
+        set fact to calculate_factorial(i)
+        add fact to values
+        set i to i + 1
+
+    # Use AGK's math functions for comparison
+    create sqrt_fact as float
+    set sqrt_fact to math.sqrt(get(values, 0))  # sqrt of 1! = 1
+
+    print to console "Mixed computation result: " + string.format(sqrt_fact)
+    return values

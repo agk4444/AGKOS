@@ -7,7 +7,7 @@ Performs type checking, variable validation, and semantic analysis on the AST.
 
 from typing import Dict, List, Optional, Set
 from agk_ast import (
-    ASTNode, Program, Import, TypeNode, Parameter, FunctionDef, ClassDef,
+    ASTNode, Program, Import, TypeNode, Parameter, FunctionDef, ExternalFunctionDef, ClassDef,
     ConstructorDef, InterfaceDef, VariableDecl, Assignment, IfStatement,
     ForStatement, WhileStatement, ReturnStatement, BreakStatement,
     ContinueStatement, TryCatchStatement, ThrowStatement, BinaryOp,
@@ -139,18 +139,25 @@ class SemanticAnalyzer:
 
     def visit_program(self, node: Program):
         """Analyze a program"""
-        # First pass: collect all declarations
+        # First pass: handle imports
+        for import_stmt in node.imports:
+            self.handle_import(import_stmt)
+
+        # Second pass: collect all declarations
         for statement in node.statements:
             if isinstance(statement, (FunctionDef, ClassDef, InterfaceDef)):
                 self.collect_declaration(statement)
 
-        # Second pass: analyze all statements
+        # Third pass: analyze all statements
         for statement in node.statements:
             statement.accept(self)
 
     def collect_declaration(self, node: ASTNode):
         """Collect declarations in a first pass"""
         if isinstance(node, FunctionDef):
+            info = SymbolInfo(node.name, node.return_type, is_function=True)
+            self.current_scope.declare(node.name, info)
+        elif isinstance(node, ExternalFunctionDef):
             info = SymbolInfo(node.name, node.return_type, is_function=True)
             self.current_scope.declare(node.name, info)
         elif isinstance(node, ClassDef):
@@ -180,6 +187,22 @@ class SemanticAnalyzer:
 
         finally:
             self.current_scope = func_scope.parent
+
+    def visit_externalfunctiondef(self, node: 'ExternalFunctionDef'):
+        """Analyze an external function definition"""
+        # External functions don't need scope analysis since they don't have bodies
+        # Just validate that the function name doesn't conflict with existing symbols
+        existing = self.current_scope.lookup_current_scope(node.name)
+        if existing and existing.is_function:
+            self.add_warning(f"External function '{node.name}' shadows existing function", node)
+
+        # Validate parameter types and return type
+        for param in node.parameters:
+            if param.type_node and param.type_node.name not in ['int', 'float', 'string', 'bool', 'void']:
+                self.add_warning(f"External function parameter '{param.name}' uses non-standard type '{param.type_node.name}'", node)
+
+        if node.return_type and node.return_type.name not in ['int', 'float', 'string', 'bool', 'void']:
+            self.add_warning(f"External function return type '{node.return_type.name}' is non-standard", node)
 
     def visit_classdef(self, node: ClassDef):
         """Analyze a class definition"""
@@ -418,6 +441,101 @@ class SemanticAnalyzer:
     def get_warnings(self) -> List[str]:
         """Get all semantic warnings"""
         return self.warnings
+
+    def handle_import(self, import_stmt: Import):
+        """Handle an import statement by loading the module and adding its symbols"""
+        module_name = import_stmt.module
+
+        # Use dependency manager to resolve and load dependencies
+        from agk_dependency_manager import dependency_manager
+
+        try:
+            # Resolve dependencies for this module
+            dependencies = dependency_manager.resolve_dependencies([module_name])
+
+            # Load all dependencies in the correct order
+            for dep_name in dependencies:
+                if dep_name != module_name:  # Don't reload the main module
+                    self._load_module_symbols(dep_name, import_stmt)
+
+            # Load the main module
+            self._load_module_symbols(module_name, import_stmt)
+
+        except Exception as e:
+            # Fallback to direct loading if dependency resolution fails
+            self._load_module_directly(module_name, import_stmt)
+
+    def _load_module_symbols(self, module_name: str, import_stmt: Import):
+        """Load symbols from a module"""
+        # Try to find and parse the module
+        module_path = f"stdlib/{module_name}.agk"
+
+        try:
+            # Read the module file
+            with open(module_path, 'r') as f:
+                module_source = f.read()
+
+            # Parse the module
+            from agk_lexer import AGKLexer
+            from agk_parser import AGKParser
+
+            lexer = AGKLexer(module_source)
+            tokens = lexer.tokenize()
+            parser = AGKParser(tokens)
+            module_ast = parser.parse()
+
+            # Extract functions and add them to the global scope with module prefix
+            for statement in module_ast.statements:
+                if isinstance(statement, FunctionDef):
+                    # Add function with module prefix
+                    prefixed_name = f"{module_name}.{statement.name}"
+                    info = SymbolInfo(prefixed_name, statement.return_type, is_function=True)
+                    self.current_scope.declare(prefixed_name, info)
+
+                    # Also add without prefix for direct access (like Python's import)
+                    info_direct = SymbolInfo(statement.name, statement.return_type, is_function=True)
+                    self.current_scope.declare(statement.name, info_direct)
+
+        except FileNotFoundError:
+            self.add_error(f"Module '{module_name}' not found", None)
+        except Exception as e:
+            self.add_error(f"Error importing module '{module_name}': {e}", None)
+
+    def _load_module_directly(self, module_name: str, import_stmt: Import):
+        """Fallback method to load module directly without dependency resolution"""
+        # Try to find and parse the module
+        module_path = f"stdlib/{module_name}.agk"
+
+        try:
+            # Read the module file
+            with open(module_path, 'r') as f:
+                module_source = f.read()
+
+            # Parse the module
+            from agk_lexer import AGKLexer
+            from agk_parser import AGKParser
+
+            lexer = AGKLexer(module_source)
+            tokens = lexer.tokenize()
+            parser = AGKParser(tokens)
+            module_ast = parser.parse()
+
+            # Extract functions and add them to the global scope with module prefix
+            for statement in module_ast.statements:
+                if isinstance(statement, FunctionDef):
+                    # Add function with module prefix
+                    prefixed_name = f"{module_name}.{statement.name}"
+                    info = SymbolInfo(prefixed_name, statement.return_type, is_function=True)
+                    self.current_scope.declare(prefixed_name, info)
+
+                    # Also add without prefix for direct access (like Python's import)
+                    info_direct = SymbolInfo(statement.name, statement.return_type, is_function=True)
+                    self.current_scope.declare(statement.name, info_direct)
+
+        except FileNotFoundError:
+            self.add_error(f"Module '{module_name}' not found", None)
+        except Exception as e:
+            self.add_error(f"Error importing module '{module_name}': {e}", None)
 
 
 def main():
