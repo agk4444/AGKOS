@@ -1,0 +1,7 @@
+define function calculate_total that takes items:
+    create total as Integer
+    set total to 0
+    return total
+
+define function greet that takes name as String and returns String:
+    return "Hello, " + name + "!"
