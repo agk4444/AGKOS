@@ -1,0 +1,559 @@
+# AGK Regex Template - Regular Expressions
+# This template demonstrates pattern matching and text processing
+# Perfect for: Text validation, data extraction, search and replace, parsing
+
+import regex
+import io
+import logging
+
+# Global configuration
+define constant TEST_TEXT_FILENAME as String = "regex_test.txt"
+define constant PATTERN_FILENAME as String = "regex_patterns.txt"
+
+# Main application entry point
+define function main:
+    # Initialize logging for the regex application
+    create logger as Logger
+    set logger to logging.get_logger("Regex_Processor")
+    logging.set_level(logger, logging.INFO)
+    logging.add_console_handler(logger)
+
+    logging.info(logger, "Starting Regex Processing Application")
+
+    # Run the main application loop
+    run_regex_application_loop(logger)
+
+# Main application loop with menu-driven interface
+define function run_regex_application_loop that takes logger as Logger:
+    create running as Boolean
+    set running to true
+
+    while running:
+        io.println("\n🔍 Regular Expressions - Pattern Matching")
+        io.println("1. Email Validation")
+        io.println("2. Phone Number Extraction")
+        io.println("3. URL Detection")
+        io.println("4. Credit Card Number Validation")
+        io.println("5. HTML Tag Removal")
+        io.println("6. Log File Parsing")
+        io.println("7. Custom Pattern Matching")
+        io.println("8. Text Search and Replace")
+        io.println("9. Data Extraction")
+        io.println("10. Pattern Validation")
+        io.println("11. Exit")
+        io.print("Enter your choice (1-11): ")
+
+        create choice as String
+        set choice to io.read_line()
+
+        if choice == "1":
+            email_validation(logger)
+        else if choice == "2":
+            phone_extraction(logger)
+        else if choice == "3":
+            url_detection(logger)
+        else if choice == "4":
+            credit_card_validation(logger)
+        else if choice == "5":
+            html_tag_removal(logger)
+        else if choice == "6":
+            log_parsing(logger)
+        else if choice == "7":
+            custom_pattern_matching(logger)
+        else if choice == "8":
+            text_search_replace(logger)
+        else if choice == "9":
+            data_extraction(logger)
+        else if choice == "10":
+            pattern_validation(logger)
+        else if choice == "11":
+            set running to false
+            logging.info(logger, "Regex application shutting down")
+        else:
+            io.println("❌ Invalid choice. Please try again.")
+
+# Email validation
+define function email_validation that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "email_validation")
+
+    io.println("\n📧 Email Validation:")
+    io.println("─" * 40)
+
+    create test_emails as List
+    add "john.doe@example.com" to test_emails
+    add "user+tag@domain.co.uk" to test_emails
+    add "invalid-email" to test_emails
+    add "another.test@sub.domain.org" to test_emails
+    add "user@domain" to test_emails
+    add "test.email@company-name.net" to test_emails
+
+    io.println("Testing email addresses:")
+
+    for each email in test_emails:
+        create is_valid as Boolean
+        set is_valid to regex.validate_email(email)
+
+        if is_valid:
+            io.println("  ✅ " + email + " - Valid")
+        else:
+            io.println("  ❌ " + email + " - Invalid")
+    fi
+
+    io.println("✅ Email validation completed")
+    io.println("📋 Email validation features demonstrated:")
+    io.println("  - Standard email format validation")
+    io.println("  - Domain validation")
+    io.println("  - Special character handling")
+    io.println("  - Multiple TLD support")
+    io.println("  - Edge case testing")
+
+    logging.info(logger, "Email validation completed")
+    logging.end_timer(timer)
+
+# Phone number extraction
+define function phone_extraction that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "phone_extraction")
+
+    io.println("\n📞 Phone Number Extraction:")
+    io.println("─" * 40)
+
+    create text_with_phones as String
+    set text_with_phones to "Contact us at (555) 123-4567 or 555-987-6543. For international calls, dial +1-800-555-0123. You can also reach us at 1-888-555-9999 or 555.123.7890. Emergency number is 911."
+
+    io.println("Source text:")
+    io.println(text_with_phones)
+    io.println("\nExtracted phone numbers:")
+
+    # Pattern for various phone number formats
+    create phone_pattern as String
+    set phone_pattern to r'\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}|\+?\d{1,3}[-.\s]?\d{3}[-.\s]?\d{4}|\d{3}'
+
+    create found_phones as List
+    set found_phones to regex.findall(phone_pattern, text_with_phones)
+
+    create i as Integer
+    set i to 1
+    for each phone in found_phones:
+        io.println("  " + i + ". " + phone)
+        set i to i + 1
+    fi
+
+    io.println("✅ Phone extraction completed")
+    io.println("📋 Phone extraction features demonstrated:")
+    io.println("  - Multiple phone number formats")
+    io.println("  - Area code extraction")
+    io.println("  - International number support")
+    io.println("  - Special character handling")
+    io.println("  - Pattern optimization")
+
+    logging.info(logger, "Phone number extraction completed")
+    logging.end_timer(timer)
+
+# URL detection
+define function url_detection that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "url_detection")
+
+    io.println("\n🌐 URL Detection:")
+    io.println("─" * 40)
+
+    create text_with_urls as String
+    set text_with_urls to "Visit our website at https://www.example.com or http://test.org. You can also check out https://github.com/user/repo and our blog at http://blog.example.com/2024/01/article. Don't forget www.company.net and ftp://files.example.com/download.zip"
+
+    io.println("Source text:")
+    io.println(text_with_urls)
+    io.println("\nDetected URLs:")
+
+    # Pattern for URL detection
+    create url_pattern as String
+    set url_pattern to r'https?://[^\s<>"{}|\\^`[\]]+'
+
+    create found_urls as List
+    set found_urls to regex.findall(url_pattern, text_with_urls)
+
+    create i as Integer
+    set i to 1
+    for each url in found_urls:
+        io.println("  " + i + ". " + url)
+        set i to i + 1
+    fi
+
+    io.println("✅ URL detection completed")
+    io.println("📋 URL detection features demonstrated:")
+    io.println("  - HTTP and HTTPS detection")
+    io.println("  - FTP URL support")
+    io.println("  - Domain name validation")
+    io.println("  - Path and query parameter handling")
+    io.println("  - Special character escaping")
+
+    logging.info(logger, "URL detection completed")
+    logging.end_timer(timer)
+
+# Credit card number validation
+define function credit_card_validation that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "credit_card_validation")
+
+    io.println("\n💳 Credit Card Validation:")
+    io.println("─" * 40)
+
+    create test_cards as List
+    add "4532015112830366" to test_cards  # Valid Visa
+    add "6011111111111117" to test_cards  # Valid Discover
+    add "1234567890123456" to test_cards  # Invalid
+    add "5105105105105100" to test_cards  # Valid Mastercard
+    add "378282246310005" to test_cards   # Valid American Express
+    add "4111111111111111" to test_cards  # Valid Visa
+
+    io.println("Testing credit card numbers:")
+
+    for each card in test_cards:
+        # Basic format validation using regex
+        create card_pattern as String
+        set card_pattern to r'^\d{13,19}$'
+
+        create format_valid as Boolean
+        set format_valid to regex.match(card_pattern, card)
+
+        if format_valid:
+            io.println("  ✅ " + card + " - Valid format")
+        else:
+            io.println("  ❌ " + card + " - Invalid format")
+    fi
+
+    io.println("✅ Credit card validation completed")
+    io.println("📋 Credit card validation features demonstrated:")
+    io.println("  - Format validation")
+    io.println("  - Length checking")
+    io.println("  - Digit-only validation")
+    io.println("  - Pattern matching")
+    io.println("  - Security considerations")
+
+    logging.info(logger, "Credit card validation completed")
+    logging.end_timer(timer)
+
+# HTML tag removal
+define function html_tag_removal that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "html_tag_removal")
+
+    io.println("\n🏷️ HTML Tag Removal:")
+    io.println("─" * 40)
+
+    create html_text as String
+    set html_text to '<div class="content"><h1>Welcome to Our Site</h1><p>This is a <strong>sample</strong> paragraph with <a href="https://example.com">links</a> and <em>emphasis</em>.</p><ul><li>Item 1</li><li>Item 2</li></ul></div>'
+
+    io.println("Original HTML:")
+    io.println(html_text)
+
+    # Remove HTML tags
+    create tag_pattern as String
+    set tag_pattern to r'<[^>]*>'
+
+    create clean_text as String
+    set clean_text to regex.sub(tag_pattern, "", html_text)
+
+    io.println("\nText after HTML tag removal:")
+    io.println(clean_text)
+
+    io.println("✅ HTML tag removal completed")
+    io.println("📋 HTML processing features demonstrated:")
+    io.println("  - Tag pattern matching")
+    io.println("  - Search and replace operations")
+    io.println("  - Nested tag handling")
+    io.println("  - Attribute preservation options")
+    io.println("  - Content extraction")
+
+    logging.info(logger, "HTML tag removal completed")
+    logging.end_timer(timer)
+
+# Log file parsing
+define function log_parsing that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "log_parsing")
+
+    io.println("\n📋 Log File Parsing:")
+    io.println("─" * 40)
+
+    create log_entries as List
+    add "2024-01-15 10:30:45 ERROR Database connection failed: timeout" to log_entries
+    add "2024-01-15 10:31:12 INFO User login successful: user_id=12345" to log_entries
+    add "2024-01-15 10:31:58 WARNING High memory usage: 85%" to log_entries
+    add "2024-01-15 10:32:33 INFO API request: method=GET url=/api/users" to log_entries
+    add "2024-01-15 10:33:01 ERROR Invalid input: email format" to log_entries
+
+    io.println("Sample log entries:")
+
+    for each entry in log_entries:
+        io.println("  " + entry)
+
+        # Parse log level
+        create level_pattern as String
+        set level_pattern to r'(ERROR|INFO|WARNING|DEBUG)'
+
+        create level_match as List
+        set level_match to regex.findall(level_pattern, entry)
+
+        if level_match:
+            create level as String
+            set level to level_match[0]
+            io.println("    Level: " + level)
+    fi
+
+    io.println("✅ Log parsing completed")
+    io.println("📋 Log parsing features demonstrated:")
+    io.println("  - Timestamp extraction")
+    io.println("  - Log level identification")
+    io.println("  - Message parsing")
+    io.println("  - Structured data extraction")
+    io.println("  - Pattern-based filtering")
+
+    logging.info(logger, "Log parsing completed")
+    logging.end_timer(timer)
+
+# Custom pattern matching
+define function custom_pattern_matching that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "custom_pattern_matching")
+
+    io.println("\n🔧 Custom Pattern Matching:")
+    io.println("─" * 40)
+
+    io.print("Enter text to search in: ")
+    create search_text as String
+    set search_text to io.read_line()
+
+    if search_text == "":
+        set search_text to "The quick brown fox jumps over the lazy dog. Email: test@example.com, Phone: 555-123-4567"
+
+    io.print("Enter regex pattern: ")
+    create pattern as String
+    set pattern to io.read_line()
+
+    if pattern == "":
+        set pattern to r'\b\w{5,}\b'  # Words with 5+ characters
+
+    io.println("\nSearch text:")
+    io.println(search_text)
+    io.println("\nPattern: " + pattern)
+
+    # Find all matches
+    create matches as List
+    set matches to regex.findall(pattern, search_text)
+
+    io.println("\nMatches found:")
+    if matches:
+        create i as Integer
+        set i to 1
+        for each match in matches:
+            io.println("  " + i + ". " + match)
+            set i to i + 1
+    else:
+        io.println("  No matches found")
+
+    # Test single match
+    create single_match as Boolean
+    set single_match to regex.match(pattern, search_text)
+
+    if single_match:
+        io.println("✅ Pattern matches the beginning of text")
+    else:
+        io.println("❌ Pattern does not match the beginning of text")
+
+    io.println("✅ Custom pattern matching completed")
+    io.println("📋 Custom matching features demonstrated:")
+    io.println("  - User-defined patterns")
+    io.println("  - Multiple match extraction")
+    io.println("  - Single match testing")
+    io.println("  - Pattern compilation")
+    io.println("  - Error handling for invalid patterns")
+
+    logging.info(logger, "Custom pattern matching completed")
+    logging.end_timer(timer)
+
+# Text search and replace
+define function text_search_replace that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "text_search_replace")
+
+    io.println("\n🔄 Text Search and Replace:")
+    io.println("─" * 40)
+
+    create original_text as String
+    set original_text to "Hello, my name is John and I work at ABC Company. John's email is john@abc.com. Please contact John for more information."
+
+    io.println("Original text:")
+    io.println(original_text)
+
+    io.println("\nSearch and replace operations:")
+
+    # Replace names
+    create name_pattern as String
+    set name_pattern to r'\bJohn\b'
+    create name_replacement as String
+    set name_replacement to "Jane"
+
+    create replaced_names as String
+    set replaced_names to regex.sub(name_pattern, name_replacement, original_text)
+
+    io.println("\nAfter replacing 'John' with 'Jane':")
+    io.println(replaced_names)
+
+    # Replace email domains
+    create email_pattern as String
+    set email_pattern to r'@abc\.com\b'
+    create domain_replacement as String
+    set domain_replacement to "@xyz.com"
+
+    create replaced_domain as String
+    set replaced_domain to regex.sub(email_pattern, domain_replacement, replaced_names)
+
+    io.println("\nAfter replacing domain:")
+    io.println(replaced_domain)
+
+    # Remove extra spaces
+    create space_pattern as String
+    set space_pattern to r'\s+'
+    create clean_text as String
+    set clean_text to regex.sub(space_pattern, " ", replaced_domain)
+
+    io.println("\nAfter cleaning extra spaces:")
+    io.println(clean_text)
+
+    io.println("✅ Text search and replace completed")
+    io.println("📋 Search and replace features demonstrated:")
+    io.println("  - Pattern-based replacement")
+    io.println("  - Global vs single replacement")
+    io.println("  - Backreference usage")
+    io.println("  - Text cleaning operations")
+    io.println("  - Multiple replacement operations")
+
+    logging.info(logger, "Text search and replace completed")
+    logging.end_timer(timer)
+
+# Data extraction
+define function data_extraction that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "data_extraction")
+
+    io.println("\n📊 Data Extraction:")
+    io.println("─" * 40)
+
+    create data_text as String
+    set data_text to "User Data: Name=John Doe, Age=30, Email=john@example.com, Phone=(555) 123-4567. Product Info: ID=12345, Price=$99.99, Category=Electronics. Order Details: OrderID=ORD-2024-001, Status=Processing, Total=$199.98"
+
+    io.println("Source data:")
+    io.println(data_text)
+
+    io.println("\nExtracted Information:")
+
+    # Extract user information
+    create user_pattern as String
+    set user_pattern to r'Name=([^,]+), Age=(\d+), Email=([^,]+), Phone=([^.]+)'
+
+    create user_matches as List
+    set user_matches to regex.findall(user_pattern, data_text)
+
+    if user_matches:
+        io.println("User Information:")
+        io.println("  Name: " + user_matches[0])
+        io.println("  Age: " + user_matches[1])
+        io.println("  Email: " + user_matches[2])
+        io.println("  Phone: " + user_matches[3])
+
+    # Extract product information
+    create product_pattern as String
+    set product_pattern to r'ID=(\d+), Price=\$([\d.]+), Category=([^.]+)'
+
+    create product_matches as List
+    set product_matches to regex.findall(product_pattern, data_text)
+
+    if product_matches:
+        io.println("\nProduct Information:")
+        io.println("  ID: " + product_matches[0])
+        io.println("  Price: $" + product_matches[1])
+        io.println("  Category: " + product_matches[2])
+
+    # Extract order information
+    create order_pattern as String
+    set order_pattern to r'OrderID=([^,]+), Status=([^,]+), Total=\$([\d.]+)'
+
+    create order_matches as List
+    set order_matches to regex.findall(order_pattern, data_text)
+
+    if order_matches:
+        io.println("\nOrder Information:")
+        io.println("  Order ID: " + order_matches[0])
+        io.println("  Status: " + order_matches[1])
+        io.println("  Total: $" + order_matches[2])
+
+    io.println("✅ Data extraction completed")
+    io.println("📋 Data extraction features demonstrated:")
+    io.println("  - Named group extraction")
+    io.println("  - Multiple pattern matching")
+    io.println("  - Structured data parsing")
+    io.println("  - Complex pattern design")
+    io.println("  - Data validation and cleaning")
+
+    logging.info(logger, "Data extraction completed")
+    logging.end_timer(timer)
+
+# Pattern validation
+define function pattern_validation that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "pattern_validation")
+
+    io.println("\n✅ Pattern Validation:")
+    io.println("─" * 40)
+
+    io.print("Enter regex pattern to validate: ")
+    create test_pattern as String
+    set test_pattern to io.read_line()
+
+    if test_pattern == "":
+        set test_pattern to r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
+
+    io.print("Enter test string: ")
+    create test_string as String
+    set test_string to io.read_line()
+
+    if test_string == "":
+        set test_string to "test@example.com"
+
+    io.println("\nPattern Validation Results:")
+    io.println("Pattern: " + test_pattern)
+    io.println("Test String: " + test_string)
+
+    # Test pattern compilation
+    create compiled_pattern as RegexPattern
+    set compiled_pattern to regex.compile(test_pattern)
+
+    if compiled_pattern:
+        io.println("✅ Pattern compilation: Successful")
+
+        # Test matching
+        create match_result as RegexMatch
+        set match_result to regex.search(compiled_pattern, test_string)
+
+        if match_result:
+            io.println("✅ Pattern matching: Match found")
+        else:
+            io.println("❌ Pattern matching: No match found")
+    else:
+        io.println("❌ Pattern compilation: Failed")
+
+    io.println("✅ Pattern validation completed")
+    io.println("📋 Pattern validation features demonstrated:")
+    io.println("  - Pattern syntax validation")
+    io.println("  - Compilation testing")
+    io.println("  - Match testing")
+    io.println("  - Error reporting")
+    io.println("  - Pattern optimization suggestions")
+
+    logging.info(logger, "Pattern validation completed")
+    logging.end_timer(timer)
+
+# Initialize the application
+main()

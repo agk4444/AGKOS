@@ -1,0 +1,700 @@
+# AGK Logging Template - Structured Logging Framework
+# This template demonstrates comprehensive logging capabilities
+# Perfect for: Application monitoring, debugging, audit trails, system diagnostics
+
+import logging
+import io
+import json
+
+# Global configuration
+define constant LOG_FILENAME as String = "application.log"
+define constant ERROR_LOG_FILENAME as String = "errors.log"
+define constant PERFORMANCE_LOG_FILENAME as String = "performance.log"
+define constant AUDIT_LOG_FILENAME as String = "audit.log"
+
+# Main application entry point
+define function main:
+    # Initialize logging for the logging demonstration application
+    create logger as Logger
+    set logger to logging.get_logger("Logging_Demo")
+    logging.set_level(logger, logging.INFO)
+    logging.add_console_handler(logger)
+
+    logging.info(logger, "Starting Logging Framework Demonstration")
+
+    # Run the main application loop
+    run_logging_application_loop(logger)
+
+# Main application loop with menu-driven interface
+define function run_logging_application_loop that takes logger as Logger:
+    create running as Boolean
+    set running to true
+
+    while running:
+        io.println("\n📝 Logging Framework - Comprehensive Logging")
+        io.println("1. Basic Logging Operations")
+        io.println("2. Multiple Log Levels")
+        io.println("3. Structured Logging")
+        io.println("4. Performance Logging")
+        io.println("5. Error Logging & Handling")
+        io.println("6. Security Audit Logging")
+        io.println("7. Log File Management")
+        io.println("8. Log Analysis & Statistics")
+        io.println("9. Custom Log Formatters")
+        io.println("10. Log Filtering & Search")
+        io.println("11. Remote Log Shipping")
+        io.println("12. Log Rotation & Archiving")
+        io.println("13. Exit")
+        io.print("Enter your choice (1-13): ")
+
+        create choice as String
+        set choice to io.read_line()
+
+        if choice == "1":
+            demonstrate_basic_logging(logger)
+        else if choice == "2":
+            demonstrate_log_levels(logger)
+        else if choice == "3":
+            demonstrate_structured_logging(logger)
+        else if choice == "4":
+            demonstrate_performance_logging(logger)
+        else if choice == "5":
+            demonstrate_error_logging(logger)
+        else if choice == "6":
+            demonstrate_audit_logging(logger)
+        else if choice == "7":
+            demonstrate_log_file_management(logger)
+        else if choice == "8":
+            demonstrate_log_analysis(logger)
+        else if choice == "9":
+            demonstrate_custom_formatters(logger)
+        else if choice == "10":
+            demonstrate_log_filtering(logger)
+        else if choice == "11":
+            demonstrate_remote_logging(logger)
+        else if choice == "12":
+            demonstrate_log_rotation(logger)
+        else if choice == "13":
+            set running to false
+            logging.info(logger, "Logging Framework demonstration shutting down")
+        else:
+            io.println("❌ Invalid choice. Please try again.")
+
+# Basic logging operations
+define function demonstrate_basic_logging that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "basic_logging_demo")
+
+    io.println("\n📝 Basic Logging Operations:")
+    io.println("─" * 40)
+
+    # Basic log messages
+    logging.debug(logger, "This is a debug message - detailed information for developers")
+    logging.info(logger, "This is an info message - general information about application flow")
+    logging.warning(logger, "This is a warning message - something unexpected but not critical")
+    logging.error(logger, "This is an error message - something went wrong but application continues")
+    logging.critical(logger, "This is a critical message - application may be unable to continue")
+
+    io.println("✅ Basic logging operations completed")
+    io.println("📋 Log levels demonstrated:")
+    io.println("  - DEBUG: Detailed development information")
+    io.println("  - INFO: General application information")
+    io.println("  - WARNING: Warning conditions")
+    io.println("  - ERROR: Error conditions")
+    io.println("  - CRITICAL: Critical error conditions")
+
+    logging.info(logger, "Basic logging demonstration completed")
+    logging.end_timer(timer)
+
+# Multiple log levels demonstration
+define function demonstrate_log_levels that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "log_levels_demo")
+
+    io.println("\n📊 Log Levels Demonstration:")
+    io.println("─" * 40)
+
+    # Create loggers with different levels
+    create debug_logger as Logger
+    set debug_logger to logging.get_logger("DebugLogger")
+    logging.set_level(debug_logger, logging.DEBUG)
+
+    create info_logger as Logger
+    set info_logger to logging.get_logger("InfoLogger")
+    logging.set_level(info_logger, logging.INFO)
+
+    create error_logger as Logger
+    set error_logger to logging.get_logger("ErrorLogger")
+    logging.set_level(error_logger, logging.ERROR)
+
+    # Log messages at different levels
+    logging.debug(debug_logger, "Debug: This will be logged")
+    logging.info(debug_logger, "Info: This will be logged")
+    logging.warning(debug_logger, "Warning: This will be logged")
+    logging.error(debug_logger, "Error: This will be logged")
+    logging.critical(debug_logger, "Critical: This will be logged")
+
+    logging.debug(info_logger, "Debug: This will NOT be logged")
+    logging.info(info_logger, "Info: This will be logged")
+    logging.warning(info_logger, "Warning: This will be logged")
+    logging.error(info_logger, "Error: This will be logged")
+    logging.critical(info_logger, "Critical: This will be logged")
+
+    logging.debug(error_logger, "Debug: This will NOT be logged")
+    logging.info(error_logger, "Info: This will NOT be logged")
+    logging.warning(error_logger, "Warning: This will NOT be logged")
+    logging.error(error_logger, "Error: This will be logged")
+    logging.critical(error_logger, "Critical: This will be logged")
+
+    io.println("✅ Log levels demonstration completed")
+    io.println("📋 Different log levels shown:")
+    io.println("  - DEBUG Logger: Shows all messages")
+    io.println("  - INFO Logger: Shows INFO and above")
+    io.println("  - ERROR Logger: Shows only ERROR and above")
+
+    logging.info(logger, "Log levels demonstration completed")
+    logging.end_timer(timer)
+
+# Structured logging demonstration
+define function demonstrate_structured_logging that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "structured_logging")
+
+    io.println("\n🏗️ Structured Logging:")
+    io.println("─" * 40)
+
+    # Create structured log data
+    create user_context as Object
+    set user_context["user_id"] to "12345"
+    set user_context["username"] to "john_doe"
+    set user_context["email"] to "john@example.com"
+    set user_context["role"] to "admin"
+    set user_context["ip_address"] to "192.168.1.100"
+
+    create request_context as Object
+    set request_context["method"] to "POST"
+    set request_context["url"] to "/api/users"
+    set request_context["user_agent"] to "Mozilla/5.0"
+    set request_context["response_time"] to 0.245
+    set request_context["status_code"] to 201
+
+    create error_context as Object
+    set error_context["error_code"] to "VALIDATION_ERROR"
+    set error_context["error_message"] to "Invalid email format"
+    set error_context["field"] to "email"
+    set error_context["input_value"] to "invalid-email"
+
+    # Log structured data
+    logging.info(logger, "User login successful", user_context)
+    logging.info(logger, "API request completed", request_context)
+    logging.warning(logger, "Validation failed", error_context)
+
+    io.println("✅ Structured logging completed")
+    io.println("📋 Structured logging features:")
+    io.println("  - User context information")
+    io.println("  - Request/Response data")
+    io.println("  - Error context and details")
+    io.println("  - Structured JSON format")
+    io.println("  - Searchable log fields")
+
+    logging.info(logger, "Structured logging demonstration completed")
+    logging.end_timer(timer)
+
+# Performance logging demonstration
+define function demonstrate_performance_logging that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "performance_logging")
+
+    io.println("\n⚡ Performance Logging:")
+    io.println("─" * 40)
+
+    # Simulate various operations with timing
+    create perf_logger as Logger
+    set perf_logger to logging.get_logger("Performance")
+
+    # Database operation timing
+    create db_timer as Timer
+    set db_timer to logging.start_timer(perf_logger, "database_query")
+    # Simulate database query
+    io.println("Executing database query...")
+    logging.end_timer(db_timer)
+
+    # File operation timing
+    create file_timer as Timer
+    set file_timer to logging.start_timer(perf_logger, "file_operation")
+    # Simulate file operation
+    io.println("Performing file operation...")
+    logging.end_timer(file_timer)
+
+    # Network operation timing
+    create network_timer as Timer
+    set network_timer to logging.start_timer(perf_logger, "network_request")
+    # Simulate network request
+    io.println("Making network request...")
+    logging.end_timer(network_timer)
+
+    # Memory usage logging
+    create memory_context as Object
+    set memory_context["memory_usage"] to "45.2 MB"
+    set memory_context["memory_peak"] to "67.8 MB"
+    set memory_context["memory_available"] to "8.2 GB"
+    logging.info(perf_logger, "Memory usage statistics", memory_context)
+
+    # CPU usage logging
+    create cpu_context as Object
+    set cpu_context["cpu_usage"] to "23.5%"
+    set cpu_context["cpu_cores"] to 8
+    set cpu_context["cpu_temperature"] to "65.2°C"
+    logging.info(perf_logger, "CPU usage statistics", cpu_context)
+
+    io.println("✅ Performance logging completed")
+    io.println("📋 Performance metrics logged:")
+    io.println("  - Database query execution time")
+    io.println("  - File operation performance")
+    io.println("  - Network request timing")
+    io.println("  - Memory usage statistics")
+    io.println("  - CPU usage monitoring")
+
+    logging.info(logger, "Performance logging demonstration completed")
+    logging.end_timer(timer)
+
+# Error logging and handling demonstration
+define function demonstrate_error_logging that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "error_logging")
+
+    io.println("\n🚨 Error Logging & Handling:")
+    io.println("─" * 40)
+
+    create error_logger as Logger
+    set error_logger to logging.get_logger("ErrorHandler")
+
+    # Different types of errors
+    create validation_error as Object
+    set validation_error["error_type"] to "VALIDATION_ERROR"
+    set validation_error["field"] to "email"
+    set validation_error["value"] to "invalid-email"
+    set validation_error["message"] to "Invalid email format"
+    set validation_error["severity"] to "LOW"
+    logging.error(error_logger, "Form validation failed", validation_error)
+
+    create database_error as Object
+    set database_error["error_type"] to "DATABASE_ERROR"
+    set database_error["operation"] to "INSERT"
+    set database_error["table"] to "users"
+    set database_error["sql_state"] to "23505"
+    set database_error["message"] to "Duplicate key value"
+    set database_error["severity"] to "MEDIUM"
+    logging.error(error_logger, "Database constraint violation", database_error)
+
+    create network_error as Object
+    set network_error["error_type"] to "NETWORK_ERROR"
+    set network_error["operation"] to "HTTP_GET"
+    set network_error["url"] to "https://api.example.com/data"
+    set network_error["status_code"] to 500
+    set network_error["response_time"] to 30.5
+    set network_error["message"] to "Internal server error"
+    set network_error["severity"] to "HIGH"
+    logging.error(error_logger, "Network request failed", network_error)
+
+    create security_error as Object
+    set security_error["error_type"] to "SECURITY_ERROR"
+    set security_error["event"] to "UNAUTHORIZED_ACCESS"
+    set security_error["user_id"] to "12345"
+    set security_error["ip_address"] to "10.0.0.5"
+    set security_error["resource"] to "/admin/panel"
+    set security_error["severity"] to "CRITICAL"
+    logging.critical(error_logger, "Security breach attempt", security_error)
+
+    io.println("✅ Error logging demonstration completed")
+    io.println("📋 Error types logged:")
+    io.println("  - Validation errors")
+    io.println("  - Database errors")
+    io.println("  - Network errors")
+    io.println("  - Security incidents")
+    io.println("  - Different severity levels")
+
+    logging.info(logger, "Error logging demonstration completed")
+    logging.end_timer(timer)
+
+# Security audit logging demonstration
+define function demonstrate_audit_logging that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "audit_logging")
+
+    io.println("\n🔒 Security Audit Logging:")
+    io.println("─" * 40)
+
+    create audit_logger as Logger
+    set audit_logger to logging.get_logger("SecurityAudit")
+
+    # User authentication events
+    create login_event as Object
+    set login_event["event_type"] to "USER_LOGIN"
+    set login_event["user_id"] to "12345"
+    set login_event["username"] to "john_doe"
+    set login_event["ip_address"] to "192.168.1.100"
+    set login_event["user_agent"] to "Chrome/91.0"
+    set login_event["success"] to true
+    set login_event["timestamp"] to "current_timestamp"
+    logging.info(audit_logger, "User authentication successful", login_event)
+
+    create failed_login_event as Object
+    set failed_login_event["event_type"] to "USER_LOGIN_FAILED"
+    set failed_login_event["username"] to "unknown_user"
+    set failed_login_event["ip_address"] to "10.0.0.5"
+    set failed_login_event["reason"] to "Invalid credentials"
+    set failed_login_event["attempt_count"] to 3
+    set failed_login_event["timestamp"] to "current_timestamp"
+    logging.warning(audit_logger, "Authentication failed", failed_login_event)
+
+    # Data access events
+    create data_access_event as Object
+    set data_access_event["event_type"] to "DATA_ACCESS"
+    set data_access_event["user_id"] to "12345"
+    set data_access_event["action"] to "READ"
+    set data_access_event["resource"] to "customer_database"
+    set data_access_event["records_accessed"] to 150
+    set data_access_event["timestamp"] to "current_timestamp"
+    logging.info(audit_logger, "Data access event", data_access_event)
+
+    create data_modification_event as Object
+    set data_modification_event["event_type"] to "DATA_MODIFICATION"
+    set data_modification_event["user_id"] to "12345"
+    set data_modification_event["action"] to "UPDATE"
+    set data_modification_event["resource"] to "user_profile"
+    set data_modification_event["fields_changed"] to "email, phone"
+    set data_modification_event["timestamp"] to "current_timestamp"
+    logging.info(audit_logger, "Data modification event", data_modification_event)
+
+    # System events
+    create system_event as Object
+    set system_event["event_type"] to "SYSTEM_ACCESS"
+    set system_event["user_id"] to "12345"
+    set system_event["action"] to "CONFIGURATION_CHANGE"
+    set system_event["setting"] to "security_level"
+    set system_event["old_value"] to "medium"
+    set system_event["new_value"] to "high"
+    set system_event["timestamp"] to "current_timestamp"
+    logging.info(audit_logger, "System configuration changed", system_event)
+
+    io.println("✅ Security audit logging completed")
+    io.println("📋 Audit events logged:")
+    io.println("  - User authentication events")
+    io.println("  - Data access tracking")
+    io.println("  - System configuration changes")
+    io.println("  - Security incident monitoring")
+
+    logging.info(logger, "Security audit logging demonstration completed")
+    logging.end_timer(timer)
+
+# Log file management demonstration
+define function demonstrate_log_file_management that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "log_file_management")
+
+    io.println("\n📁 Log File Management:")
+    io.println("─" * 40)
+
+    io.println("Current log files:")
+    io.println("  - application.log (main application logs)")
+    io.println("  - errors.log (error logs only)")
+    io.println("  - performance.log (performance metrics)")
+    io.println("  - audit.log (security audit logs)")
+
+    io.println("\nLog file operations demonstrated:")
+    io.println("  - Multiple log file handlers")
+    io.println("  - Log rotation and archiving")
+    io.println("  - Log compression")
+    io.println("  - Log cleanup and retention")
+
+    # Demonstrate different log handlers
+    create file_logger as Logger
+    set file_logger to logging.get_logger("FileLogger")
+    logging.add_file_handler(file_logger, LOG_FILENAME)
+
+    create error_logger as Logger
+    set error_logger to logging.get_logger("ErrorLogger")
+    logging.add_file_handler(error_logger, ERROR_LOG_FILENAME)
+
+    create perf_logger as Logger
+    set perf_logger to logging.get_logger("PerfLogger")
+    logging.add_file_handler(perf_logger, PERFORMANCE_LOG_FILENAME)
+
+    create audit_logger as Logger
+    set audit_logger to logging.get_logger("AuditLogger")
+    logging.add_file_handler(audit_logger, AUDIT_LOG_FILENAME)
+
+    # Write sample entries to each log file
+    logging.info(file_logger, "Sample application log entry")
+    logging.error(error_logger, "Sample error log entry")
+    logging.info(perf_logger, "Sample performance log entry")
+    logging.info(audit_logger, "Sample audit log entry")
+
+    io.println("✅ Log file management completed")
+    io.println("📋 Log management features:")
+    io.println("  - Multiple log file handlers")
+    io.println("  - Specialized log files")
+    io.println("  - Log rotation policies")
+    io.println("  - Log archiving and cleanup")
+
+    logging.info(logger, "Log file management demonstration completed")
+    logging.end_timer(timer)
+
+# Log analysis and statistics
+define function demonstrate_log_analysis that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "log_analysis")
+
+    io.println("\n📊 Log Analysis & Statistics:")
+    io.println("─" * 40)
+
+    # Simulate log analysis
+    create analysis_results as Object
+    set analysis_results["total_log_entries"] to 1250
+    set analysis_results["time_period"] to "24 hours"
+    set analysis_results["error_count"] to 12
+    set analysis_results["warning_count"] to 45
+    set analysis_results["info_count"] to 1193
+
+    create error_breakdown as Object
+    set error_breakdown["VALIDATION_ERROR"] to 5
+    set error_breakdown["DATABASE_ERROR"] to 3
+    set error_breakdown["NETWORK_ERROR"] to 4
+    set error_breakdown["SECURITY_ERROR"] to 0
+    set analysis_results["error_breakdown"] to error_breakdown
+
+    create top_users as Object
+    set top_users["john_doe"] to 156
+    set top_users["jane_smith"] to 89
+    set top_users["admin"] to 234
+    set analysis_results["top_active_users"] to top_users
+
+    create performance_stats as Object
+    set performance_stats["avg_response_time"] to "0.245s"
+    set performance_stats["max_response_time"] to "2.1s"
+    set performance_stats["min_response_time"] to "0.023s"
+    set performance_stats["requests_per_second"] to 45.2
+    set analysis_results["performance_stats"] to performance_stats
+
+    # Display analysis results
+    create json_results as String
+    set json_results to json.stringify(analysis_results, 2)
+    io.println("Log Analysis Results:")
+    io.println(json_results)
+
+    io.println("✅ Log analysis completed")
+    io.println("📋 Analysis features:")
+    io.println("  - Log entry counting and categorization")
+    io.println("  - Error type breakdown")
+    io.println("  - User activity tracking")
+    io.println("  - Performance metrics analysis")
+    io.println("  - Trend analysis and reporting")
+
+    logging.info(logger, "Log analysis demonstration completed")
+    logging.end_timer(timer)
+
+# Custom log formatters demonstration
+define function demonstrate_custom_formatters that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "custom_formatters")
+
+    io.println("\n🎨 Custom Log Formatters:")
+    io.println("─" * 40)
+
+    io.println("Custom formatting options:")
+    io.println("  1. JSON Format:")
+    io.println('     {"timestamp": "2024-01-15 10:30:45", "level": "INFO", "logger": "MyApp", "message": "User logged in", "user_id": "12345"}')
+
+    io.println("  2. Simple Format:")
+    io.println("     2024-01-15 10:30:45 INFO MyApp - User logged in")
+
+    io.println("  3. Detailed Format:")
+    io.println("     [2024-01-15 10:30:45] [INFO] [MyApp] [Thread-1] [user_id=12345] User logged in")
+
+    io.println("  4. Colored Format:")
+    io.println("     \x1b[32m2024-01-15 10:30:45 INFO MyApp - User logged in\x1b[0m")
+
+    io.println("  5. Structured Format:")
+    io.println("     timestamp=2024-01-15T10:30:45Z level=INFO logger=MyApp message='User logged in' user_id=12345")
+
+    # Demonstrate different formatters
+    create json_logger as Logger
+    set json_logger to logging.get_logger("JSONLogger")
+    logging.info(json_logger, "Sample JSON formatted log entry")
+
+    create simple_logger as Logger
+    set simple_logger to logging.get_logger("SimpleLogger")
+    logging.info(simple_logger, "Sample simple formatted log entry")
+
+    io.println("✅ Custom formatters demonstration completed")
+    io.println("📋 Formatter types demonstrated:")
+    io.println("  - JSON format for structured data")
+    io.println("  - Simple format for readability")
+    io.println("  - Detailed format for debugging")
+    io.println("  - Colored format for console output")
+    io.println("  - Structured format for log parsing")
+
+    logging.info(logger, "Custom formatters demonstration completed")
+    logging.end_timer(timer)
+
+# Log filtering and search demonstration
+define function demonstrate_log_filtering that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "log_filtering")
+
+    io.println("\n🔍 Log Filtering & Search:")
+    io.println("─" * 40)
+
+    io.println("Log filtering capabilities:")
+    io.println("  1. Filter by log level:")
+    io.println("     - Show only ERROR and CRITICAL messages")
+    io.println("     - Exclude DEBUG messages")
+
+    io.println("  2. Filter by logger name:")
+    io.println("     - Show only SecurityAudit logs")
+    io.println("     - Show only Performance logs")
+
+    io.println("  3. Filter by content:")
+    io.println("     - Search for 'user_id=12345'")
+    io.println("     - Find all database errors")
+
+    io.println("  4. Filter by time range:")
+    io.println("     - Show logs from last hour")
+    io.println("     - Show logs from specific date range")
+
+    io.println("  5. Complex filters:")
+    io.println("     - ERROR level AND SecurityAudit logger")
+    io.println("     - INFO level AND response_time > 1.0s")
+
+    # Simulate filtering operations
+    create filter_logger as Logger
+    set filter_logger to logging.get_logger("FilterDemo")
+
+    logging.debug(filter_logger, "Debug message (will be filtered out)")
+    logging.info(filter_logger, "Info message about user login", {"user_id": "12345"})
+    logging.warning(filter_logger, "Warning about slow response", {"response_time": "2.5s"})
+    logging.error(filter_logger, "Error in database connection", {"error_code": "DB001"})
+
+    io.println("✅ Log filtering demonstration completed")
+    io.println("📋 Filtering features demonstrated:")
+    io.println("  - Level-based filtering")
+    io.println("  - Logger-based filtering")
+    io.println("  - Content-based searching")
+    io.println("  - Time-based filtering")
+    io.println("  - Complex multi-condition filters")
+
+    logging.info(logger, "Log filtering demonstration completed")
+    logging.end_timer(timer)
+
+# Remote log shipping demonstration
+define function demonstrate_remote_logging that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "remote_logging")
+
+    io.println("\n📡 Remote Log Shipping:")
+    io.println("─" * 40)
+
+    io.println("Remote logging destinations:")
+    io.println("  1. Log Aggregation Services:")
+    io.println("     - ELK Stack (Elasticsearch, Logstash, Kibana)")
+    io.println("     - Splunk")
+    io.println("     - Graylog")
+    io.println("     - Papertrail")
+
+    io.println("  2. Cloud Logging Services:")
+    io.println("     - AWS CloudWatch")
+    io.println("     - Google Cloud Logging")
+    io.println("     - Azure Monitor")
+    io.println("     - Datadog")
+
+    io.println("  3. Protocol Support:")
+    io.println("     - TCP/UDP socket shipping")
+    io.println("     - HTTP/HTTPS API endpoints")
+    io.println("     - Message queues (Kafka, RabbitMQ)")
+    io.println("     - File-based shipping")
+
+    # Simulate remote log shipping
+    create remote_logger as Logger
+    set remote_logger to logging.get_logger("RemoteLogger")
+
+    create remote_context as Object
+    set remote_context["destination"] to "logstash.example.com:5044"
+    set remote_context["protocol"] to "TCP"
+    set remote_context["compressed"] to true
+    set remote_context["batch_size"] to 100
+    set remote_context["retry_count"] to 3
+
+    logging.info(remote_logger, "Remote log shipping configured", remote_context)
+    logging.info(remote_logger, "Sample log entry for remote shipping", {"user_id": "12345", "action": "LOGIN"})
+
+    io.println("✅ Remote logging demonstration completed")
+    io.println("📋 Remote logging features:")
+    io.println("  - Multiple destination support")
+    io.println("  - Various transport protocols")
+    io.println("  - Log compression and batching")
+    io.println("  - Retry logic and error handling")
+    io.println("  - SSL/TLS encryption support")
+
+    logging.info(logger, "Remote logging demonstration completed")
+    logging.end_timer(timer)
+
+# Log rotation and archiving demonstration
+define function demonstrate_log_rotation that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "log_rotation")
+
+    io.println("\n🔄 Log Rotation & Archiving:")
+    io.println("─" * 40)
+
+    io.println("Log rotation strategies:")
+    io.println("  1. Size-based rotation:")
+    io.println("     - Rotate when file reaches 10MB")
+    io.println("     - Keep 5 backup files")
+    io.println("     - Compress old files")
+
+    io.println("  2. Time-based rotation:")
+    io.println("     - Rotate daily at midnight")
+    io.println("     - Rotate weekly on Sunday")
+    io.println("     - Rotate monthly on 1st")
+
+    io.println("  3. Hybrid rotation:")
+    io.println("     - Rotate when size > 50MB OR daily")
+    io.println("     - Smart rotation based on activity")
+
+    io.println("  4. Archiving options:")
+    io.println("     - Compress rotated files (gzip)")
+    io.println("     - Move to archive directory")
+    io.println("     - Upload to cloud storage")
+    io.println("     - Delete files older than 90 days")
+
+    # Simulate rotation process
+    create rotation_logger as Logger
+    set rotation_logger to logging.get_logger("RotationDemo")
+
+    logging.info(rotation_logger, "Log rotation process started")
+    logging.info(rotation_logger, "Current log file size: 8.5 MB")
+    logging.info(rotation_logger, "Rotation threshold: 10 MB")
+    logging.info(rotation_logger, "Backup files to keep: 5")
+    logging.info(rotation_logger, "Compression: Enabled (gzip)")
+
+    # Simulate rotation
+    logging.info(rotation_logger, "Rotating log file: application.log -> application.log.1")
+    logging.info(rotation_logger, "Compressing: application.log.1 -> application.log.1.gz")
+    logging.info(rotation_logger, "Creating new log file: application.log")
+    logging.info(rotation_logger, "Cleaning up old files: Deleting application.log.6.gz")
+    logging.info(rotation_logger, "Log rotation completed successfully")
+
+    io.println("✅ Log rotation demonstration completed")
+    io.println("📋 Rotation features demonstrated:")
+    io.println("  - Size-based rotation")
+    io.println("  - Time-based rotation")
+    io.println("  - File compression")
+    io.println("  - Archive cleanup")
+    io.println("  - Backup retention policies")
+
+    logging.info(logger, "Log rotation demonstration completed")
+    logging.end_timer(timer)
+
+# Initialize the application
+main()
