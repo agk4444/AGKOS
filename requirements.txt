@@ -1,4 +1,4 @@
 PyInstaller>=4.0
 nuitka>=1.8.0
 requests>=2.25.0
-sqlite3
+cryptography>=3.4.0

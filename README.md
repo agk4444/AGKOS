@@ -552,14 +552,28 @@ pyinstaller --onefile --name agk_compiler agk_compiler.py
 ```
 
 #### Option 2: Automated Build Script
+
+**Linux/macOS:**
 ```bash
-# Run the automated build script (Linux/macOS)
+# Run the automated build script
 ./make_standalone.sh
 
-# Or on Windows
+# Or run the Python build script directly
+python build_standalone.py
+```
+
+**Windows:**
+```cmd
+REM Using Command Prompt
+make_standalone.cmd
+
+REM Or using PowerShell
+.\make_standalone.ps1
+
+REM Or using Batch file (original)
 make_standalone.bat
 
-# Or run the Python build script directly
+REM Or run the Python build script directly
 python build_standalone.py
 ```
 

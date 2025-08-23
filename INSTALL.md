@@ -16,14 +16,22 @@ For creating standalone executables that don't require Python:
 
 ```bash
 # Install PyInstaller for single-executable builds
-pip install pyinstaller>=4.0
+pip install "PyInstaller>=4.0"
 
 # Install Nuitka for optimized native compilation
-pip install nuitka>=1.8.0
+pip install "nuitka>=1.8.0"
+
+# Install HTTP client for API features
+pip install "requests>=2.25.0"
+
+# Install cryptography for secure API key storage
+pip install "cryptography>=3.4.0"
 
 # Docker for containerized deployment
 # Install Docker Desktop from https://docker.com
 ```
+
+**Note:** All standalone build dependencies are included in `requirements.txt` for easy installation.
 
 ### Installation
 
@@ -53,18 +61,42 @@ The AGK compiler can be built as standalone executables that don't require Pytho
 
 1. **Install build dependencies:**
    ```bash
+   # Install all build requirements (PyInstaller, Nuitka, requests, cryptography)
    pip install -r requirements.txt
+
+   # Or install individually:
+   # pip install "PyInstaller>=4.0" "nuitka>=1.8.0" "requests>=2.25.0" "cryptography>=3.4.0"
    ```
 
+   **Required Dependencies:**
+   - **PyInstaller** (>=4.0): Creates single-executable files
+   - **Nuitka** (>=1.8.0): Optimized native compilation
+   - **requests** (>=2.25.0): HTTP client for API features
+   - **cryptography** (>=3.4.0): Secure API key storage
+
 2. **Build standalone executable:**
+
+   **Linux/macOS:**
    ```bash
-   # Linux/macOS
+   # Quick build script
    ./make_standalone.sh
 
-   # Windows
+   # Or run Python script directly
+   python build_standalone.py
+   ```
+
+   **Windows:**
+   ```cmd
+   REM Using Command Prompt
+   make_standalone.cmd
+
+   REM Or using PowerShell
+   .\make_standalone.ps1
+
+   REM Or using Batch file
    make_standalone.bat
 
-   # Or manually
+   REM Or run Python script directly
    python build_standalone.py
    ```
 
@@ -355,6 +387,10 @@ AGK_language/
 ├── agk_codegen.py       # Code generator
 ├── build_standalone.py   # Standalone executable build system
 ├── requirements.txt      # Build dependencies
+├── make_standalone.sh    # Linux/macOS build script
+├── make_standalone.bat   # Windows batch build script
+├── make_standalone.cmd   # Windows CMD build script
+├── make_standalone.ps1   # Windows PowerShell build script
 ├── make_standalone.sh    # Linux/macOS build script
 ├── make_standalone.bat   # Windows build script
 ├── simple_test.agk      # Simple example program
