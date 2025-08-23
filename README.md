@@ -608,6 +608,7 @@ AGK_language/
 ├── web_app_template.agk       # Web application template
 ├── server_api_template.agk    # Server/API template
 ├── mobile_app_template.agk    # Mobile application template
+├── llm_template.agk           # AI-powered application template
 ├── APP_TEMPLATES_README.md    # Templates usage guide
 ├── app.py                     # Flask demo for web template
 └── templates/                 # HTML templates directory
@@ -703,7 +704,7 @@ The AGK Language Compiler now supports:
 
 ## 🎯 Application Templates
 
-AGK includes **4 professional application templates** to help you get started quickly:
+AGK includes **5 professional application templates** to help you get started quickly:
 
 ### Desktop Application Template
 **File:** `desktop_app_template.agk`
@@ -752,6 +753,23 @@ Features:
 - User data management
 - Settings and preferences
 
+### LLM AI Application Template
+**File:** `llm_template.agk`
+**Perfect for:** AI assistants, code generators, content creators, educational tools, chatbots
+
+Features:
+- Code generation with multiple programming languages
+- Code explanation and analysis
+- Text summarization and content processing
+- Language translation capabilities
+- Interactive conversation mode with context
+- AI-powered code review and suggestions
+- Creative writing assistance
+- Response caching for performance optimization
+- Comprehensive error handling and retry logic
+- Performance timing and logging
+- Menu-driven interface for easy navigation
+
 ### Getting Started with Templates
 
 ```bash
@@ -763,6 +781,8 @@ cp web_app_template.agk my_webapp.agk
 cp server_api_template.agk my_api.agk
 # or
 cp mobile_app_template.agk my_mobile_app.agk
+# or
+cp llm_template.agk my_ai_assistant.agk
 
 # 2. Customize the template for your needs
 # Edit configuration, add features, modify logic
@@ -777,6 +797,7 @@ python agk_compiler.py my_game.agk
 - ✅ **Cross-Platform**: Works on desktop, web, and mobile
 - ✅ **Educational Value**: Learn AGK development patterns
 - ✅ **Extensible**: Easy to customize and expand
+- ✅ **AI Integration**: Built-in LLM support for intelligent applications
 
 **📖 For detailed usage instructions, see `APP_TEMPLATES_README.md`**
 
