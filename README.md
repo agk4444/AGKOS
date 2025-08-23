@@ -523,14 +523,77 @@ game.start_game_loop(engine)
 ### Quick Start
 ```bash
 # Clone the repository
-git clone https://github.com/hnethery/zen-mcp-modified.git
-cd zen-mcp-modified
+git clone https://github.com/agk4444/AGKCompiler.git
+cd AGKCompiler
 
 # Compile AGK code
 python agk_compiler.py your_program.agk
 
 # Start interactive REPL
 python agk_compiler.py --repl
+```
+
+## 🚀 Standalone Executable (No Python Required)
+
+The AGK compiler can be built as a standalone executable that runs without requiring Python to be installed on the target system.
+
+### Build Options
+
+#### Option 1: PyInstaller (Single Executable)
+```bash
+# Install PyInstaller
+pip install pyinstaller
+
+# Create standalone executable
+pyinstaller --onefile --name agk_compiler agk_compiler.py
+
+# Run without Python
+./dist/agk_compiler your_program.agk
+```
+
+#### Option 2: Automated Build Script
+```bash
+# Run the automated build script (Linux/macOS)
+./make_standalone.sh
+
+# Or on Windows
+make_standalone.bat
+
+# Or run the Python build script directly
+python build_standalone.py
+```
+
+#### Option 3: Docker Container
+```bash
+# Build Docker image
+docker build -f Dockerfile.standalone -t agk-compiler .
+
+# Run compiler
+docker run -v $(pwd):/app/workspace agk-compiler your_program.agk
+```
+
+### Build Script Features
+
+The `build_standalone.py` script provides multiple build options:
+
+- **PyInstaller**: Single executable file
+- **Nuitka**: Optimized native compilation
+- **Docker**: Containerized deployment
+- **Platform Installers**: Native packages for Windows/macOS/Linux
+- **Web Version**: Browser-based compiler using Pyodide
+
+### Quick Build Commands
+
+```bash
+# Linux/macOS
+chmod +x make_standalone.sh
+./make_standalone.sh
+
+# Windows
+make_standalone.bat
+
+# Manual build
+python build_standalone.py
 ```
 
 ### Docker Support
@@ -541,6 +604,51 @@ docker build -t agk-compiler .
 # Compile with Docker
 docker run --rm -v $(pwd):/app/workspace agk-compiler python agk_compiler.py workspace/your_program.agk
 ```
+
+## 📦 Distribution & Deployment
+
+### Standalone Executables
+
+The AGK compiler can be distributed as standalone executables for different platforms:
+
+#### Windows
+- **PyInstaller**: `agk_compiler.exe` (single executable)
+- **Nuitka**: `agk_compiler.exe` (optimized native)
+- **Installer**: `install_windows.bat` (adds to PATH)
+
+#### macOS
+- **PyInstaller**: `agk_compiler` (single executable)
+- **Nuitka**: `agk_compiler` (optimized native)
+- **Installer**: `install_macos.sh` (installs to /usr/local/bin)
+
+#### Linux
+- **PyInstaller**: `agk_compiler` (single executable)
+- **Nuitka**: `agk_compiler` (optimized native)
+- **Installer**: `install_linux.sh` (installs to /usr/local/bin)
+
+### Docker Deployment
+```bash
+# Build standalone Docker image
+docker build -f Dockerfile.standalone -t agk-compiler-standalone .
+
+# Run anywhere with Docker
+docker run -v $(pwd):/app/workspace agk-compiler-standalone your_file.agk
+```
+
+### Web Deployment
+```bash
+# Open web version in browser
+# Works in any modern web browser with JavaScript enabled
+agk_compiler_web.html
+```
+
+### Distribution Benefits
+
+- ✅ **No Python Required**: Users don't need to install Python
+- ✅ **Single File**: Easy to distribute and run
+- ✅ **Cross-Platform**: Works on Windows, macOS, and Linux
+- ✅ **Self-Contained**: All dependencies included
+- ✅ **Professional**: Looks like a native application
 
 ## Architecture
 
