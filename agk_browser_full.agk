@@ -1,0 +1,12 @@
+# AGK AGKCompiler stub for the browser project
+# This is a lightweight AGK-language version of the browser app for editing.
+# The working app is the Python implementation (agk_browser_full.py).
+
+import graphics
+import web
+
+define function main:
+    create window titled "AGK Browser (stub)" size 800 by 600
+    create label as info with text "This AGK file is a stub. Use the Python runtime for full functionality."
+    add info to window center
+    run application
