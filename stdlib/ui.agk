@@ -1,0 +1,659 @@
+# AGK UI Library
+# Advanced user interface components and form management
+# Provides comprehensive UI building blocks for desktop applications
+
+# Form Components
+define function create_text_field that takes placeholder as String and returns TextField:
+    # Create a text input field
+    create field as TextField
+    set field["placeholder"] to placeholder
+    set field["text"] to ""
+    set field["max_length"] to 0
+    set field["enabled"] to true
+    set field["visible"] to true
+
+    return field
+
+define function create_password_field that takes placeholder as String and returns PasswordField:
+    # Create a password input field
+    create field as PasswordField
+    set field["placeholder"] to placeholder
+    set field["text"] to ""
+    set field["max_length"] to 0
+    set field["enabled"] to true
+    set field["visible"] to true
+
+    return field
+
+define function create_text_area that takes placeholder as String, rows as Integer and returns TextArea:
+    # Create a multi-line text area
+    create area as TextArea
+    set area["placeholder"] to placeholder
+    set area["text"] to ""
+    set area["rows"] to rows
+    set area["max_length"] to 0
+    set area["enabled"] to true
+    set area["visible"] to true
+
+    return area
+
+define function create_button that takes text as String, action as String and returns Button:
+    # Create a clickable button
+    create button as Button
+    set button["text"] to text
+    set button["action"] to action
+    set button["enabled"] to true
+    set button["visible"] to true
+    set button["width"] to 100
+    set button["height"] to 30
+
+    return button
+
+define function create_checkbox that takes label as String, checked as Boolean and returns Checkbox:
+    # Create a checkbox with label
+    create checkbox as Checkbox
+    set checkbox["label"] to label
+    set checkbox["checked"] to checked
+    set checkbox["enabled"] to true
+    set checkbox["visible"] to true
+
+    return checkbox
+
+define function create_radio_button that takes label as String, group as String, selected as Boolean and returns RadioButton:
+    # Create a radio button in a group
+    create radio as RadioButton
+    set radio["label"] to label
+    set radio["group"] to group
+    set radio["selected"] to selected
+    set radio["enabled"] to true
+    set radio["visible"] to true
+
+    return radio
+
+define function create_dropdown that takes options as List, selected_index as Integer and returns Dropdown:
+    # Create a dropdown/select component
+    create dropdown as Dropdown
+    set dropdown["options"] to options
+    set dropdown["selected_index"] to selected_index
+    set dropdown["enabled"] to true
+    set dropdown["visible"] to true
+
+    return dropdown
+
+define function create_label that takes text as String and returns Label:
+    # Create a text label
+    create label as Label
+    set label["text"] to text
+    set label["enabled"] to true
+    set label["visible"] to true
+
+    return label
+
+# Form Management
+define function create_form that takes title as String, width as Integer, height as Integer and returns Form:
+    # Create a new form window
+    create form as Form
+    set form["title"] to title
+    set form["width"] to width
+    set form["height"] to height
+    set form["components"] to []
+    set form["layout"] to "vertical"
+    set form["modal"] to false
+
+    return form
+
+define function add_to_form that takes form as Form, component as Object:
+    # Add component to form
+    add component to form["components"]
+
+define function create_form_layout and returns FormLayout:
+    # Create a form layout manager
+    create layout as FormLayout
+    set layout["rows"] to []
+    set layout["spacing"] to 10
+
+    return layout
+
+define function add_form_row that takes layout as FormLayout, label as String, component as Object:
+    # Add a labeled row to form layout
+    create row as Object
+    set row["label"] to label
+    set row["component"] to component
+    add row to layout["rows"]
+
+# Dialog Management
+define function show_message_dialog that takes title as String, message as String, dialog_type as String:
+    # Show a message dialog
+    # dialog_type: "info", "warning", "error", "question"
+    # In implementation: graphics.show_message_dialog(title, message, dialog_type)
+
+define function show_confirmation_dialog that takes title as String, message as String and returns Boolean:
+    # Show a yes/no confirmation dialog
+    # In implementation: return graphics.show_confirmation_dialog(title, message)
+    return true  # Placeholder
+
+define function show_input_dialog that takes title as String, message as String, default_value as String and returns String:
+    # Show an input dialog
+    # In implementation: return graphics.show_input_dialog(title, message, default_value)
+    return default_value  # Placeholder
+
+define function create_custom_dialog that takes title as String, width as Integer, height as Integer and returns Dialog:
+    # Create a custom dialog window
+    create dialog as Dialog
+    set dialog["title"] to title
+    set dialog["width"] to width
+    set dialog["height"] to height
+    set dialog["components"] to []
+    set dialog["buttons"] to []
+
+    return dialog
+
+define function add_dialog_button that takes dialog as Dialog, text as String, action as String and returns Button:
+    # Add a button to dialog
+    create button as Button
+    set button["text"] to text
+    set button["action"] to action
+    add button to dialog["buttons"]
+
+    return button
+
+# Component State Management
+define function set_text_field_text that takes field as TextField, text as String:
+    # Set text field value
+    set field["text"] to text
+
+define function get_text_field_text that takes field as TextField and returns String:
+    # Get text field value
+    return field["text"]
+
+define function set_button_enabled that takes button as Button, enabled as Boolean:
+    # Enable/disable button
+    set button["enabled"] to enabled
+
+define function set_checkbox_checked that takes checkbox as Checkbox, checked as Boolean:
+    # Set checkbox state
+    set checkbox["checked"] to checked
+
+define function get_checkbox_checked that takes checkbox as Checkbox and returns Boolean:
+    # Get checkbox state
+    return checkbox["checked"]
+
+define function set_dropdown_selection that takes dropdown as Dropdown, index as Integer:
+    # Set dropdown selection
+    set dropdown["selected_index"] to index
+
+define function get_dropdown_selection that takes dropdown as Dropdown and returns Integer:
+    # Get dropdown selection index
+    return dropdown["selected_index"]
+
+define function get_dropdown_selected_text that takes dropdown as Dropdown and returns String:
+    # Get selected dropdown text
+    create index as Integer
+    set index to get_dropdown_selection(dropdown)
+
+    if index >= 0 and index < dropdown["options"] length:
+        return dropdown["options"][index]
+    else:
+        return ""
+
+# Form Validation
+define function add_validation_rule that takes field as TextField, rule as String, error_message as String:
+    # Add validation rule to field
+    if not object.has_key(field, "validation_rules"):
+        set field["validation_rules"] to []
+
+    create validation_rule as Object
+    set validation_rule["rule"] to rule
+    set validation_rule["error_message"] to error_message
+    add validation_rule to field["validation_rules"]
+
+define function validate_field that takes field as TextField and returns ValidationResult:
+    # Validate a single field
+    create result as ValidationResult
+    set result["valid"] to true
+    set result["errors"] to []
+
+    create text as String
+    set text to get_text_field_text(field)
+
+    if object.has_key(field, "validation_rules"):
+        create rules as List
+        set rules to field["validation_rules"]
+
+        create i as Integer
+        set i to 0
+        while i < rules length:
+            create rule as Object
+            set rule to rules[i]
+            create rule_type as String
+            set rule_type to rule["rule"]
+
+            if not validate_rule(text, rule_type):
+                set result["valid"] to false
+                add rule["error_message"] to result["errors"]
+
+            set i to i + 1
+
+    return result
+
+define function validate_form that takes form as Form and returns ValidationResult:
+    # Validate entire form
+    create result as ValidationResult
+    set result["valid"] to true
+    set result["errors"] to []
+
+    create components as List
+    set components to form["components"]
+
+    create i as Integer
+    set i to 0
+    while i < components length:
+        create component as Object
+        set component to components[i]
+
+        # Check if component has validation
+        if object.has_key(component, "validation_rules"):
+            create field_result as ValidationResult
+            set field_result to validate_field(component)
+
+            if not field_result["valid"]:
+                set result["valid"] to false
+
+                # Add field errors to form errors
+                create j as Integer
+                set j to 0
+                while j < field_result["errors"] length:
+                    add field_result["errors"][j] to result["errors"]
+                    set j to j + 1
+
+        set i to i + 1
+
+    return result
+
+define function validate_rule that takes text as String, rule as String and returns Boolean:
+    # Validate text against a rule
+    if rule = "required":
+        return string.length(text) > 0
+    else if rule = "email":
+        return regex.validate_email(text)
+    else if rule = "number":
+        return is_number(text)
+    else if rule = "positive_number":
+        return is_number(text) and string.to_number(text) > 0
+    else if rule = "min_length":
+        return string.length(text) >= 3  # Default min length
+    else if rule = "max_length":
+        return string.length(text) <= 100  # Default max length
+    else:
+        return true  # Unknown rule, pass validation
+
+define function is_number that takes text as String and returns Boolean:
+    # Check if text is a valid number
+    # In implementation: try float(text); return True
+    return true  # Placeholder
+
+# Common UI Patterns
+define function create_login_form that returns Form:
+    # Create a standard login form
+    create form as Form
+    set form to create_form("Login", 300, 200)
+
+    create username_field as TextField
+    set username_field to create_text_field("Username")
+    add_validation_rule(username_field, "required", "Username is required")
+
+    create password_field as PasswordField
+    set password_field to create_password_field("Password")
+    add_validation_rule(password_field, "required", "Password is required")
+
+    create login_button as Button
+    set login_button to create_button("Login", "handle_login")
+
+    create cancel_button as Button
+    set cancel_button to create_button("Cancel", "handle_cancel")
+
+    add_to_form(form, username_field)
+    add_to_form(form, password_field)
+    add_to_form(form, login_button)
+    add_to_form(form, cancel_button)
+
+    return form
+
+define function create_settings_dialog that returns Dialog:
+    # Create a settings/preferences dialog
+    create dialog as Dialog
+    set dialog to create_custom_dialog("Settings", 400, 300)
+
+    create layout as FormLayout
+    set layout to create_form_layout()
+
+    create theme_dropdown as Dropdown
+    create themes as List
+    add "Light" to themes
+    add "Dark" to themes
+    add "System" to themes
+    set theme_dropdown to create_dropdown(themes, 0)
+
+    create notifications_checkbox as Checkbox
+    set notifications_checkbox to create_checkbox("Enable notifications", true)
+
+    create auto_save_checkbox as Checkbox
+    set auto_save_checkbox to create_checkbox("Auto-save files", true)
+
+    add_form_row(layout, "Theme:", theme_dropdown)
+    add_form_row(layout, "", notifications_checkbox)
+    add_form_row(layout, "", auto_save_checkbox)
+
+    add_to_dialog(dialog, layout)
+
+    create save_button as Button
+    set save_button to add_dialog_button(dialog, "Save", "handle_save_settings")
+
+    create cancel_button as Button
+    set cancel_button to add_dialog_button(dialog, "Cancel", "handle_cancel_settings")
+
+    return dialog
+
+define function create_file_save_dialog that takes default_filename as String and returns String:
+    # Show file save dialog
+    # In implementation: return graphics.show_save_dialog("Save File", default_filename)
+    return default_filename  # Placeholder
+
+define function create_file_open_dialog that takes file_types as String and returns String:
+    # Show file open dialog
+    # In implementation: return graphics.show_open_dialog("Open File", file_types)
+    return ""  # Placeholder
+
+# Progress and Status Indicators
+define function create_progress_bar that takes min_value as Integer, max_value as Integer and returns ProgressBar:
+    # Create a progress bar
+    create progress as ProgressBar
+    set progress["min"] to min_value
+    set progress["max"] to max_value
+    set progress["value"] to min_value
+    set progress["visible"] to true
+
+    return progress
+
+define function set_progress_value that takes progress as ProgressBar, value as Integer:
+    # Set progress bar value
+    if value < progress["min"]:
+        set progress["value"] to progress["min"]
+    else if value > progress["max"]:
+        set progress["value"] to progress["max"]
+    else:
+        set progress["value"] to value
+
+define function create_status_bar that returns StatusBar:
+    # Create a status bar
+    create status as StatusBar
+    set status["text"] to ""
+    set status["visible"] to true
+
+    return status
+
+define function set_status_text that takes status as StatusBar, text as String:
+    # Set status bar text
+    set status["text"] to text
+
+# Menu System
+define function create_menu_bar that returns MenuBar:
+    # Create a menu bar
+    create menubar as MenuBar
+    set menubar["menus"] to []
+
+    return menubar
+
+define function add_menu that takes menubar as MenuBar, title as String and returns Menu:
+    # Add menu to menu bar
+    create menu as Menu
+    set menu["title"] to title
+    set menu["items"] to []
+
+    add menu to menubar["menus"]
+
+    return menu
+
+define function add_menu_item that takes menu as Menu, text as String, action as String and returns MenuItem:
+    # Add item to menu
+    create item as MenuItem
+    set item["text"] to text
+    set item["action"] to action
+    set item["enabled"] to true
+
+    add item to menu["items"]
+
+    return item
+
+define function add_menu_separator that takes menu as Menu:
+    # Add separator to menu
+    create separator as MenuItem
+    set separator["text"] to "---"
+    set separator["action"] to ""
+    set separator["enabled"] to false
+
+    add separator to menu["items"]
+
+# Event Handling
+define function set_component_event_handler that takes component as Object, event as String, handler as String:
+    # Set event handler for component
+    if not object.has_key(component, "event_handlers"):
+        set component["event_handlers"] to {}
+
+    set component["event_handlers"][event] to handler
+
+define function trigger_component_event that takes component as Object, event as String:
+    # Trigger component event
+    if object.has_key(component, "event_handlers"):
+        create handlers as Object
+        set handlers to component["event_handlers"]
+
+        if object.has_key(handlers, event):
+            create handler as String
+            set handler to handlers[event]
+
+            # In implementation: call_function(handler, component)
+            pass
+
+# Layout Management
+define function create_grid_layout that takes rows as Integer, columns as Integer and returns GridLayout:
+    # Create grid layout manager
+    create layout as GridLayout
+    set layout["rows"] to rows
+    set layout["columns"] to columns
+    set layout["components"] to []
+
+    return layout
+
+define function add_to_grid that takes layout as GridLayout, component as Object, row as Integer, column as Integer:
+    # Add component to grid position
+    create grid_item as Object
+    set grid_item["component"] to component
+    set grid_item["row"] to row
+    set grid_item["column"] to column
+
+    add grid_item to layout["components"]
+
+define function create_flow_layout that returns FlowLayout:
+    # Create flow layout manager
+    create layout as FlowLayout
+    set layout["components"] to []
+    set layout["alignment"] to "left"
+
+    return layout
+
+define function add_to_flow that takes layout as FlowLayout, component as Object:
+    # Add component to flow layout
+    add component to layout["components"]
+
+# Error Handling
+define function get_last_ui_error and returns String:
+    # Get last UI error message
+    return ""  # Placeholder
+
+define function clear_last_ui_error:
+    # Clear last UI error
+    pass
+
+# Example usage patterns
+define function example_usage:
+    # Create a simple form
+    create form as Form
+    set form to create_form("Contact Form", 400, 300)
+
+    create name_field as TextField
+    set name_field to create_text_field("Enter your name")
+    add_validation_rule(name_field, "required", "Name is required")
+    add_validation_rule(name_field, "min_length", "Name must be at least 3 characters")
+
+    create email_field as TextField
+    set email_field to create_text_field("Enter your email")
+    add_validation_rule(email_field, "required", "Email is required")
+    add_validation_rule(email_field, "email", "Please enter a valid email address")
+
+    create message_area as TextArea
+    set message_area to create_text_area("Enter your message", 5)
+
+    create submit_button as Button
+    set submit_button to create_button("Submit", "handle_submit")
+
+    create cancel_button as Button
+    set cancel_button to create_button("Cancel", "handle_cancel")
+
+    add_to_form(form, name_field)
+    add_to_form(form, email_field)
+    add_to_form(form, message_area)
+    add_to_form(form, submit_button)
+    add_to_form(form, cancel_button)
+
+    # Validate form before submission
+    create validation_result as ValidationResult
+    set validation_result to validate_form(form)
+
+    if validation_result["valid"]:
+        io.print("Form is valid, submitting...")
+    else:
+        io.print("Form validation errors:")
+        create i as Integer
+        set i to 0
+        while i < validation_result["errors"] length:
+            io.print("  - " + validation_result["errors"][i])
+            set i to i + 1
+
+define function dialog_example:
+    # Show various dialog types
+    show_message_dialog("Information", "This is an info message", "info")
+
+    create confirmed as Boolean
+    set confirmed to show_confirmation_dialog("Confirm", "Are you sure?")
+
+    if confirmed:
+        io.print("User confirmed action")
+    else:
+        io.print("User cancelled action")
+
+    create user_input as String
+    set user_input to show_input_dialog("Input", "Enter your name:", "John Doe")
+
+    io.print("User entered: " + user_input)
+
+define function settings_dialog_example:
+    # Create and show settings dialog
+    create settings_dialog as Dialog
+    set settings_dialog to create_settings_dialog()
+
+    # In implementation: graphics.show_dialog(settings_dialog)
+    io.print("Settings dialog would be shown")
+
+define function progress_example:
+    # Show progress bar example
+    create progress as ProgressBar
+    set progress to create_progress_bar(0, 100)
+
+    create i as Integer
+    set i to 0
+    while i <= 100:
+        set_progress_value(progress, i)
+        # In implementation: update progress display
+        io.print("Progress: " + string.format(i) + "%")
+        set i to i + 10
+
+    io.print("Task completed!")
+
+define function menu_example:
+    # Create menu system
+    create menubar as MenuBar
+    set menubar to create_menu_bar()
+
+    create file_menu as Menu
+    set file_menu to add_menu(menubar, "File")
+
+    add_menu_item(file_menu, "New", "handle_new")
+    add_menu_item(file_menu, "Open", "handle_open")
+    add_menu_separator(file_menu)
+    add_menu_item(file_menu, "Save", "handle_save")
+    add_menu_item(file_menu, "Save As...", "handle_save_as")
+    add_menu_separator(file_menu)
+    add_menu_item(file_menu, "Exit", "handle_exit")
+
+    create edit_menu as Menu
+    set edit_menu to add_menu(menubar, "Edit")
+
+    add_menu_item(edit_menu, "Cut", "handle_cut")
+    add_menu_item(edit_menu, "Copy", "handle_copy")
+    add_menu_item(edit_menu, "Paste", "handle_paste")
+
+    # In implementation: graphics.set_menu_bar(menubar)
+    io.print("Menu system would be displayed")
+
+define function grid_layout_example:
+    # Create form with grid layout
+    create grid_layout as GridLayout
+    set grid_layout to create_grid_layout(3, 2)
+
+    create name_label as Label
+    set name_label to create_label("Name:")
+
+    create name_field as TextField
+    set name_field to create_text_field("Enter name")
+
+    create email_label as Label
+    set email_label to create_label("Email:")
+
+    create email_field as TextField
+    set email_field to create_text_field("Enter email")
+
+    create password_label as Label
+    set password_label to create_label("Password:")
+
+    create password_field as PasswordField
+    set password_field to create_password_field("Enter password")
+
+    add_to_grid(grid_layout, name_label, 0, 0)
+    add_to_grid(grid_layout, name_field, 0, 1)
+    add_to_grid(grid_layout, email_label, 1, 0)
+    add_to_grid(grid_layout, email_field, 1, 1)
+    add_to_grid(grid_layout, password_label, 2, 0)
+    add_to_grid(grid_layout, password_field, 2, 1)
+
+    io.print("Grid layout form would be displayed")
+
+define function file_dialog_example:
+    # File dialog examples
+    create filename as String
+    set filename to create_file_open_dialog("Text Files (*.txt);;All Files (*)")
+
+    if filename != "":
+        io.print("Selected file: " + filename)
+        # In implementation: load file contents
+    else:
+        io.print("No file selected")
+
+    create save_filename as String
+    set save_filename to create_file_save_dialog("document.txt")
+
+    if save_filename != "":
+        io.print("File will be saved as: " + save_filename)
+        # In implementation: save file
+    else:
+        io.print("Save cancelled")

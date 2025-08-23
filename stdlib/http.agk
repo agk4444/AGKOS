@@ -1,0 +1,441 @@
+# AGK HTTP Client Library
+# HTTP client for making web requests and API calls
+# Provides a clean interface for REST APIs and web services
+
+# HTTP Client Management
+define function create_client that returns HttpClient:
+    # Create HTTP client instance
+    # In implementation: return requests.Session()
+    create client as HttpClient
+    # Implementation would create actual HTTP client
+    return client
+
+define function close_client that takes client as HttpClient:
+    # Close HTTP client and release resources
+    # In implementation: client.close()
+    pass
+
+define function set_timeout that takes client as HttpClient, timeout_seconds as Float:
+    # Set request timeout in seconds
+    # In implementation: client.timeout = timeout_seconds
+    pass
+
+define function set_user_agent that takes client as HttpClient, user_agent as String:
+    # Set User-Agent header for all requests
+    # In implementation: client.headers.update({'User-Agent': user_agent})
+    pass
+
+define function set_default_header that takes client as HttpClient, name as String, value as String:
+    # Set default header for all requests
+    # In implementation: client.headers.update({name: value})
+    pass
+
+# HTTP Methods - GET
+define function get that takes client as HttpClient, url as String and returns HttpResponse:
+    # Perform GET request
+    create response as HttpResponse
+    set response to make_request(client, "GET", url, "", [])
+    return response
+
+define function get_with_headers that takes client as HttpClient, url as String, headers as Object and returns HttpResponse:
+    # Perform GET request with custom headers
+    create response as HttpResponse
+    set response to make_request(client, "GET", url, "", headers)
+    return response
+
+# HTTP Methods - POST
+define function post that takes client as HttpClient, url as String, data as String and returns HttpResponse:
+    # Perform POST request with string data
+    create response as HttpResponse
+    set response to make_request(client, "POST", url, data, [])
+    return response
+
+define function post_json that takes client as HttpClient, url as String, json_data as Object and returns HttpResponse:
+    # Perform POST request with JSON data
+    create json_string as String
+    set json_string to to_json_string(json_data)
+
+    create headers as Object
+    set headers["Content-Type"] to "application/json"
+
+    create response as HttpResponse
+    set response to make_request(client, "POST", url, json_string, headers)
+    return response
+
+define function post_form that takes client as HttpClient, url as String, form_data as Object and returns HttpResponse:
+    # Perform POST request with form data
+    create form_string as String
+    set form_string to encode_form_data(form_data)
+
+    create headers as Object
+    set headers["Content-Type"] to "application/x-www-form-urlencoded"
+
+    create response as HttpResponse
+    set response to make_request(client, "POST", url, form_string, headers)
+    return response
+
+# HTTP Methods - PUT
+define function put that takes client as HttpClient, url as String, data as String and returns HttpResponse:
+    # Perform PUT request
+    create response as HttpResponse
+    set response to make_request(client, "PUT", url, data, [])
+    return response
+
+define function put_json that takes client as HttpClient, url as String, json_data as Object and returns HttpResponse:
+    # Perform PUT request with JSON data
+    create json_string as String
+    set json_string to to_json_string(json_data)
+
+    create headers as Object
+    set headers["Content-Type"] to "application/json"
+
+    create response as HttpResponse
+    set response to make_request(client, "PUT", url, json_string, headers)
+    return response
+
+# HTTP Methods - DELETE
+define function delete that takes client as HttpClient, url as String and returns HttpResponse:
+    # Perform DELETE request
+    create response as HttpResponse
+    set response to make_request(client, "DELETE", url, "", [])
+    return response
+
+# HTTP Methods - PATCH
+define function patch that takes client as HttpClient, url as String, data as String and returns HttpResponse:
+    # Perform PATCH request
+    create response as HttpResponse
+    set response to make_request(client, "PATCH", url, data, [])
+    return response
+
+define function patch_json that takes client as HttpClient, url as String, json_data as Object and returns HttpResponse:
+    # Perform PATCH request with JSON data
+    create json_string as String
+    set json_string to to_json_string(json_data)
+
+    create headers as Object
+    set headers["Content-Type"] to "application/json"
+
+    create response as HttpResponse
+    set response to make_request(client, "PATCH", url, json_string, headers)
+    return response
+
+# Advanced Request Methods
+define function request that takes client as HttpClient, method as String, url as String, data as String, headers as Object and returns HttpResponse:
+    # Perform custom HTTP request
+    create response as HttpResponse
+    set response to make_request(client, method, url, data, headers)
+    return response
+
+# Response handling
+define function get_status_code that takes response as HttpResponse and returns Integer:
+    return response["status_code"]
+
+define function get_response_text that takes response as HttpResponse and returns String:
+    return response["text"]
+
+define function get_response_headers that takes response as HttpResponse and returns Object:
+    return response["headers"]
+
+define function get_response_cookies that takes response as HttpResponse and returns Object:
+    return response["cookies"]
+
+define function get_response_url that takes response as HttpResponse and returns String:
+    return response["url"]
+
+define function get_response_elapsed_time that takes response as HttpResponse and returns Float:
+    return response["elapsed"]
+
+define function is_success that takes response as HttpResponse and returns Boolean:
+    create status as Integer
+    set status to get_status_code(response)
+    if status >= 200 and status < 300:
+        return true
+    else:
+        return false
+
+define function is_error that takes response as HttpResponse and returns Boolean:
+    create status as Integer
+    set status to get_status_code(response)
+    if status >= 400:
+        return true
+    else:
+        return false
+
+# JSON Response Handling
+define function get_json that takes response as HttpResponse and returns Object:
+    create text as String
+    set text to get_response_text(response)
+    return parse_json(text)
+
+define function get_json_array that takes response as HttpResponse and returns List:
+    create text as String
+    set text to get_response_text(response)
+    return parse_json_array(text)
+
+# Utility Functions
+define function url_encode that takes data as String and returns String:
+    # URL encode string data
+    # In implementation: return urllib.parse.quote(data)
+    return data  # Placeholder
+
+define function url_decode that takes data as String and returns String:
+    # URL decode string data
+    # In implementation: return urllib.parse.unquote(data)
+    return data  # Placeholder
+
+define function encode_form_data that takes data as Object and returns String:
+    # Encode object as form data
+    # In implementation: return urllib.parse.urlencode(data)
+    create result as String
+    set result to ""
+
+    create keys as List
+    set keys to object.keys(data)
+
+    create i as Integer
+    set i to 0
+    while i < keys length:
+        if i > 0:
+            set result to result + "&"
+
+        create key as String
+        set key to keys[i]
+        create value as String
+        set value to data[key]
+
+        set result to result + url_encode(key) + "=" + url_encode(value)
+        set i to i + 1
+
+    return result
+
+define function to_json_string that takes data as Object and returns String:
+    # Convert object to JSON string
+    # In implementation: return json.dumps(data)
+    return "{}"  # Placeholder
+
+define function parse_json that takes json_text as String and returns Object:
+    # Parse JSON string to object
+    # In implementation: return json.loads(json_text)
+    create result as Object
+    return result  # Placeholder
+
+define function parse_json_array that takes json_text as String and returns List:
+    # Parse JSON string to array
+    # In implementation: return json.loads(json_text)
+    create result as List
+    return result  # Placeholder
+
+# Authentication
+define function set_basic_auth that takes client as HttpClient, username as String, password as String:
+    # Set HTTP Basic Authentication
+    create credentials as String
+    set credentials to username + ":" + password
+    create encoded_credentials as String
+    set encoded_credentials to base64_encode(credentials)
+
+    create auth_header as String
+    set auth_header to "Basic " + encoded_credentials
+
+    set_default_header(client, "Authorization", auth_header)
+
+define function set_bearer_token that takes client as HttpClient, token as String:
+    # Set Bearer token authentication
+    create auth_header as String
+    set auth_header to "Bearer " + token
+
+    set_default_header(client, "Authorization", auth_header)
+
+define function set_api_key that takes client as HttpClient, api_key as String, header_name as String:
+    # Set API key authentication
+    if header_name is empty:
+        set header_name to "X-API-Key"
+
+    set_default_header(client, header_name, api_key)
+
+# Cookie Management
+define function get_cookies that takes client as HttpClient and returns Object:
+    # Get all cookies from client
+    create cookies as Object
+    return cookies  # Placeholder
+
+define function set_cookie that takes client as HttpClient, name as String, value as String, domain as String, path as String:
+    # Set a cookie
+    # In implementation: client.cookies.set(name, value, domain=domain, path=path)
+    pass
+
+define function clear_cookies that takes client as HttpClient:
+    # Clear all cookies
+    # In implementation: client.cookies.clear()
+    pass
+
+# Error Handling
+define function get_last_error that takes client as HttpClient and returns String:
+    # Get last error message
+    return ""  # Placeholder
+
+define function clear_last_error that takes client as HttpClient:
+    # Clear last error
+    pass
+
+# File Upload/Download
+define function upload_file that takes client as HttpClient, url as String, file_path as String, field_name as String and returns HttpResponse:
+    # Upload file via multipart form
+    # In implementation: with open(file_path, 'rb') as f: files = {field_name: f}
+    create response as HttpResponse
+    # Implementation would handle file upload
+    return response  # Placeholder
+
+define function download_file that takes client as HttpClient, url as String, save_path as String and returns Boolean:
+    # Download file to specified path
+    create response as HttpResponse
+    set response to get(client, url)
+
+    if is_success(response):
+        create file_data as String
+        set file_data to get_response_text(response)
+        io.write_file(save_path, file_data)
+        return true
+    else:
+        return false
+
+# Core request execution (would be implemented in Python runtime)
+define function make_request that takes client as HttpClient, method as String, url as String, data as String, headers as Object and returns HttpResponse:
+    # Core HTTP request execution function
+    # This would be implemented in the Python runtime with actual HTTP calls
+
+    create response as HttpResponse
+    create response["status_code"] as Integer
+    create response["text"] as String
+    create response["headers"] as Object
+    create response["cookies"] as Object
+    create response["url"] as String
+    create response["elapsed"] as Float
+    create response["success"] as Boolean
+    create response["error"] as String
+
+    # Implementation would make actual HTTP request and populate response object
+    # For demo purposes, we'll return a mock successful response
+    set response["status_code"] to 200
+    set response["text"] to data
+    set response["headers"] to headers
+    set response["cookies"] to {}
+    set response["url"] to url
+    set response["elapsed"] to 0.5
+    set response["success"] to true
+    set response["error"] to ""
+
+    return response
+
+# Utility functions (would be implemented in Python runtime)
+define function base64_encode that takes data as String and returns String:
+    # Base64 encode string
+    return data  # Placeholder
+
+# Example usage and common patterns
+define function example_usage:
+    # Basic GET request
+    create client as HttpClient
+    set client to create_client()
+
+    create response as HttpResponse
+    set response to get(client, "https://api.example.com/users")
+
+    if is_success(response):
+        create users as Object
+        set users to get_json(response)
+        io.print("Retrieved " + string.format(list.length(users)) + " users")
+    else:
+        io.print("Request failed with status: " + string.format(get_status_code(response)))
+
+    # POST with JSON data
+    create user_data as Object
+    set user_data["name"] to "Alice"
+    set user_data["email"] to "alice@example.com"
+
+    create post_response as HttpResponse
+    set post_response to post_json(client, "https://api.example.com/users", user_data)
+
+    if is_success(post_response):
+        create created_user as Object
+        set created_user to get_json(post_response)
+        io.print("User created with ID: " + string.format(created_user["id"]))
+    else:
+        io.print("Failed to create user: " + get_response_text(post_response))
+
+    # Authentication
+    set_bearer_token(client, "your-jwt-token-here")
+
+    # File download
+    create download_success as Boolean
+    set download_success to download_file(client, "https://example.com/file.pdf", "downloaded_file.pdf")
+
+    if download_success:
+        io.print("File downloaded successfully")
+    else:
+        io.print("Download failed")
+
+    close_client(client)
+
+define function api_client_example:
+    # REST API client example
+    create api_client as HttpClient
+    set api_client to create_client()
+    set_timeout(api_client, 30.0)
+    set_user_agent(api_client, "MyApp/1.0")
+
+    # Set authentication
+    set_bearer_token(api_client, "your-api-token")
+
+    # CRUD operations
+    create base_url as String
+    set base_url to "https://jsonplaceholder.typicode.com"
+
+    # CREATE
+    create new_post as Object
+    set new_post["title"] to "My Post"
+    set new_post["body"] to "This is the content"
+    set new_post["userId"] to 1
+
+    create create_response as HttpResponse
+    set create_response to post_json(api_client, base_url + "/posts", new_post)
+
+    if is_success(create_response):
+        create created_post as Object
+        set created_post to get_json(create_response)
+        io.print("Post created with ID: " + string.format(created_post["id"]))
+    else:
+        io.print("Failed to create post")
+
+    # READ
+    create read_response as HttpResponse
+    set read_response to get(api_client, base_url + "/posts/1")
+
+    if is_success(read_response):
+        create post as Object
+        set post to get_json(read_response)
+        io.print("Post title: " + post["title"])
+    else:
+        io.print("Failed to read post")
+
+    # UPDATE
+    create update_data as Object
+    set update_data["title"] to "Updated Title"
+
+    create update_response as HttpResponse
+    set update_response to put_json(api_client, base_url + "/posts/1", update_data)
+
+    if is_success(update_response):
+        io.print("Post updated successfully")
+    else:
+        io.print("Failed to update post")
+
+    # DELETE
+    create delete_response as HttpResponse
+    set delete_response to delete(api_client, base_url + "/posts/1")
+
+    if is_success(delete_response):
+        io.print("Post deleted successfully")
+    else:
+        io.print("Failed to delete post")
+
+    close_client(api_client)

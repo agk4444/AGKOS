@@ -11,6 +11,17 @@
 # - llm: Large Language Model integration (AI)
 # - gto: Game Theory Optimization algorithms
 # - web: Web interface and HTTP capabilities
+# - http: HTTP client for REST APIs and web requests
+# - database: SQLite database integration
+# - fs: Advanced file system operations and path management
+# - json: Enhanced JSON processing, validation, and manipulation
+# - logging: Structured logging and debugging capabilities
+# - regex: Regular expressions for pattern matching and text processing
+# - test: Unit testing framework with assertions and test discovery
+# - stats: Statistics and data analysis functions
+# - ui: Advanced user interface components and form management
+# - network: Socket programming and networking capabilities
+# - game: Game development framework with sprites, physics, and AI
 # - date: Date and time manipulation functions
 # - finance: Financial calculations and investment analysis
 
@@ -22,6 +33,17 @@
 # import llm
 # import gto
 # import web
+# import http
+# import database
+# import fs
+# import json
+# import logging
+# import regex
+# import test
+# import stats
+# import ui
+# import network
+# import game
 # import date
 # import finance
 
@@ -50,6 +72,164 @@
 # set route to web.create_route("/", "GET")
 # set server to web.add_route(server, route, my_handler)
 # web.start_server(server)
+
+# Database usage:
+# create db as Database
+# set db to database.connect("myapp.db")
+# create columns as List
+# add "id INTEGER PRIMARY KEY" to columns
+# add "name TEXT NOT NULL" to columns
+# database.create_table(db, "users", columns)
+# create user_data as Object
+# set user_data["name"] to "Alice"
+# create user_id as Integer
+# set user_id to database.insert(db, "users", user_data)
+# create result as QueryResult
+# set result to database.query(db, "SELECT * FROM users")
+# database.close(db)
+
+# HTTP client usage:
+# create client as HttpClient
+# set client to http.create_client()
+# http.set_timeout(client, 30.0)
+# http.set_user_agent(client, "MyApp/1.0")
+# create response as HttpResponse
+# set response to http.get(client, "https://api.example.com/data")
+# if http.is_success(response):
+#     create data as Object
+#     set data to http.get_json(response)
+#     io.print("Retrieved: " + string.format(data["count"]) + " items")
+# else:
+#     io.print("Request failed: " + http.get_response_text(response))
+# create post_data as Object
+# set post_data["name"] to "Alice"
+# set post_data["email"] to "alice@example.com"
+# create post_response as HttpResponse
+# set post_response to http.post_json(client, "https://api.example.com/users", post_data)
+# http.close_client(client)
+
+# File system usage:
+# create files as List
+# set files to fs.list_files("/home/user/documents")
+# create subdirs as List
+# set subdirs to fs.list_directories("/home/user/documents")
+# create file_info as Object
+# set file_info to fs.get_file_info("document.pdf")
+# if fs.file_exists("config.json"):
+#     create config as Object
+#     set config to fs.read_json("config.json")
+# create backup_path as String
+# set backup_path to fs.copy_file("important.txt", "important_backup.txt")
+# create python_files as List
+# set python_files to fs.find_by_extension("/home/user/project", ".py")
+# create temp_file as String
+# set temp_file to fs.create_temp_file("temp_data", ".json")
+# fs.write_json(temp_file, my_data)
+
+# JSON processing usage:
+# create user_data as Object
+# set user_data["name"] to "Alice"
+# set user_data["age"] to 30
+# create json_text as String
+# set json_text to json.stringify(user_data, 2)
+# create parsed_data as Object
+# set parsed_data to json.parse(json_text)
+# json.write_file("config.json", user_data, 2)
+# create loaded_data as Object
+# set loaded_data to json.read_file("config.json")
+# create merged as Object
+# set merged to json.merge_recursive(data1, data2)
+# create filtered as Object
+# set filtered to json.filter_keys(data, ["name", "email"])
+
+# Logging usage:
+# create logger as Logger
+# set logger to logging.get_logger("MyApp")
+# logging.set_level(logger, logging.INFO)
+# logging.add_console_handler(logger)
+# logging.add_file_handler(logger, "app.log")
+# logging.info(logger, "Application started")
+# logging.error(logger, "An error occurred", error_context)
+# create timer as Timer
+# set timer to logging.start_timer(logger, "operation")
+# logging.end_timer(timer)
+
+# Regex usage:
+# create emails as List
+# set emails to regex.findall(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', text)
+# create clean_text as String
+# set clean_text to regex.sub(r'\s+', ' ', messy_text)
+# if regex.validate_email("user@example.com"):
+#     io.print("Valid email")
+# create compiled_pattern as RegexPattern
+# set compiled_pattern to regex.compile(r'\d{4}-\d{2}-\d{2}')
+# create match_result as RegexMatch
+# set match_result to regex.search(compiled_pattern["pattern"], "Date: 2024-01-01")
+
+# Testing usage:
+# create test_suite as TestSuite
+# set test_suite to test.create_suite("Math Functions")
+# test.add_test(test_suite, "Addition", "test_addition")
+# test.add_test(test_suite, "Multiplication", "test_multiplication")
+# create result as TestSuiteResult
+# set result to test.run_suite(test_suite)
+# test.assert_equals(2 + 2, 4, "Basic addition should work")
+# test.assert_true(user.is_active, "User should be active")
+# test.assert_string_contains("Hello World", "World", "String should contain World")
+
+# Statistics usage:
+# create data as List
+# add 10.0 to data
+# add 15.0 to data
+# add 20.0 to data
+# create mean_val as Float
+# set mean_val to stats.mean(data)
+# create std_dev as Float
+# set std_dev to stats.standard_deviation(data)
+# create correlation_val as Float
+# set correlation_val to stats.correlation(x_data, y_data)
+# create regression as Object
+# set regression to stats.linear_regression(x_data, y_data)
+# create prediction as Float
+# set prediction to stats.predict(regression, 6.0)
+# create sample_data as List
+# set sample_data to stats.sample(data, 10)
+
+# UI usage:
+# create form as Form
+# set form to ui.create_form("Contact", 400, 300)
+# create name_field as TextField
+# set name_field to ui.create_text_field("Enter name")
+# ui.add_validation_rule(name_field, "required", "Name required")
+# create submit_button as Button
+# set submit_button to ui.create_button("Submit", "handle_submit")
+# ui.add_to_form(form, name_field)
+# ui.add_to_form(form, submit_button)
+# ui.show_message_dialog("Info", "Form submitted!", "info")
+
+# Network usage:
+# create client as TcpSocket
+# set client to network.create_tcp_socket()
+# network.connect_tcp(client, "localhost", 8080)
+# network.send_tcp(client, "Hello Server!")
+# create response as String
+# set response to network.receive_tcp(client, 1024)
+# network.close_tcp(client)
+# create server as TcpServer
+# set server to network.create_tcp_server(9000)
+
+# Game development usage:
+# create engine as GameEngine
+# set engine to game.create_game_engine()
+# create scene as Scene
+# set scene to game.create_scene(engine, "level1")
+# create player as Entity
+# set player to game.create_entity(scene, "player")
+# game.add_component(player, game.create_sprite_component("player.png"))
+# game.add_component(player, game.create_physics_component())
+# game.add_component(player, game.create_input_component())
+# game.add_ai_component(enemy, "chase_player", 5.0)
+# game.start_game_loop(engine)
 
 # Date and time usage:
 # create today_date as Date
