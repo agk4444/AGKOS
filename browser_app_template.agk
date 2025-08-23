@@ -1,0 +1,583 @@
+# AGK Browser Application Template
+# Full-featured web browser with tabs, bookmarks, and downloads
+# Perfect for: Web Browsers, Custom Clients, Content Viewers
+
+import web
+import io
+import string
+import graphics
+import llm
+
+# Browser Configuration
+create APP_NAME as String
+set APP_NAME to "AGK Browser"
+
+create HOME_PAGE as String
+set HOME_PAGE to "https://example.com"
+
+create BOOKMARKS_FILE as String
+set BOOKMARKS_FILE to "browser_bookmarks.json"
+
+create DOWNLOADS_FILE as String
+set DOWNLOADS_FILE to "browser_downloads.json"
+
+create SESSION_FILE as String
+set SESSION_FILE to "browser_session.json"
+
+# Global State
+create bookmarks as List
+create downloads as List
+create session as List
+create current_tab_index as Integer
+set current_tab_index to 0
+
+create ai_enabled as Boolean
+set ai_enabled to false
+
+create ai_client as LLMClient
+
+# UI Components
+create main_window as graphics.Window
+create tabs_container as graphics.TabContainer
+create address_bar as graphics.TextField
+create navigation_bar as graphics.ButtonBar
+
+# Button references for navigation
+create back_button as graphics.Button
+create forward_button as graphics.Button
+create reload_button as graphics.Button
+create stop_button as graphics.Button
+create new_tab_button as graphics.Button
+create bookmark_button as graphics.Button
+create downloads_button as graphics.Button
+
+define function main:
+    # Initialize browser
+    io.print("🚀 Starting " + APP_NAME + " in AGK...")
+
+    # Load persistent data
+    load_bookmarks()
+    load_downloads()
+    load_session()
+
+    # Setup UI
+    initialize_ui()
+
+    # Setup AI if available
+    if ai_enabled:
+        set ai_client to llm.create_llm_client("your-api-key-here", llm.gpt4())
+
+    # Restore session or open home page
+    if session:
+        restore_session()
+    else:
+        create_new_tab(HOME_PAGE)
+
+    # Start the application
+    graphics.show_window(main_window)
+    graphics.run_application()
+
+    return 0
+
+define function initialize_ui:
+    # Create main window
+    set main_window to graphics.create_window(1200, 800, APP_NAME)
+
+    # Create navigation bar
+    set navigation_bar to graphics.create_button_bar()
+    set back_button to graphics.add_button(navigation_bar, "◀ Back", handle_back)
+    set forward_button to graphics.add_button(navigation_bar, "▶ Forward", handle_forward)
+    set reload_button to graphics.add_button(navigation_bar, "⟳ Reload", handle_reload)
+    set stop_button to graphics.add_button(navigation_bar, "✖ Stop", handle_stop)
+    set new_tab_button to graphics.add_button(navigation_bar, "＋ New Tab", handle_new_tab)
+    set bookmark_button to graphics.add_button(navigation_bar, "★ Bookmark", handle_bookmark)
+    set downloads_button to graphics.add_button(navigation_bar, "▼ Downloads", handle_downloads)
+
+    # Create address bar
+    set address_bar to graphics.create_text_field()
+    graphics.set_text_field_placeholder(address_bar, "Enter URL or search terms...")
+    graphics.set_text_field_action(address_bar, handle_address_bar_enter)
+
+    # Create tabs container
+    set tabs_container to graphics.create_tab_container()
+    graphics.set_tab_close_handler(tabs_container, handle_tab_close)
+    graphics.set_tab_change_handler(tabs_container, handle_tab_change)
+
+    # Layout components
+    graphics.add_to_window(main_window, navigation_bar)
+    graphics.add_to_window(main_window, address_bar)
+    graphics.add_to_window(main_window, tabs_container)
+
+    # Setup menus
+    setup_menus()
+
+define function setup_menus:
+    # File menu
+    create file_menu as graphics.Menu
+    set file_menu to graphics.create_menu("File")
+    graphics.add_menu_item(file_menu, "New Tab", handle_new_tab)
+    graphics.add_menu_item(file_menu, "Close Tab", handle_close_current_tab)
+    graphics.add_menu_separator(file_menu)
+    graphics.add_menu_item(file_menu, "Exit", handle_exit)
+
+    # Bookmarks menu
+    create bookmarks_menu as graphics.Menu
+    set bookmarks_menu to graphics.create_menu("Bookmarks")
+    graphics.add_menu_item(bookmarks_menu, "Manage Bookmarks", handle_manage_bookmarks)
+    graphics.add_menu_item(bookmarks_menu, "Add Current Page", handle_bookmark)
+
+    # Downloads menu
+    create downloads_menu as graphics.Menu
+    set downloads_menu to graphics.create_menu("Downloads")
+    graphics.add_menu_item(downloads_menu, "Show Downloads", handle_downloads)
+    graphics.add_menu_item(downloads_menu, "Clear Completed", handle_clear_downloads)
+
+    # Tools menu
+    create tools_menu as graphics.Menu
+    set tools_menu to graphics.create_menu("Tools")
+    graphics.add_menu_item(tools_menu, "Preferences", handle_preferences)
+    graphics.add_menu_item(tools_menu, "AI Assistant", handle_ai_assistant)
+
+    # Add menus to window
+    graphics.add_menu_to_window(main_window, file_menu)
+    graphics.add_menu_to_window(main_window, bookmarks_menu)
+    graphics.add_menu_to_window(main_window, downloads_menu)
+    graphics.add_menu_to_window(main_window, tools_menu)
+
+define function create_new_tab that takes url as String and returns Integer:
+    # Create new web view
+    create web_view as graphics.WebView
+    set web_view to graphics.create_web_view()
+
+    # Configure web view
+    graphics.set_web_view_url_handler(web_view, handle_web_url_change)
+    graphics.set_web_view_title_handler(web_view, handle_web_title_change)
+    graphics.set_web_view_download_handler(web_view, handle_web_download)
+    graphics.set_web_view_progress_handler(web_view, handle_web_progress)
+
+    # Load URL
+    graphics.load_url(web_view, url)
+
+    # Add to tabs container
+    create tab_title as String
+    set tab_title to "New Tab"
+    create tab_index as Integer
+    set tab_index to graphics.add_tab(tabs_container, tab_title, web_view)
+
+    return tab_index
+
+define function handle_address_bar_enter that takes text as String:
+    create url as String
+    set url to sanitize_url(text)
+    graphics.load_url(get_current_web_view(), url)
+
+define function sanitize_url that takes input as String and returns String:
+    create trimmed as String
+    set trimmed to string.trim(input)
+
+    if trimmed is empty:
+        return HOME_PAGE
+
+    # Check if it's already a URL
+    if string.starts_with(trimmed, "http://") or string.starts_with(trimmed, "https://"):
+        return trimmed
+
+    # Check if it has domain-like structure
+    if string.contains(trimmed, ".") and not string.contains(trimmed, " "):
+        return "https://" + trimmed
+
+    # Treat as search query
+    create encoded_query as String
+    set encoded_query to web.url_encode(trimmed)
+    return "https://www.google.com/search?q=" + encoded_query
+
+# Navigation handlers
+define function handle_back:
+    create web_view as graphics.WebView
+    set web_view to get_current_web_view()
+    if web_view is not null:
+        graphics.go_back(web_view)
+
+define function handle_forward:
+    create web_view as graphics.WebView
+    set web_view to get_current_web_view()
+    if web_view is not null:
+        graphics.go_forward(web_view)
+
+define function handle_reload:
+    create web_view as graphics.WebView
+    set web_view to get_current_web_view()
+    if web_view is not null:
+        graphics.reload(web_view)
+
+define function handle_stop:
+    create web_view as graphics.WebView
+    set web_view to get_current_web_view()
+    if web_view is not null:
+        graphics.stop_loading(web_view)
+
+define function handle_new_tab:
+    create_new_tab(HOME_PAGE)
+
+define function handle_close_current_tab:
+    if graphics.get_tab_count(tabs_container) > 1:
+        graphics.remove_tab(tabs_container, current_tab_index)
+
+define function handle_tab_close that takes index as Integer:
+    if graphics.get_tab_count(tabs_container) > 1:
+        graphics.remove_tab(tabs_container, index)
+
+define function handle_tab_change that takes index as Integer:
+    set current_tab_index to index
+    update_address_bar()
+
+# Web view event handlers
+define function handle_web_url_change that takes web_view as graphics.WebView, url as String:
+    if web_view is get_current_web_view():
+        graphics.set_text_field_text(address_bar, url)
+
+define function handle_web_title_change that takes web_view as graphics.WebView, title as String:
+    create tab_index as Integer
+    set tab_index to graphics.get_web_view_tab_index(web_view)
+    if tab_index >= 0:
+        graphics.set_tab_title(tabs_container, tab_index, title)
+
+define function handle_web_download that takes web_view as graphics.WebView, url as String, filename as String:
+    # Show download dialog
+    create save_path as String
+    set save_path to graphics.show_save_dialog("Save File", filename)
+
+    if save_path is not empty:
+        create download_id as String
+        set download_id to start_download(url, save_path)
+        track_download(download_id, url, save_path)
+
+define function handle_web_progress that takes web_view as graphics.WebView, progress as Integer:
+    # Update progress indicator in tab or status bar
+    create tab_index as Integer
+    set tab_index to graphics.get_web_view_tab_index(web_view)
+    if tab_index >= 0:
+        if progress < 100:
+            graphics.set_tab_title(tabs_container, tab_index, "Loading " + string.format(progress) + "%...")
+        else:
+            graphics.set_tab_title(tabs_container, tab_index, graphics.get_web_view_title(web_view))
+
+# Bookmark functionality
+define function handle_bookmark:
+    create web_view as graphics.WebView
+    set web_view to get_current_web_view()
+    if web_view is not null:
+        create url as String
+        set url to graphics.get_web_view_url(web_view)
+        create title as String
+        set title to graphics.get_web_view_title(web_view)
+
+        add_bookmark(title, url)
+        graphics.show_message("Bookmark Added", "Added bookmark for " + url)
+
+define function handle_manage_bookmarks:
+    # Show bookmarks dialog
+    create bookmarks_dialog as graphics.Dialog
+    set bookmarks_dialog to graphics.create_dialog("Bookmarks", 600, 400)
+
+    create bookmarks_list as graphics.ListBox
+    set bookmarks_list to graphics.create_list_box()
+
+    # Populate list
+    create i as Integer
+    set i to 0
+    while i < bookmarks length:
+        create bookmark as Object
+        set bookmark to bookmarks[i]
+        graphics.add_list_item(bookmarks_list, bookmark["title"] + " — " + bookmark["url"])
+        set i to i + 1
+
+    graphics.add_to_dialog(bookmarks_dialog, bookmarks_list)
+
+    create button_bar as graphics.ButtonBar
+    set button_bar to graphics.create_button_bar()
+    graphics.add_button(button_bar, "Open", handle_open_bookmark)
+    graphics.add_button(button_bar, "Delete", handle_delete_bookmark)
+    graphics.add_button(button_bar, "Close", handle_close_bookmarks_dialog)
+
+    graphics.add_to_dialog(bookmarks_dialog, button_bar)
+    graphics.show_dialog(bookmarks_dialog)
+
+# Download functionality
+define function handle_downloads:
+    # Show downloads dialog
+    create downloads_dialog as graphics.Dialog
+    set downloads_dialog to graphics.create_dialog("Downloads", 600, 300)
+
+    create downloads_list as graphics.ListBox
+    set downloads_list to graphics.create_list_box()
+
+    # Populate list
+    create i as Integer
+    set i to 0
+    while i < downloads length:
+        create download as Object
+        set download to downloads[i]
+        create status as String
+        set status to download["status"]
+        create filename as String
+        set filename to get_filename_from_path(download["path"])
+        graphics.add_list_item(downloads_list, filename + " — " + status)
+        set i to i + 1
+
+    graphics.add_to_dialog(downloads_dialog, downloads_list)
+
+    create button_bar as graphics.ButtonBar
+    set button_bar to graphics.create_button_bar()
+    graphics.add_button(button_bar, "Clear Completed", handle_clear_downloads)
+    graphics.add_button(button_bar, "Close", handle_close_downloads_dialog)
+
+    graphics.add_to_dialog(downloads_dialog, button_bar)
+    graphics.show_dialog(downloads_dialog)
+
+# AI Assistant functionality
+define function handle_ai_assistant:
+    if not ai_enabled:
+        graphics.show_message("AI Assistant", "AI features are not enabled. Please configure an API key in preferences.")
+        return
+
+    # Show AI chat dialog
+    create ai_dialog as graphics.Dialog
+    set ai_dialog to graphics.create_dialog("AI Assistant", 500, 400)
+
+    create chat_history as graphics.TextArea
+    set chat_history to graphics.create_text_area()
+    graphics.set_text_area_editable(chat_history, false)
+
+    create message_input as graphics.TextField
+    set message_input to graphics.create_text_field()
+    graphics.set_text_field_placeholder(message_input, "Ask me anything...")
+
+    create send_button as graphics.Button
+    set send_button to graphics.create_button("Send")
+    graphics.set_button_action(send_button, handle_send_ai_message)
+
+    graphics.add_to_dialog(ai_dialog, chat_history)
+    graphics.add_to_dialog(ai_dialog, message_input)
+    graphics.add_to_dialog(ai_dialog, send_button)
+
+    graphics.show_dialog(ai_dialog)
+
+define function handle_send_ai_message:
+    create message as String
+    set message to graphics.get_text_field_text(message_input)
+
+    if message is not empty:
+        # Add user message to chat
+        graphics.append_text_area_text(chat_history, "You: " + message + "\n")
+
+        # Get AI response
+        create ai_response as String
+        set ai_response to llm.ask_llm(ai_client, message)
+
+        # Add AI response to chat
+        graphics.append_text_area_text(chat_history, "AI: " + ai_response + "\n\n")
+
+        # Clear input
+        graphics.set_text_field_text(message_input, "")
+
+# Preferences dialog
+define function handle_preferences:
+    create prefs_dialog as graphics.Dialog
+    set prefs_dialog to graphics.create_dialog("Preferences", 400, 300)
+
+    create form_layout as graphics.FormLayout
+    set form_layout to graphics.create_form_layout()
+
+    create home_page_input as graphics.TextField
+    set home_page_input to graphics.create_text_field()
+    graphics.set_text_field_text(home_page_input, HOME_PAGE)
+
+    create ai_key_input as graphics.TextField
+    set ai_key_input to graphics.create_text_field()
+    graphics.set_text_field_placeholder(ai_key_input, "Enter AI API key...")
+
+    graphics.add_form_row(form_layout, "Home Page:", home_page_input)
+    graphics.add_form_row(form_layout, "AI API Key:", ai_key_input)
+
+    graphics.add_to_dialog(prefs_dialog, form_layout)
+
+    create button_bar as graphics.ButtonBar
+    set button_bar to graphics.create_button_bar()
+    graphics.add_button(button_bar, "Save", handle_save_preferences)
+    graphics.add_button(button_bar, "Cancel", handle_cancel_preferences)
+
+    graphics.add_to_dialog(prefs_dialog, button_bar)
+    graphics.show_dialog(prefs_dialog)
+
+# Data persistence functions
+define function load_bookmarks:
+    try:
+        create bookmarks_data as String
+        set bookmarks_data to io.read_file(BOOKMARKS_FILE)
+        if bookmarks_data is not empty:
+            # In real implementation, parse JSON
+            # set bookmarks to json.parse(bookmarks_data)
+            pass
+    catch:
+        # Initialize empty bookmarks
+        pass
+
+define function save_bookmarks:
+    try:
+        # In real implementation, convert to JSON
+        # create bookmarks_json as String
+        # set bookmarks_json to json.stringify(bookmarks)
+        # io.write_file(BOOKMARKS_FILE, bookmarks_json)
+        pass
+    catch:
+        io.print("Warning: Could not save bookmarks")
+
+define function load_downloads:
+    try:
+        create downloads_data as String
+        set downloads_data to io.read_file(DOWNLOADS_FILE)
+        if downloads_data is not empty:
+            # In real implementation, parse JSON
+            pass
+    catch:
+        pass
+
+define function save_downloads:
+    try:
+        # In real implementation, convert to JSON
+        pass
+    catch:
+        io.print("Warning: Could not save downloads")
+
+define function load_session:
+    try:
+        create session_data as String
+        set session_data to io.read_file(SESSION_FILE)
+        if session_data is not empty:
+            # In real implementation, parse JSON
+            pass
+    catch:
+        pass
+
+define function save_session:
+    try:
+        # Collect current URLs
+        create current_urls as List
+        create tab_count as Integer
+        set tab_count to graphics.get_tab_count(tabs_container)
+
+        create i as Integer
+        set i to 0
+        while i < tab_count:
+            create web_view as graphics.WebView
+            set web_view to graphics.get_tab_web_view(tabs_container, i)
+            if web_view is not null:
+                create url as String
+                set url to graphics.get_web_view_url(web_view)
+                add url to current_urls
+            set i to i + 1
+
+        # In real implementation, save to JSON
+        # create session_json as String
+        # set session_json to json.stringify(current_urls)
+        # io.write_file(SESSION_FILE, session_json)
+    catch:
+        io.print("Warning: Could not save session")
+
+define function restore_session:
+    # In real implementation, restore tabs from session data
+    create_new_tab(HOME_PAGE)
+
+# Utility functions
+define function get_current_web_view that returns graphics.WebView:
+    if graphics.get_tab_count(tabs_container):
+        return graphics.get_tab_web_view(tabs_container, current_tab_index)
+    return null
+
+define function update_address_bar:
+    create web_view as graphics.WebView
+    set web_view to get_current_web_view()
+    if web_view is not null:
+        create url as String
+        set url to graphics.get_web_view_url(web_view)
+        graphics.set_text_field_text(address_bar, url)
+
+define function add_bookmark that takes title as String, url as String:
+    create bookmark as Object
+    set bookmark["title"] to title
+    set bookmark["url"] to url
+    set bookmark["date_added"] to get_current_timestamp()
+
+    add bookmark to bookmarks
+    save_bookmarks()
+
+define function start_download that takes url as String, save_path as String and returns String:
+    # In real implementation, start actual download
+    # For demo, just return a mock ID
+    return "download_" + string.format(generate_id())
+
+define function track_download that takes download_id as String, url as String, save_path as String:
+    create download_record as Object
+    set download_record["id"] to download_id
+    set download_record["url"] to url
+    set download_record["path"] to save_path
+    set download_record["status"] to "in_progress"
+    set download_record["bytes"] to 0
+    set download_record["total"] to 0
+    set download_record["start_time"] to get_current_timestamp()
+
+    add download_record to downloads
+    save_downloads()
+
+define function get_filename_from_path that takes file_path as String and returns String:
+    create parts as List
+    set parts to string.split(file_path, "/")
+    if parts:
+        return parts[parts length - 1]
+    return file_path
+
+define function get_current_timestamp that returns String:
+    # In real implementation, get actual timestamp
+    return "2024-01-01T00:00:00Z"
+
+define function generate_id that returns Integer:
+    # Simple ID generator
+    return 1000 + math.random() * 9000
+
+# Menu action handlers
+define function handle_open_bookmark:
+    # Open selected bookmark
+    pass
+
+define function handle_delete_bookmark:
+    # Delete selected bookmark
+    pass
+
+define function handle_close_bookmarks_dialog:
+    pass
+
+define function handle_clear_downloads:
+    # Clear completed downloads
+    pass
+
+define function handle_close_downloads_dialog:
+    pass
+
+define function handle_save_preferences:
+    # Save preferences
+    pass
+
+define function handle_cancel_preferences:
+    pass
+
+define function handle_exit:
+    # Save session before exit
+    save_session()
+    graphics.close_application()
+
+# Application lifecycle
+define function on_application_exit:
+    save_bookmarks()
+    save_downloads()
+    save_session()

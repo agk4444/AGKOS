@@ -8,8 +8,9 @@ Secure management of API keys for external services like LLM providers.
 import os
 import json
 import base64
-from typing import Dict, Optional, List
-from cryptography.fernet import Fernet
+import secrets
+from typing import Dict, Optional, List, Union, Any
+from cryptography.fernet import Fernet, InvalidToken
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
@@ -17,25 +18,60 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 class APIKeyManager:
     """Secure API key management system"""
 
-    def __init__(self, storage_file: str = ".agk_api_keys"):
+    def __init__(self, storage_file: str = ".agk_api_keys") -> None:
         self.storage_file = storage_file
+        self.salt_file = storage_file + ".salt"
         self.keys: Dict[str, str] = {}
-        self.encryption_key = self._generate_encryption_key()
+        self.encryption_key: bytes = self._generate_encryption_key()
         self._load_keys()
 
     def _generate_encryption_key(self) -> bytes:
-        """Generate encryption key from system properties"""
-        # Use system information to create a consistent key
-        system_info = f"{os.name}-{os.getlogin()}-{os.getcwd()}"
-        salt = b'agk_api_key_salt_2024'
+        """Generate encryption key using secure random salt
 
-        kdf = PBKDF2HMAC(
-            algorithm=hashes.SHA256(),
-            length=32,
-            salt=salt,
-            iterations=100000,
-        )
-        return base64.urlsafe_b64encode(kdf.derive(system_info.encode()))
+        Returns:
+            bytes: Base64-encoded encryption key for Fernet
+        """
+        try:
+            # Try to load existing salt for consistent key generation
+            if os.path.exists(self.salt_file):
+                with open(self.salt_file, 'rb') as f:
+                    salt = f.read()
+            else:
+                # Generate new cryptographically secure salt
+                salt = secrets.token_bytes(32)
+                # Save salt securely with restricted permissions
+                with open(self.salt_file, 'wb') as f:
+                    f.write(salt)
+                # Set restrictive permissions on Unix systems
+                try:
+                    os.chmod(self.salt_file, 0o600)  # Owner read/write only
+                except (OSError, AttributeError):
+                    pass  # Windows or permission error, continue anyway
+
+            # Use a secure password for key derivation (could be user-configurable in future)
+            password = b'agk_secure_key_derivation_2024'
+
+            kdf = PBKDF2HMAC(
+                algorithm=hashes.SHA256(),
+                length=32,
+                salt=salt,
+                iterations=100000,
+            )
+            return base64.urlsafe_b64encode(kdf.derive(password))
+
+        except Exception as e:
+            # Fallback to system-based generation for compatibility
+            print(f"Warning: Using fallback key generation due to: {e}")
+            system_info = f"{os.name}-{os.getlogin()}-{os.getcwd()}"
+            salt = b'agk_api_key_salt_fallback_2024'
+
+            kdf = PBKDF2HMAC(
+                algorithm=hashes.SHA256(),
+                length=32,
+                salt=salt,
+                iterations=100000,
+            )
+            return base64.urlsafe_b64encode(kdf.derive(system_info.encode()))
 
     def _load_keys(self):
         """Load encrypted API keys from storage"""
@@ -48,8 +84,14 @@ class APIKeyManager:
                     cipher = Fernet(self.encryption_key)
                     decrypted_data = cipher.decrypt(encrypted_data)
                     self.keys = json.loads(decrypted_data.decode())
+            except (FileNotFoundError, PermissionError, OSError) as e:
+                print(f"Warning: Could not access API keys file: {e}")
+            except InvalidToken as e:
+                print(f"Warning: API keys file appears to be corrupted or tampered with: {e}")
+            except (json.JSONDecodeError, UnicodeDecodeError) as e:
+                print(f"Warning: API keys file contains invalid data: {e}")
             except Exception as e:
-                print(f"Warning: Could not load API keys: {e}")
+                print(f"Warning: Unexpected error loading API keys: {e}")
 
     def _save_keys(self):
         """Save API keys to encrypted storage"""
@@ -60,33 +102,70 @@ class APIKeyManager:
 
             with open(self.storage_file, 'wb') as f:
                 f.write(encrypted_data)
+        except (FileNotFoundError, PermissionError, OSError) as e:
+            print(f"Warning: Could not save API keys to file: {e}")
+        except (TypeError, ValueError) as e:
+            print(f"Warning: Could not serialize API keys data: {e}")
         except Exception as e:
-            print(f"Warning: Could not save API keys: {e}")
+            print(f"Warning: Unexpected error saving API keys: {e}")
 
     def set_key(self, service: str, api_key: str) -> bool:
         """Set API key for a service"""
         try:
+            if not isinstance(service, str) or not isinstance(api_key, str):
+                print("Error: Service and API key must be strings")
+                return False
+            if not service.strip() or not api_key.strip():
+                print("Error: Service and API key cannot be empty")
+                return False
+
             self.keys[service.lower()] = api_key
             self._save_keys()
             return True
+        except (FileNotFoundError, PermissionError, OSError) as e:
+            print(f"Error saving API key to file: {e}")
+            return False
         except Exception as e:
-            print(f"Error setting API key: {e}")
+            print(f"Unexpected error setting API key: {e}")
             return False
 
     def get_key(self, service: str) -> Optional[str]:
-        """Get API key for a service"""
+        """Get API key for a service
+
+        Args:
+            service: The service name to retrieve the key for
+
+        Returns:
+            The API key if found, None otherwise
+        """
+        if not isinstance(service, str):
+            print("Error: Service must be a string")
+            return None
+        if not service.strip():
+            print("Error: Service cannot be empty")
+            return None
         return self.keys.get(service.lower())
 
     def remove_key(self, service: str) -> bool:
         """Remove API key for a service"""
         try:
+            if not isinstance(service, str):
+                print("Error: Service must be a string")
+                return False
+            if not service.strip():
+                print("Error: Service cannot be empty")
+                return False
+
             if service.lower() in self.keys:
                 del self.keys[service.lower()]
                 self._save_keys()
                 return True
             return False
+        except (FileNotFoundError, PermissionError, OSError) as e:
+            print(f"Error saving updated keys to file: {e}")
+            return False
         except Exception as e:
-            print(f"Error removing API key: {e}")
+            print(f"Unexpected error removing API key: {e}")
             return False
 
     def list_services(self) -> List[str]:
@@ -94,7 +173,18 @@ class APIKeyManager:
         return list(self.keys.keys())
 
     def has_key(self, service: str) -> bool:
-        """Check if API key exists for service"""
+        """Check if API key exists for service
+
+        Args:
+            service: The service name to check
+
+        Returns:
+            True if the service has an API key, False otherwise
+        """
+        if not isinstance(service, str):
+            return False
+        if not service.strip():
+            return False
         return service.lower() in self.keys
 
     def clear_all(self) -> bool:
@@ -103,13 +193,31 @@ class APIKeyManager:
             self.keys.clear()
             if os.path.exists(self.storage_file):
                 os.remove(self.storage_file)
+            # Also remove the salt file to reset encryption key
+            if os.path.exists(self.salt_file):
+                os.remove(self.salt_file)
             return True
+        except (FileNotFoundError, PermissionError, OSError) as e:
+            print(f"Error deleting API keys files: {e}")
+            return False
         except Exception as e:
-            print(f"Error clearing API keys: {e}")
+            print(f"Unexpected error clearing API keys: {e}")
             return False
 
     def get_key_preview(self, service: str) -> Optional[str]:
-        """Get preview of API key (first 8 chars + ...)"""
+        """Get preview of API key (first 8 chars + ...)
+
+        Args:
+            service: The service name to get preview for
+
+        Returns:
+            Preview string or None if service not found
+        """
+        if not isinstance(service, str):
+            return None
+        if not service.strip():
+            return None
+
         key = self.get_key(service)
         if key and len(key) > 8:
             return key[:8] + "..."
@@ -147,8 +255,15 @@ class LLMProvider:
     }
 
     @classmethod
-    def get_provider_info(cls, service: str) -> Optional[Dict]:
-        """Get provider information"""
+    def get_provider_info(cls, service: str) -> Optional[Dict[str, Union[str, List[str]]]]:
+        """Get provider information
+
+        Args:
+            service: The service name (e.g., 'openai', 'anthropic')
+
+        Returns:
+            Dictionary containing provider info or None if not found
+        """
         return cls.PROVIDERS.get(service.lower())
 
     @classmethod
@@ -185,8 +300,19 @@ class APIKeyValidator:
 
     @staticmethod
     def validate_key(service: str, api_key: str) -> bool:
-        """Validate API key format for any service"""
-        validators = {
+        """Validate API key format for any service
+
+        Args:
+            service: The service name to validate for
+            api_key: The API key to validate
+
+        Returns:
+            True if the API key format is valid for the service, False otherwise
+        """
+        if not isinstance(service, str) or not isinstance(api_key, str):
+            return False
+
+        validators: Dict[str, Any] = {
             'openai': APIKeyValidator.validate_openai_key,
             'anthropic': APIKeyValidator.validate_anthropic_key,
             'google': APIKeyValidator.validate_google_key,
@@ -256,8 +382,12 @@ def setup_common_providers():
 
 
 # Environment variable integration
-def load_keys_from_environment():
-    """Load API keys from environment variables"""
+def load_keys_from_environment() -> List[str]:
+    """Load API keys from environment variables
+
+    Returns:
+        List of service names for which keys were successfully loaded
+    """
     env_mapping = {
         'OPENAI_API_KEY': 'openai',
         'ANTHROPIC_API_KEY': 'anthropic',
@@ -267,13 +397,18 @@ def load_keys_from_environment():
 
     loaded = []
     for env_var, service in env_mapping.items():
-        if env_var in os.environ:
-            api_key = os.environ[env_var]
-            if set_api_key(service, api_key):
-                loaded.append(service)
+        try:
+            if env_var in os.environ:
+                api_key = os.environ[env_var]
+                if api_key and set_api_key(service, api_key):
+                    loaded.append(service)
+        except (OSError, ValueError) as e:
+            print(f"Warning: Could not load {service} API key from environment: {e}")
 
     if loaded:
         print(f"Loaded API keys from environment: {', '.join(loaded)}")
+
+    return loaded
 
 
 if __name__ == "__main__":

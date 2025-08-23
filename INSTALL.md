@@ -18,7 +18,12 @@ A revolutionary compiler that transforms natural language programming into execu
    cd zen-mcp-modified
    ```
 
-2. **No additional dependencies required!** The compiler is written in pure Python with no external dependencies.
+2. **Install required dependencies:**
+   ```bash
+   pip install cryptography
+   ```
+
+   The API management features require the `cryptography` package for secure API key storage.
 
 3. **Make the compiler executable (optional):**
    ```bash
