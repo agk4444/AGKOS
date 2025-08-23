@@ -10,6 +10,21 @@ A revolutionary compiler that transforms natural language programming into execu
 - **Git** (for cloning the repository)
 - **Command-line terminal** (Windows Command Prompt, PowerShell, Terminal, or bash)
 
+### Optional Dependencies (for Standalone Builds)
+
+For creating standalone executables that don't require Python:
+
+```bash
+# Install PyInstaller for single-executable builds
+pip install pyinstaller>=4.0
+
+# Install Nuitka for optimized native compilation
+pip install nuitka>=1.8.0
+
+# Docker for containerized deployment
+# Install Docker Desktop from https://docker.com
+```
+
 ### Installation
 
 1. **Clone the repository:**
@@ -29,6 +44,66 @@ A revolutionary compiler that transforms natural language programming into execu
    ```bash
    chmod +x agk_compiler.py
    ```
+
+## 🚀 Standalone Executable Installation (No Python Required)
+
+The AGK compiler can be built as standalone executables that don't require Python to be installed on the target system.
+
+### Quick Standalone Build
+
+1. **Install build dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. **Build standalone executable:**
+   ```bash
+   # Linux/macOS
+   ./make_standalone.sh
+
+   # Windows
+   make_standalone.bat
+
+   # Or manually
+   python build_standalone.py
+   ```
+
+3. **Choose your build option:**
+   - **PyInstaller**: Single executable file
+   - **Nuitka**: Optimized native compilation
+   - **Docker**: Containerized deployment
+   - **Web Version**: Browser-based compiler
+
+### Using Standalone Executables
+
+#### PyInstaller Build
+```bash
+# After building, run without Python
+./dist/agk_compiler your_program.agk
+
+# On Windows
+dist\agk_compiler.exe your_program.agk
+```
+
+#### Docker Build
+```bash
+# Build and run with Docker
+docker run -v $(pwd):/app/workspace agk-compiler-standalone your_program.agk
+```
+
+#### Web Version
+```bash
+# Open in browser (no installation needed)
+agk_compiler_web.html
+```
+
+### Standalone Installation Benefits
+
+- ✅ **No Python Required**: Works on any system
+- ✅ **Easy Distribution**: Single files or containers
+- ✅ **Professional Appearance**: Native application feel
+- ✅ **Cross-Platform**: Windows, macOS, Linux support
+- ✅ **Multiple Options**: Choose your preferred deployment method
 
 ## 🐳 Docker Installation (Alternative Method)
 
@@ -278,9 +353,46 @@ AGK_language/
 ├── agk_ast.py           # Abstract Syntax Tree definitions
 ├── agk_semantic.py      # Semantic analyzer
 ├── agk_codegen.py       # Code generator
+├── build_standalone.py   # Standalone executable build system
+├── requirements.txt      # Build dependencies
+├── make_standalone.sh    # Linux/macOS build script
+├── make_standalone.bat   # Windows build script
 ├── simple_test.agk      # Simple example program
 ├── test_program.agk     # More complex example
-└── debug_lexer.py       # Debugging utilities
+├── debug_lexer.py       # Debugging utilities
+├── stdlib/              # Standard library modules (22 libraries)
+│   ├── database.agk     # SQLite database integration
+│   ├── http.agk         # HTTP client for REST APIs
+│   ├── fs.agk           # Advanced file system operations
+│   ├── json.agk         # Enhanced JSON processing
+│   ├── ui.agk           # User interface components
+│   ├── network.agk      # Socket programming
+│   ├── logging.agk      # Structured logging framework
+│   ├── test.agk         # Unit testing framework
+│   ├── stats.agk        # Statistics and data analysis
+│   ├── regex.agk        # Regular expressions
+│   ├── game.agk         # Game development framework
+│   └── ...              # 11 more libraries
+├── templates/           # Application templates
+│   ├── desktop_app_template.agk      # Desktop applications
+│   ├── web_app_template.agk          # Web applications
+│   ├── server_api_template.agk       # REST API servers
+│   ├── mobile_app_template.agk       # Mobile applications
+│   ├── browser_app_template.agk      # Web browsers
+│   ├── llm_template.agk              # AI applications
+│   ├── general_template.agk          # Business applications
+│   ├── database_template.agk         # Database demos
+│   ├── http_template.agk             # HTTP client demos
+│   ├── fs_template.agk               # File system demos
+│   ├── ui_template.agk               # UI component demos
+│   ├── test_template.agk             # Testing demos
+│   ├── logging_template.agk          # Logging demos
+│   ├── json_template.agk             # JSON processing demos
+│   ├── network_template.agk          # Network demos
+│   ├── regex_template.agk            # Regex demos
+│   ├── stats_template.agk            # Statistics demos
+│   └── game_template.agk             # Game demos
+└── APP_TEMPLATES_README.md           # Templates usage guide
 ```
 
 ## 🐛 Troubleshooting
@@ -305,11 +417,20 @@ AGK_language/
 - Look at the line and column numbers in error messages
 - Try the REPL mode for quick testing
 
+**5. Standalone build issues**
+- Ensure PyInstaller/Nuitka are installed: `pip install pyinstaller nuitka`
+- Check Docker installation for container builds
+- Verify write permissions in the output directory
+- Try running with administrator privileges on Windows
+
 ### Getting Help
 
 1. **REPL Help**: Type `help` in REPL mode
 2. **Example Files**: Study `simple_test.agk` and `test_program.agk`
-3. **Error Messages**: Read compiler error messages carefully
+3. **Template Library**: Explore 16 professional templates for learning
+4. **Library Demos**: Use `*_template.agk` files to learn each library
+5. **Error Messages**: Read compiler error messages carefully
+6. **Template Guide**: See `APP_TEMPLATES_README.md` for detailed template usage
 
 ## 🌟 Example Session
 
@@ -336,8 +457,44 @@ After installation, you can:
 
 1. **Try the examples**: Compile and run the provided example files
 2. **Experiment in REPL**: Use `--repl` mode for quick testing
-3. **Write your own programs**: Use the syntax examples above
-4. **Contribute**: Help improve the compiler or add new features
+3. **Explore templates**: Use 16 professional templates to learn AGK features
+4. **Learn libraries**: Study 11 library templates for each standard library
+5. **Build applications**: Start with application templates for common use cases
+6. **Create standalone**: Build distributable executables with the standalone system
+7. **Write your own programs**: Use the syntax examples above
+8. **Contribute**: Help improve the compiler or add new features
+
+## 📚 Template Ecosystem
+
+The AGK Language now includes a comprehensive template ecosystem:
+
+### Application Templates (7)
+- **Desktop Apps**: Interactive GUI applications
+- **Web Apps**: Full-stack web applications
+- **API Servers**: REST API backend services
+- **Mobile Apps**: Touch-based mobile applications
+- **Browser Apps**: Custom web browser applications
+- **AI Apps**: LLM-powered intelligent applications
+- **Business Apps**: General-purpose business applications
+
+### Library Templates (11)
+- **Database**: SQLite integration and CRUD operations
+- **HTTP Client**: REST API operations and JSON handling
+- **File System**: Advanced file operations and path management
+- **UI Components**: Form creation and validation
+- **Testing**: Unit testing and assertion frameworks
+- **Logging**: Structured logging and performance monitoring
+- **JSON**: Parsing, validation, and transformation
+- **Network**: Socket programming and client-server apps
+- **Regex**: Pattern matching and text processing
+- **Statistics**: Data analysis and visualization
+- **Game Development**: Entity-component system and game mechanics
+
+### Learning Path
+1. **Start with examples**: Use `simple_test.agk` and `test_program.agk`
+2. **Learn libraries**: Study each `*_template.agk` file
+3. **Build applications**: Use application templates for real projects
+4. **Create distributables**: Use standalone build system for deployment
 
 ## 📞 Support
 
