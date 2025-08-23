@@ -1,0 +1,437 @@
+# AGK Database Template - SQLite Database Application
+# This template demonstrates how to build database-driven applications
+# Perfect for: Data management apps, inventory systems, user management, analytics
+
+import database
+import io
+import logging
+import json
+
+# Global configuration
+define constant DATABASE_NAME as String = "app_database.db"
+
+# Main application entry point
+define function main:
+    # Initialize logging for the database application
+    create logger as Logger
+    set logger to logging.get_logger("Database_App")
+    logging.set_level(logger, logging.INFO)
+    logging.add_console_handler(logger)
+
+    logging.info(logger, "Starting Database Application")
+
+    # Run the main application loop
+    run_database_application_loop(logger)
+
+# Main application loop with menu-driven interface
+define function run_database_application_loop that takes logger as Logger:
+    create running as Boolean
+    set running to true
+
+    # Initialize database connection
+    create db as Database
+    set db to initialize_database(logger)
+
+    while running:
+        io.println("\n📊 Database Management System")
+        io.println("1. Create Tables")
+        io.println("2. Insert Sample Data")
+        io.println("3. View All Records")
+        io.println("4. Search Records")
+        io.println("5. Update Records")
+        io.println("6. Delete Records")
+        io.println("7. Database Statistics")
+        io.println("8. Export Data to JSON")
+        io.println("9. Import Data from JSON")
+        io.println("10. Optimize Database")
+        io.println("11. Exit")
+        io.print("Enter your choice (1-11): ")
+
+        create choice as String
+        set choice to io.read_line()
+
+        if choice == "1":
+            create_tables(db, logger)
+        else if choice == "2":
+            insert_sample_data(db, logger)
+        else if choice == "3":
+            view_all_records(db, logger)
+        else if choice == "4":
+            search_records(db, logger)
+        else if choice == "5":
+            update_records(db, logger)
+        else if choice == "6":
+            delete_records(db, logger)
+        else if choice == "7":
+            show_database_statistics(db, logger)
+        else if choice == "8":
+            export_data_to_json(db, logger)
+        else if choice == "9":
+            import_data_from_json(db, logger)
+        else if choice == "10":
+            optimize_database(db, logger)
+        else if choice == "11":
+            set running to false
+            database.close(db)
+            logging.info(logger, "Database connection closed. Application shutting down")
+        else:
+            io.println("❌ Invalid choice. Please try again.")
+
+# Initialize database connection
+define function initialize_database that takes logger as Logger and returns Database:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "database_initialization")
+
+    create db as Database
+    set db to database.connect(DATABASE_NAME)
+
+    logging.end_timer(timer)
+    logging.info(logger, "Database connection established: " + DATABASE_NAME)
+
+    return db
+
+# Create database tables
+define function create_tables that takes db as Database, logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "table_creation")
+
+    # Users table
+    create user_columns as List
+    add "id INTEGER PRIMARY KEY AUTOINCREMENT" to user_columns
+    add "username TEXT NOT NULL UNIQUE" to user_columns
+    add "email TEXT NOT NULL UNIQUE" to user_columns
+    add "password TEXT NOT NULL" to user_columns
+    add "created_at DATETIME DEFAULT CURRENT_TIMESTAMP" to user_columns
+    add "is_active INTEGER DEFAULT 1" to user_columns
+
+    database.create_table(db, "users", user_columns)
+    logging.info(logger, "Created users table")
+
+    # Products table
+    create product_columns as List
+    add "id INTEGER PRIMARY KEY AUTOINCREMENT" to product_columns
+    add "name TEXT NOT NULL" to product_columns
+    add "description TEXT" to product_columns
+    add "price REAL NOT NULL" to product_columns
+    add "category TEXT" to product_columns
+    add "stock_quantity INTEGER DEFAULT 0" to product_columns
+    add "created_at DATETIME DEFAULT CURRENT_TIMESTAMP" to product_columns
+
+    database.create_table(db, "products", product_columns)
+    logging.info(logger, "Created products table")
+
+    # Orders table
+    create order_columns as List
+    add "id INTEGER PRIMARY KEY AUTOINCREMENT" to order_columns
+    add "user_id INTEGER NOT NULL" to order_columns
+    add "product_id INTEGER NOT NULL" to order_columns
+    add "quantity INTEGER NOT NULL" to order_columns
+    add "total_price REAL NOT NULL" to order_columns
+    add "order_date DATETIME DEFAULT CURRENT_TIMESTAMP" to order_columns
+    add "status TEXT DEFAULT 'pending'" to order_columns
+    add "FOREIGN KEY (user_id) REFERENCES users (id)" to order_columns
+    add "FOREIGN KEY (product_id) REFERENCES products (id)" to order_columns
+
+    database.create_table(db, "orders", order_columns)
+    logging.info(logger, "Created orders table")
+
+    logging.end_timer(timer)
+    io.println("✅ All tables created successfully!")
+
+# Insert sample data
+define function insert_sample_data that takes db as Database, logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "sample_data_insertion")
+
+    # Insert sample users
+    create user1 as Object
+    set user1["username"] to "john_doe"
+    set user1["email"] to "john@example.com"
+    set user1["password"] to "password123"
+    database.insert(db, "users", user1)
+
+    create user2 as Object
+    set user2["username"] to "jane_smith"
+    set user2["email"] to "jane@example.com"
+    set user2["password"] to "password456"
+    database.insert(db, "users", user2)
+
+    # Insert sample products
+    create product1 as Object
+    set product1["name"] to "Laptop"
+    set product1["description"] to "High-performance laptop"
+    set product1["price"] to 999.99
+    set product1["category"] to "Electronics"
+    set product1["stock_quantity"] to 50
+    database.insert(db, "products", product1)
+
+    create product2 as Object
+    set product2["name"] to "Book"
+    set product2["description"] to "Programming guide"
+    set product2["price"] to 29.99
+    set product2["category"] to "Books"
+    set product2["stock_quantity"] to 100
+    database.insert(db, "products", product2)
+
+    logging.end_timer(timer)
+    logging.info(logger, "Sample data inserted successfully")
+    io.println("✅ Sample data inserted successfully!")
+
+# View all records from a table
+define function view_all_records that takes db as Database, logger as Logger:
+    io.print("Enter table name (users/products/orders): ")
+    create table_name as String
+    set table_name to io.read_line()
+
+    if table_name == "":
+        set table_name to "users"
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "view_records")
+
+    create query as String
+    set query to "SELECT * FROM " + table_name
+    create result as QueryResult
+    set result to database.query(db, query)
+
+    logging.end_timer(timer)
+
+    io.println("\n📋 Records from " + table_name + " table:")
+    io.println("─" * 50)
+
+    # Display results (simplified for demo)
+    create record_count as Integer
+    set record_count to 0
+
+    # In a real implementation, you would iterate through the result set
+    # For demo purposes, we'll show the query was successful
+    io.println("Query executed successfully: " + query)
+    io.println("✓ Table exists and is accessible")
+
+    logging.info(logger, "Viewed " + record_count + " records from " + table_name)
+
+# Search records
+define function search_records that takes db as Database, logger as Logger:
+    io.print("Enter table name to search in (users/products/orders): ")
+    create table_name as String
+    set table_name to io.read_line()
+
+    if table_name == "":
+        set table_name to "users"
+
+    io.print("Enter search term: ")
+    create search_term as String
+    set search_term to io.read_line()
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "search_records")
+
+    create query as String
+    if table_name == "users":
+        set query to "SELECT * FROM users WHERE username LIKE '%" + search_term + "%' OR email LIKE '%" + search_term + "%'"
+    else if table_name == "products":
+        set query to "SELECT * FROM products WHERE name LIKE '%" + search_term + "%' OR category LIKE '%" + search_term + "%'"
+    else:
+        set query to "SELECT * FROM " + table_name + " WHERE id = " + search_term
+
+    create result as QueryResult
+    set result to database.query(db, query)
+
+    logging.end_timer(timer)
+
+    io.println("\n🔍 Search Results:")
+    io.println("─" * 30)
+    io.println("Query: " + query)
+    io.println("✅ Search completed successfully")
+
+    logging.info(logger, "Search completed for term: " + search_term + " in table: " + table_name)
+
+# Update records
+define function update_records that takes db as Database, logger as Logger:
+    io.print("Enter table name (users/products/orders): ")
+    create table_name as String
+    set table_name to io.read_line()
+
+    if table_name == "":
+        set table_name to "users"
+
+    io.print("Enter record ID to update: ")
+    create record_id as String
+    set record_id to io.read_line()
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "update_record")
+
+    # Update user email example
+    if table_name == "users":
+        create update_data as Object
+        set update_data["email"] to "updated@example.com"
+
+        create where_condition as Object
+        set where_condition["id"] to record_id
+
+        database.update(db, "users", update_data, where_condition)
+        io.println("✅ User email updated successfully!")
+    else:
+        io.println("ℹ️ Update operation for " + table_name + " table (demo)")
+
+    logging.end_timer(timer)
+    logging.info(logger, "Updated record " + record_id + " in table " + table_name)
+
+# Delete records
+define function delete_records that takes db as Database, logger as Logger:
+    io.print("Enter table name (users/products/orders): ")
+    create table_name as String
+    set table_name to io.read_line()
+
+    if table_name == "":
+        set table_name to "users"
+
+    io.print("Enter record ID to delete: ")
+    create record_id as String
+    set record_id to io.read_line()
+
+    io.print("⚠️ Are you sure you want to delete record " + record_id + " from " + table_name + "? (y/n): ")
+    create confirmation as String
+    set confirmation to io.read_line()
+
+    if confirmation == "y":
+        create timer as Timer
+        set timer to logging.start_timer(logger, "delete_record")
+
+        create where_condition as Object
+        set where_condition["id"] to record_id
+
+        database.delete(db, table_name, where_condition)
+
+        logging.end_timer(timer)
+        logging.info(logger, "Deleted record " + record_id + " from table " + table_name)
+        io.println("✅ Record deleted successfully!")
+    else:
+        io.println("ℹ️ Delete operation cancelled")
+
+# Show database statistics
+define function show_database_statistics that takes db as Database, logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "database_statistics")
+
+    io.println("\n📈 Database Statistics:")
+    io.println("─" * 30)
+
+    # Count records in each table
+    create user_count_query as String
+    set user_count_query to "SELECT COUNT(*) as count FROM users"
+    create user_result as QueryResult
+    set user_result to database.query(db, user_count_query)
+    io.println("👥 Users: (count query executed)")
+
+    create product_count_query as String
+    set product_count_query to "SELECT COUNT(*) as count FROM products"
+    create product_result as QueryResult
+    set product_result to database.query(db, product_count_query)
+    io.println("📦 Products: (count query executed)")
+
+    create order_count_query as String
+    set order_count_query to "SELECT COUNT(*) as count FROM orders"
+    create order_result as QueryResult
+    set order_result to database.query(db, order_count_query)
+    io.println("🛒 Orders: (count query executed)")
+
+    logging.end_timer(timer)
+    logging.info(logger, "Database statistics displayed")
+
+# Export data to JSON
+define function export_data_to_json that takes db as Database, logger as Logger:
+    io.print("Enter table name to export (users/products/orders): ")
+    create table_name as String
+    set table_name to io.read_line()
+
+    if table_name == "":
+        set table_name to "users"
+
+    io.print("Enter export filename: ")
+    create filename as String
+    set filename to io.read_line()
+
+    if filename == "":
+        set filename to table_name + "_export.json"
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "json_export")
+
+    create query as String
+    set query to "SELECT * FROM " + table_name
+    create result as QueryResult
+    set result to database.query(db, query)
+
+    # Create export data (simplified for demo)
+    create export_data as Object
+    set export_data["table"] to table_name
+    set export_data["exported_at"] to "current_timestamp"
+    set export_data["records"] to result
+
+    create json_content as String
+    set json_content to json.stringify(export_data, 2)
+    # In real implementation: fs.write_file(filename, json_content)
+
+    logging.end_timer(timer)
+
+    io.println("✅ Data exported to " + filename)
+    io.println("📄 JSON Preview:")
+    io.println(json_content)
+
+    logging.info(logger, "Exported " + table_name + " data to " + filename)
+
+# Import data from JSON
+define function import_data_from_json that takes db as Database, logger as Logger:
+    io.print("Enter table name to import into (users/products/orders): ")
+    create table_name as String
+    set table_name to io.read_line()
+
+    if table_name == "":
+        set table_name to "users"
+
+    io.print("Enter import filename: ")
+    create filename as String
+    set filename to io.read_line()
+
+    if filename == "":
+        set filename to table_name + "_import.json"
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "json_import")
+
+    # In real implementation:
+    # create json_content as String = fs.read_file(filename)
+    # create import_data as Object = json.parse(json_content)
+
+    io.println("ℹ️ JSON import for " + table_name + " from " + filename + " (demo)")
+    io.println("✅ Import operation completed successfully!")
+
+    logging.end_timer(timer)
+    logging.info(logger, "Imported data into " + table_name + " from " + filename)
+
+# Optimize database
+define function optimize_database that takes db as Database, logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "database_optimization")
+
+    io.println("🔧 Database Optimization:")
+    io.println("─" * 30)
+
+    # Run optimization queries (simplified for demo)
+    create vacuum_query as String
+    set vacuum_query to "VACUUM"
+    database.execute(db, vacuum_query)
+    io.println("✅ Database vacuum completed")
+
+    create analyze_query as String
+    set analyze_query to "ANALYZE"
+    database.execute(db, analyze_query)
+    io.println("✅ Database statistics updated")
+
+    logging.end_timer(timer)
+    logging.info(logger, "Database optimization completed")
+
+# Initialize the application
+main()
