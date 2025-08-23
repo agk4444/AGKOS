@@ -1,0 +1,299 @@
+# AGK Operating System Development Library
+# Provides low-level system programming interfaces
+
+# Memory Management
+define function memory_allocate(size as Integer) as pointer:
+    """Allocate memory block"""
+    # External function declaration for memory allocation
+    external function allocate_memory(size as Integer) from "libc.so" as pointer
+    return allocate_memory(size)
+
+define function memory_free(ptr as pointer):
+    """Free allocated memory"""
+    external function free_memory(ptr as pointer) from "libc.so" as void
+    free_memory(ptr)
+
+define function memory_copy(destination as pointer, source as pointer, size as Integer) as pointer:
+    """Copy memory block"""
+    external function copy_memory(dest as pointer, src as pointer, size as Integer) from "libc.so" as pointer
+    return copy_memory(destination, source, size)
+
+define function memory_set(destination as pointer, value as Integer, size as Integer) as pointer:
+    """Set memory block to value"""
+    external function set_memory(dest as pointer, value as Integer, size as Integer) from "libc.so" as pointer
+    return set_memory(destination, value, size)
+
+# File System Operations
+define function file_open(filename as String, flags as Integer) as Integer:
+    """Open file descriptor"""
+    external function open_file(name as String, flags as Integer) from "libc.so" as Integer
+    return open_file(filename, flags)
+
+define function file_close(fd as Integer) as Integer:
+    """Close file descriptor"""
+    external function close_file(fd as Integer) from "libc.so" as Integer
+    return close_file(fd)
+
+define function file_read(fd as Integer, buffer as pointer, count as Integer) as Integer:
+    """Read from file descriptor"""
+    external function read_file(fd as Integer, buf as pointer, count as Integer) from "libc.so" as Integer
+    return read_file(fd, buffer, count)
+
+define function file_write(fd as Integer, buffer as pointer, count as Integer) as Integer:
+    """Write to file descriptor"""
+    external function write_file(fd as Integer, buf as pointer, count as Integer) from "libc.so" as Integer
+    return write_file(fd, buffer, count)
+
+define function file_seek(fd as Integer, offset as Integer, whence as Integer) as Integer:
+    """Seek in file descriptor"""
+    external function seek_file(fd as Integer, offset as Integer, whence as Integer) from "libc.so" as Integer
+    return seek_file(fd, offset, whence)
+
+# Process Management
+define function process_create(command as String, arguments as List) as Integer:
+    """Create new process"""
+    external function create_process(cmd as String, args as pointer) from "libc.so" as Integer
+    return create_process(command, arguments)
+
+define function process_wait(pid as Integer) as Integer:
+    """Wait for process to complete"""
+    external function wait_process(pid as Integer) from "libc.so" as Integer
+    return wait_process(pid)
+
+define function process_kill(pid as Integer, signal as Integer) as Integer:
+    """Send signal to process"""
+    external function kill_process(pid as Integer, sig as Integer) from "libc.so" as Integer
+    return kill_process(pid, signal)
+
+define function get_process_id() as Integer:
+    """Get current process ID"""
+    external function get_pid() from "libc.so" as Integer
+    return get_pid()
+
+define function get_parent_process_id() as Integer:
+    """Get parent process ID"""
+    external function get_ppid() from "libc.so" as Integer
+    return get_ppid()
+
+# Thread Management
+define function thread_create(function as Function, argument as pointer) as Integer:
+    """Create new thread"""
+    external function create_thread(func as Function, arg as pointer) from "pthread.so" as Integer
+    return create_thread(function, argument)
+
+define function thread_join(thread_id as Integer, return_value as pointer) as Integer:
+    """Join thread"""
+    external function join_thread(tid as Integer, retval as pointer) from "pthread.so" as Integer
+    return join_thread(thread_id, return_value)
+
+define function thread_detach(thread_id as Integer) as Integer:
+    """Detach thread"""
+    external function detach_thread(tid as Integer) from "pthread.so" as Integer
+    return detach_thread(thread_id)
+
+define function get_thread_id() as Integer:
+    """Get current thread ID"""
+    external function get_tid() from "pthread.so" as Integer
+    return get_tid()
+
+# Synchronization Primitives
+define function mutex_create() as pointer:
+    """Create mutex"""
+    external function create_mutex() from "pthread.so" as pointer
+    return create_mutex()
+
+define function mutex_lock(mutex as pointer) as Integer:
+    """Lock mutex"""
+    external function lock_mutex(mtx as pointer) from "pthread.so" as Integer
+    return lock_mutex(mutex)
+
+define function mutex_unlock(mutex as pointer) as Integer:
+    """Unlock mutex"""
+    external function unlock_mutex(mtx as pointer) from "pthread.so" as Integer
+    return unlock_mutex(mutex)
+
+define function mutex_destroy(mutex as pointer) as Integer:
+    """Destroy mutex"""
+    external function destroy_mutex(mtx as pointer) from "pthread.so" as Integer
+    return destroy_mutex(mutex)
+
+# Semaphore Operations
+define function semaphore_create(value as Integer) as pointer:
+    """Create semaphore"""
+    external function create_semaphore(val as Integer) from "pthread.so" as pointer
+    return create_semaphore(value)
+
+define function semaphore_wait(semaphore as pointer) as Integer:
+    """Wait on semaphore"""
+    external function wait_semaphore(sem as pointer) from "pthread.so" as Integer
+    return wait_semaphore(semaphore)
+
+define function semaphore_post(semaphore as pointer) as Integer:
+    """Post to semaphore"""
+    external function post_semaphore(sem as pointer) from "pthread.so" as Integer
+    return post_semaphore(semaphore)
+
+define function semaphore_destroy(semaphore as pointer) as Integer:
+    """Destroy semaphore"""
+    external function destroy_semaphore(sem as pointer) from "pthread.so" as Integer
+    return destroy_semaphore(semaphore)
+
+# Network Programming
+define function network_socket(domain as Integer, type as Integer, protocol as Integer) as Integer:
+    """Create network socket"""
+    external function create_socket(domain as Integer, type as Integer, protocol as Integer) from "libc.so" as Integer
+    return create_socket(domain, type, protocol)
+
+define function network_bind(socket as Integer, address as pointer, address_len as Integer) as Integer:
+    """Bind socket to address"""
+    external function bind_socket(sock as Integer, addr as pointer, addr_len as Integer) from "libc.so" as Integer
+    return bind_socket(socket, address, address_len)
+
+define function network_listen(socket as Integer, backlog as Integer) as Integer:
+    """Listen for connections"""
+    external function listen_socket(sock as Integer, backlog as Integer) from "libc.so" as Integer
+    return listen_socket(socket, backlog)
+
+define function network_accept(socket as Integer, address as pointer, address_len as pointer) as Integer:
+    """Accept connection"""
+    external function accept_connection(sock as Integer, addr as pointer, addr_len as pointer) from "libc.so" as Integer
+    return accept_connection(socket, address, address_len)
+
+define function network_connect(socket as Integer, address as pointer, address_len as Integer) as Integer:
+    """Connect to remote host"""
+    external function connect_socket(sock as Integer, addr as pointer, addr_len as Integer) from "libc.so" as Integer
+    return connect_socket(socket, address, address_len)
+
+define function network_send(socket as Integer, buffer as pointer, length as Integer, flags as Integer) as Integer:
+    """Send data over socket"""
+    external function send_data(sock as Integer, buf as pointer, len as Integer, flags as Integer) from "libc.so" as Integer
+    return send_data(socket, buffer, length, flags)
+
+define function network_receive(socket as Integer, buffer as pointer, length as Integer, flags as Integer) as Integer:
+    """Receive data from socket"""
+    external function receive_data(sock as Integer, buf as pointer, len as Integer, flags as Integer) from "libc.so" as Integer
+    return receive_data(socket, buffer, length, flags)
+
+define function network_close(socket as Integer) as Integer:
+    """Close network socket"""
+    external function close_socket(sock as Integer) from "libc.so" as Integer
+    return close_socket(socket)
+
+# System Information
+define function system_info(info_type as String) as String:
+    """Get system information"""
+    external function get_system_info(type as String) from "libc.so" as String
+    return get_system_info(info_type)
+
+define function get_system_name() as String:
+    """Get system name"""
+    return system_info("sysname")
+
+define function get_node_name() as String:
+    """Get node name"""
+    return system_info("nodename")
+
+define function get_release() as String:
+    """Get system release"""
+    return system_info("release")
+
+define function get_version() as String:
+    """Get system version"""
+    return system_info("version")
+
+define function get_machine() as String:
+    """Get machine type"""
+    return system_info("machine")
+
+# System Calls
+define function system_call(call_number as Integer, arguments as List) as Integer:
+    """Make direct system call"""
+    external function syscall(number as Integer, args as pointer) from "libc.so" as Integer
+    return syscall(call_number, arguments)
+
+# Atomic Operations
+define function atomic_increment(target as pointer) as Integer:
+    """Atomic increment"""
+    external function atomic_inc(ptr as pointer) from "libc.so" as Integer
+    return atomic_inc(target)
+
+define function atomic_decrement(target as pointer) as Integer:
+    """Atomic decrement"""
+    external function atomic_dec(ptr as pointer) from "libc.so" as Integer
+    return atomic_dec(target)
+
+define function atomic_add(target as pointer, value as Integer) as Integer:
+    """Atomic add"""
+    external function atomic_add_op(ptr as pointer, val as Integer) from "libc.so" as Integer
+    return atomic_add_op(target, value)
+
+define function atomic_subtract(target as pointer, value as Integer) as Integer:
+    """Atomic subtract"""
+    external function atomic_sub_op(ptr as pointer, val as Integer) from "libc.so" as Integer
+    return atomic_sub_op(target, value)
+
+# Memory Barriers
+define function memory_barrier() as void:
+    """Full memory barrier"""
+    external function memory_barrier_full() from "libc.so" as void
+    memory_barrier_full()
+
+define function read_barrier() as void:
+    """Read memory barrier"""
+    external function memory_barrier_read() from "libc.so" as void
+    memory_barrier_read()
+
+define function write_barrier() as void:
+    """Write memory barrier"""
+    external function memory_barrier_write() from "libc.so" as void
+    memory_barrier_write()
+
+# Hardware I/O (x86 specific)
+define function port_in(port as Integer) as Integer:
+    """Read from I/O port"""
+    external function in_port(port as Integer) from "libc.so" as Integer
+    return in_port(port)
+
+define function port_out(port as Integer, value as Integer) as void:
+    """Write to I/O port"""
+    external function out_port(port as Integer, val as Integer) from "libc.so" as void
+    out_port(port, value)
+
+# Constants
+# File access flags
+create constant O_RDONLY as Integer = 0
+create constant O_WRONLY as Integer = 1
+create constant O_RDWR as Integer = 2
+create constant O_CREAT as Integer = 64
+create constant O_EXCL as Integer = 128
+create constant O_TRUNC as Integer = 512
+create constant O_APPEND as Integer = 1024
+
+# File seek constants
+create constant SEEK_SET as Integer = 0
+create constant SEEK_CUR as Integer = 1
+create constant SEEK_END as Integer = 2
+
+# Socket constants
+create constant AF_INET as Integer = 2
+create constant AF_UNIX as Integer = 1
+create constant SOCK_STREAM as Integer = 1
+create constant SOCK_DGRAM as Integer = 2
+create constant SOCK_RAW as Integer = 3
+
+# Signal constants
+create constant SIGTERM as Integer = 15
+create constant SIGKILL as Integer = 9
+create constant SIGINT as Integer = 2
+create constant SIGHUP as Integer = 1
+
+# System call numbers (Linux x86_64)
+create constant SYS_read as Integer = 0
+create constant SYS_write as Integer = 1
+create constant SYS_open as Integer = 2
+create constant SYS_close as Integer = 3
+create constant SYS_fork as Integer = 57
+create constant SYS_execve as Integer = 59
+create constant SYS_exit as Integer = 60
+create constant SYS_wait4 as Integer = 61
+create constant SYS_kill as Integer = 62

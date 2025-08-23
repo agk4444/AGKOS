@@ -129,6 +129,39 @@ docker run -v $(pwd):/app/workspace agk-compiler-standalone your_program.agk
 agk_compiler_web.html
 ```
 
+## 🖥️ Operating System Development (NEW!)
+
+The AGK compiler now supports **complete operating system development** with a C backend for system programming:
+
+### OS Development Setup
+```bash
+# Install system development dependencies
+pip install -r requirements.txt
+
+# The C backend is included in the standard installation
+# and supports building operating systems, kernels, and device drivers
+```
+
+### Building OS Components
+```bash
+# Compile bootloader with C backend
+python agk_compiler.py bootloader_template.agk --backend c
+
+# Compile kernel with C backend
+python agk_compiler.py kernel_template.agk --backend c
+
+# Compile device driver with C backend
+python agk_compiler.py driver_template.agk --backend c
+```
+
+### OS Development Features
+- **Complete C backend compilation** for system programming
+- **Hardware access primitives** (I/O ports, CPU registers, interrupts)
+- **Memory management** (allocation, deallocation, copying)
+- **Kernel development** (modules, synchronization, memory management)
+- **Device driver framework** (interrupt handling, I/O operations)
+- **Build system integration** (Makefile, CMake, kernel module builds)
+
 ### Standalone Installation Benefits
 
 - ✅ **No Python Required**: Works on any system
@@ -136,6 +169,7 @@ agk_compiler_web.html
 - ✅ **Professional Appearance**: Native application feel
 - ✅ **Cross-Platform**: Windows, macOS, Linux support
 - ✅ **Multiple Options**: Choose your preferred deployment method
+- ✅ **OS Development**: Build operating systems with C backend
 
 ## 🐳 Docker Installation (Alternative Method)
 

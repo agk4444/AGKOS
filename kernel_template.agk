@@ -1,0 +1,469 @@
+# AGK Kernel Template
+# A basic kernel implementation
+
+import "kernel"
+import "hardware"
+import "os"
+
+# Kernel constants
+create constant KERNEL_STACK_SIZE as Integer = 8192
+create constant MAX_PROCESSES as Integer = 256
+create constant MAX_THREADS as Integer = 1024
+create constant TIMER_FREQUENCY as Integer = 100
+create constant SYSTEM_CALL_VECTOR as Integer = 0x80
+
+# Global kernel variables
+create kernel_heap_start as pointer
+create kernel_stack as pointer
+create current_process as pointer
+create process_table as List
+create thread_table as List
+create interrupt_handlers as List
+create system_call_table as List
+
+define function kernel_main:
+    """Kernel entry point"""
+    # Initialize kernel subsystems
+    printk(KERN_INFO, "AGK Kernel starting...")
+
+    # Set up kernel stack
+    set kernel_stack to memory_allocate(KERNEL_STACK_SIZE)
+    if kernel_stack is null:
+        panic("Failed to allocate kernel stack")
+
+    # Initialize memory management
+    if not initialize_memory():
+        panic("Memory initialization failed")
+
+    # Initialize interrupt handling
+    if not initialize_interrupts():
+        panic("Interrupt initialization failed")
+
+    # Initialize process management
+    if not initialize_processes():
+        panic("Process initialization failed")
+
+    # Initialize system calls
+    if not initialize_system_calls():
+        panic("System call initialization failed")
+
+    # Initialize device drivers
+    if not initialize_drivers():
+        panic("Driver initialization failed")
+
+    printk(KERN_INFO, "Kernel initialized successfully")
+
+    # Create init process
+    create_init_process()
+
+    # Start scheduler
+    start_scheduler()
+
+    # Should never reach here
+    panic("Kernel main returned")
+
+define function initialize_memory:
+    """Initialize memory management"""
+    printk(KERN_INFO, "Initializing memory management...")
+
+    # Get available memory from bootloader or BIOS
+    create total_memory as Integer
+    set total_memory to detect_memory_size()
+
+    printk(KERN_INFO, "Detected %d MB of RAM", total_memory / (1024 * 1024))
+
+    # Initialize kernel heap
+    set kernel_heap_start to 0x100000  # 1MB mark
+
+    # Set up page tables for kernel space
+    if not setup_kernel_paging():
+        return false
+
+    return true
+
+define function initialize_interrupts:
+    """Initialize interrupt handling"""
+    printk(KERN_INFO, "Initializing interrupt handling...")
+
+    # Set up IDT (Interrupt Descriptor Table)
+    if not setup_idt():
+        return false
+
+    # Install default interrupt handlers
+    install_default_handlers()
+
+    # Set up timer interrupt
+    if not setup_timer(TIMER_FREQUENCY):
+        return false
+
+    # Remap PIC and enable interrupts
+    remap_pic()
+    enable_interrupts()
+
+    return true
+
+define function initialize_processes:
+    """Initialize process management"""
+    printk(KERN_INFO, "Initializing process management...")
+
+    # Initialize process table
+    create process_table as List
+    create thread_table as List
+
+    # Create kernel process (PID 0)
+    create kernel_process as Process
+    set kernel_process.pid to 0
+    set kernel_process.state to PROCESS_RUNNING
+    set kernel_process.name to "kernel"
+    set current_process to kernel_process
+
+    return true
+
+define function initialize_system_calls:
+    """Initialize system call table"""
+    printk(KERN_INFO, "Initializing system calls...")
+
+    # Create system call table
+    create system_call_table as List
+
+    # Register basic system calls
+    register_system_call(0, syscall_exit)      # exit
+    register_system_call(1, syscall_fork)      # fork
+    register_system_call(2, syscall_read)      # read
+    register_system_call(3, syscall_write)     # write
+    register_system_call(4, syscall_open)      # open
+    register_system_call(5, syscall_close)     # close
+    register_system_call(9, syscall_mmap)      # mmap
+    register_system_call(11, syscall_munmap)   # munmap
+    register_system_call(20, syscall_getpid)   # getpid
+    register_system_call(39, syscall_getppid)  # getppid
+    register_system_call(57, syscall_fork)     # fork (duplicate)
+    register_system_call(60, syscall_exit)     # exit (duplicate)
+
+    return true
+
+define function initialize_drivers:
+    """Initialize device drivers"""
+    printk(KERN_INFO, "Initializing device drivers...")
+
+    # Initialize keyboard driver
+    if not keyboard_init():
+        printk(KERN_WARNING, "Keyboard driver initialization failed")
+
+    # Initialize serial driver
+    if not serial_init():
+        printk(KERN_WARNING, "Serial driver initialization failed")
+
+    # Initialize timer driver
+    if not timer_init():
+        return false
+
+    return true
+
+define function create_init_process:
+    """Create the init process"""
+    printk(KERN_INFO, "Creating init process...")
+
+    create init_process as Process
+    set init_process.pid to 1
+    set init_process.state to PROCESS_READY
+    set init_process.name to "init"
+    set init_process.parent to 0
+
+    # Allocate stack for init process
+    set init_process.stack to memory_allocate(4096)
+    if init_process.stack is null:
+        panic("Failed to allocate init process stack")
+
+    # Set up init process context
+    setup_process_context(init_process, init_main)
+
+    # Add to process table
+    add_to_list(process_table, init_process)
+
+    return init_process
+
+define function init_main:
+    """Init process main function"""
+    printk(KERN_INFO, "Init process started")
+
+    # Initialize user space
+    initialize_user_space()
+
+    # Start shell or other user processes
+    start_shell()
+
+    # Main init loop
+    while true:
+        # Handle child processes
+        wait_for_children()
+
+        # Sleep for a bit
+        sleep(1000)
+
+define function start_scheduler:
+    """Start the process scheduler"""
+    printk(KERN_INFO, "Starting scheduler...")
+
+    while true:
+        # Find next ready process
+        create next_process as Process
+        set next_process to find_next_process()
+
+        if next_process is not null and next_process != current_process:
+            # Switch to next process
+            switch_to_process(next_process)
+
+        # Enable interrupts and halt until next timer tick
+        enable_interrupts()
+        halt_cpu()
+
+# System Call Implementations
+define function syscall_exit(status as Integer):
+    """Exit system call"""
+    printk(KERN_INFO, "Process %d exiting with status %d", current_process.pid, status)
+    terminate_process(current_process)
+    schedule_next_process()
+
+define function syscall_fork:
+    """Fork system call"""
+    create child_process as Process
+    set child_process to clone_process(current_process)
+
+    if child_process is null:
+        return -1
+
+    return child_process.pid
+
+define function syscall_read(fd as Integer, buffer as pointer, count as Integer):
+    """Read system call"""
+    # This would implement file descriptor reading
+    return file_read(fd, buffer, count)
+
+define function syscall_write(fd as Integer, buffer as pointer, count as Integer):
+    """Write system call"""
+    # This would implement file descriptor writing
+    return file_write(fd, buffer, count)
+
+define function syscall_open(filename as String, flags as Integer, mode as Integer):
+    """Open system call"""
+    return file_open(filename, flags)
+
+define function syscall_close(fd as Integer):
+    """Close system call"""
+    return file_close(fd)
+
+define function syscall_mmap(addr as pointer, length as Integer, prot as Integer, flags as Integer, fd as Integer, offset as Integer):
+    """Memory map system call"""
+    return memory_map(addr, length, prot, flags, fd, offset)
+
+define function syscall_munmap(addr as pointer, length as Integer):
+    """Memory unmap system call"""
+    return memory_unmap(addr, length)
+
+define function syscall_getpid:
+    """Get PID system call"""
+    return current_process.pid
+
+define function syscall_getppid:
+    """Get PPID system call"""
+    return current_process.parent
+
+# Helper Functions
+define function panic(message as String):
+    """Kernel panic"""
+    printk(KERN_EMERG, "KERNEL PANIC: %s", message)
+
+    disable_interrupts()
+    while true:
+        halt_cpu()
+
+define function printk(level as String, format as String, arguments as List):
+    """Kernel print function"""
+    # This would output to console, serial port, etc.
+    # For now, just print to screen
+    print(format)
+
+define function detect_memory_size:
+    """Detect available memory size"""
+    # This would use BIOS calls or ACPI to detect memory
+    # For now, return a reasonable default
+    return 128 * 1024 * 1024  # 128 MB
+
+define function setup_kernel_paging:
+    """Set up kernel paging"""
+    # This would set up page tables for the kernel
+    return true
+
+define function setup_idt:
+    """Set up Interrupt Descriptor Table"""
+    # This would initialize the IDT
+    return true
+
+define function install_default_handlers:
+    """Install default interrupt handlers"""
+    # Install handlers for various interrupts
+    return true
+
+define function setup_timer(frequency as Integer):
+    """Set up timer interrupt"""
+    # Configure PIT (Programmable Interval Timer)
+    create divisor as Integer
+    set divisor to 1193180 / frequency
+
+    outb(0x43, 0x36)
+    outb(0x40, divisor & 0xFF)
+    outb(0x40, (divisor >> 8) & 0xFF)
+
+    return true
+
+define function remap_pic:
+    """Remap Programmable Interrupt Controller"""
+    # Remap PIC interrupts to avoid conflicts with CPU exceptions
+    outb(0x20, 0x11)  # ICW1
+    outb(0xA0, 0x11)
+    outb(0x21, 0x20)  # ICW2 - Master PIC starts at 32
+    outb(0xA1, 0x28)  # ICW2 - Slave PIC starts at 40
+    outb(0x21, 0x04)  # ICW3
+    outb(0xA1, 0x02)
+    outb(0x21, 0x01)  # ICW4
+    outb(0xA1, 0x01)
+
+    # Mask all interrupts
+    outb(0x21, 0xFF)
+    outb(0xA1, 0xFF)
+
+define function register_system_call(number as Integer, handler as Function):
+    """Register a system call handler"""
+    # Add to system call table
+    create entry as SystemCallEntry
+    set entry.number to number
+    set entry.handler to handler
+    add_to_list(system_call_table, entry)
+
+define function keyboard_init:
+    """Initialize keyboard driver"""
+    # Set up keyboard interrupt handler
+    return request_irq(1, keyboard_handler, 0, "keyboard", null)
+
+define function serial_init:
+    """Initialize serial driver"""
+    # Configure COM1 port
+    outb(0x3F8 + 1, 0x00)  # Disable interrupts
+    outb(0x3F8 + 3, 0x80)  # Enable DLAB
+    outb(0x3F8 + 0, 0x01)  # Set baud rate to 115200
+    outb(0x3F8 + 1, 0x00)
+    outb(0x3F8 + 3, 0x03)  # 8 bits, no parity, one stop bit
+    outb(0x3F8 + 2, 0xC7)  # Enable FIFO
+    outb(0x3F8 + 4, 0x0B)  # Enable interrupts and RTS/DSR
+
+    return true
+
+define function timer_init:
+    """Initialize timer driver"""
+    return setup_timer(TIMER_FREQUENCY)
+
+define function keyboard_handler(irq as Integer, data as pointer):
+    """Keyboard interrupt handler"""
+    create scancode as Integer
+    set scancode to inb(0x60)
+
+    # Process scancode
+    process_keyboard_input(scancode)
+
+define function timer_handler(irq as Integer, data as pointer):
+    """Timer interrupt handler"""
+    # Update system time
+    update_system_time()
+
+    # Schedule next process
+    schedule_next_process()
+
+define function process_keyboard_input(scancode as Integer):
+    """Process keyboard input"""
+    # This would handle keyboard input and add to input buffer
+    return true
+
+define function update_system_time:
+    """Update system time"""
+    # Increment system tick count
+    return true
+
+define function schedule_next_process:
+    """Schedule next process"""
+    # This would implement process scheduling
+    return true
+
+# Process management functions
+define function clone_process(parent as Process):
+    """Clone a process"""
+    create child as Process
+    # Deep copy parent process
+    return child
+
+define function terminate_process(process as Process):
+    """Terminate a process"""
+    set process.state to PROCESS_TERMINATED
+    # Clean up process resources
+
+define function switch_to_process(process as Process):
+    """Switch to another process"""
+    # Save current process context
+    # Load new process context
+    # Perform context switch
+
+define function find_next_process:
+    """Find next ready process"""
+    # Simple round-robin scheduler
+    return null
+
+# Memory management functions
+define function memory_map(addr as pointer, length as Integer, prot as Integer, flags as Integer, fd as Integer, offset as Integer):
+    """Map memory"""
+    return null
+
+define function memory_unmap(addr as pointer, length as Integer):
+    """Unmap memory"""
+    return 0
+
+# Data structures
+define class Process:
+    create pid as Integer
+    create state as Integer
+    create name as String
+    create parent as Integer
+    create stack as pointer
+    create heap as pointer
+    create context as pointer
+
+define class SystemCallEntry:
+    create number as Integer
+    create handler as Function
+
+# Process states
+create constant PROCESS_RUNNING as Integer = 0
+create constant PROCESS_READY as Integer = 1
+create constant PROCESS_BLOCKED as Integer = 2
+create constant PROCESS_TERMINATED as Integer = 3
+
+# Protection flags
+create constant PROT_READ as Integer = 1
+create constant PROT_WRITE as Integer = 2
+create constant PROT_EXEC as Integer = 4
+
+# Memory mapping flags
+create constant MAP_SHARED as Integer = 1
+create constant MAP_PRIVATE as Integer = 2
+create constant MAP_ANONYMOUS as Integer = 32
+
+# External functions (implemented in assembly or C)
+external function setup_process_context(process as Process, entry as Function) from "kernel.so" as void
+external function initialize_user_space() from "kernel.so" as void
+external function start_shell() from "kernel.so" as void
+external function wait_for_children() from "kernel.so" as void
+external function sleep(milliseconds as Integer) from "kernel.so" as void
+external function add_to_list(list as List, item as pointer) from "kernel.so" as void
+external function file_read(fd as Integer, buffer as pointer, count as Integer) from "kernel.so" as Integer
+external function file_write(fd as Integer, buffer as pointer, count as Integer) from "kernel.so" as Integer
+external function file_open(filename as String, flags as Integer) from "kernel.so" as Integer
+external function file_close(fd as Integer) from "kernel.so" as Integer
