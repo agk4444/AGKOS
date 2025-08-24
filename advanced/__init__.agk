@@ -1,0 +1,11 @@
+# AGK Language Compiler - Advanced Libraries
+# This module contains specialized libraries for advanced use cases
+
+# Import all advanced libraries for easy access
+from .iot import *
+from .mobile import *
+from .specialized import *
+from .system import *
+
+__version__ = "1.0.0"
+__description__ = "Advanced Libraries for AGK Language Compiler"
