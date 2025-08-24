@@ -37,8 +37,8 @@ pip install "cryptography>=3.4.0"
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/hnethery/zen-mcp-modified.git
-   cd zen-mcp-modified
+   git clone https://github.com/agk4444/AGKCompiler.git
+   cd AGKCompiler
    ```
 
 2. **Install required dependencies:**
@@ -252,8 +252,8 @@ Docker provides a consistent environment across all platforms and eliminates dep
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/hnethery/zen-mcp-modified.git
-   cd zen-mcp-modified
+   git clone https://github.com/agk4444/AGKCompiler.git
+   cd AGKCompiler
    ```
 
 2. **Build the Docker image:**
