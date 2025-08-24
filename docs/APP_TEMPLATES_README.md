@@ -4,7 +4,9 @@ This comprehensive guide provides ready-to-use templates for different types of 
 
 ## 📱 Available Templates
 
-### 1. Desktop Application Template (`desktop_app_template.agk`)
+All templates are now organized in the dedicated `templates/` directory for better project structure and maintainability.
+
+### 1. Desktop Application Template (`templates/desktop_app_template.agk`)
 **Perfect for:** Games, Utilities, Educational Software, Data Visualization
 
 **Features:**
@@ -17,7 +19,7 @@ This comprehensive guide provides ready-to-use templates for different types of 
 **Quick Start:**
 ```bash
 # Copy the template
-cp desktop_app_template.agk my_desktop_app.agk
+cp templates/desktop_app_template.agk my_desktop_app.agk
 
 # Compile and run (using standalone executable)
 ./agk_compiler my_desktop_app.agk
@@ -26,7 +28,7 @@ cp desktop_app_template.agk my_desktop_app.agk
 agk_compiler.exe my_desktop_app.agk
 ```
 
-### 2. Web Application Template (`web_app_template.agk`)
+### 2. Web Application Template (`templates/web_app_template.agk`)
 **Perfect for:** Web Apps, REST APIs, Dynamic Websites, Admin Panels
 
 **Features:**
@@ -40,7 +42,7 @@ agk_compiler.exe my_desktop_app.agk
 **Quick Start:**
 ```bash
 # Copy the template
-cp web_app_template.agk my_web_app.agk
+cp templates/web_app_template.agk my_web_app.agk
 
 # Edit configuration (port, routes, etc.)
 # Compile and run (using standalone executable)
@@ -50,7 +52,7 @@ cp web_app_template.agk my_web_app.agk
 agk_compiler.exe my_web_app.agk
 ```
 
-### 3. Server/API Template (`server_api_template.agk`)
+### 3. Server/API Template (`templates/server_api_template.agk`)
 **Perfect for:** Microservices, REST APIs, Backend Services, Data Processing
 
 **Features:**
@@ -65,7 +67,7 @@ agk_compiler.exe my_web_app.agk
 **Quick Start:**
 ```bash
 # Copy the template
-cp server_api_template.agk my_api_server.agk
+cp templates/server_api_template.agk my_api_server.agk
 
 # Configure server settings
 # Add your API endpoints
@@ -76,7 +78,7 @@ cp server_api_template.agk my_api_server.agk
 agk_compiler.exe my_api_server.agk
 ```
 
-### 4. Mobile App Template (`mobile_app_template.agk`)
+### 4. Mobile App Template (`templates/mobile_app_template.agk`)
 **Perfect for:** Mobile Apps, Touch Games, Productivity Apps, Health Apps
 
 **Features:**
@@ -91,7 +93,7 @@ agk_compiler.exe my_api_server.agk
 **Quick Start:**
 ```bash
 # Copy the template
-cp mobile_app_template.agk my_mobile_app.agk
+cp templates/mobile_app_template.agk my_mobile_app.agk
 
 # Customize screens and interactions
 # Compile and run (using standalone executable)
@@ -101,7 +103,7 @@ cp mobile_app_template.agk my_mobile_app.agk
 agk_compiler.exe my_mobile_app.agk
 ```
 
-### 5. Browser App Template (`agk_browser_full.agk`) - ENHANCED!
+### 5. Browser App Template (`templates/browser_app_template.agk`) - ENHANCED!
 **Perfect for:** Web Browsers, Content Viewers, Document Readers, Media Players, OS GUI Development
 
 **Features:**
@@ -122,7 +124,7 @@ agk_compiler.exe my_mobile_app.agk
 **Quick Start:**
 ```bash
 # Copy the enhanced template
-cp agk_browser_full.agk my_advanced_browser.agk
+cp templates/browser_app_template.agk my_advanced_browser.agk
 
 # Configure browser settings and themes
 # Compile and run (using standalone executable)
@@ -140,7 +142,7 @@ This template now serves as a complete demonstration of the `advanced_graphics` 
 - Performance optimizations
 - Accessibility features
 
-### 6. AI Assistant Template (`llm_template.agk`)
+### 6. AI Assistant Template (`templates/llm_template.agk`)
 **Perfect for:** AI Assistants, Code Generators, Content Creators, Educational Tools, Chatbots
 
 **Features:**
@@ -159,7 +161,7 @@ This template now serves as a complete demonstration of the `advanced_graphics` 
 **Quick Start:**
 ```bash
 # Copy the template
-cp llm_template.agk my_ai_assistant.agk
+cp templates/llm_template.agk my_ai_assistant.agk
 
 # Configure API settings
 # Compile and run (using standalone executable)
@@ -169,7 +171,7 @@ cp llm_template.agk my_ai_assistant.agk
 agk_compiler.exe my_ai_assistant.agk
 ```
 
-### 7. General Application Template (`general_template.agk`)
+### 7. General Application Template (`templates/general_template.agk`)
 **Perfect for:** Business Applications, Utilities, Productivity Tools, Data Management
 
 **Features:**
@@ -186,7 +188,7 @@ agk_compiler.exe my_ai_assistant.agk
 **Quick Start:**
 ```bash
 # Copy the template
-cp general_template.agk my_business_app.agk
+cp templates/general_template.agk my_business_app.agk
 
 # Configure application settings
 # Compile and run (using standalone executable)
@@ -196,7 +198,7 @@ cp general_template.agk my_business_app.agk
 agk_compiler.exe my_business_app.agk
 ```
 
-### 8. Bootloader Template (`bootloader_template.agk`) - NEW!
+### 8. Bootloader Template (`templates/bootloader_template.agk`) - NEW!
 **Perfect for:** Operating System Development, Boot Process, Firmware, Embedded Systems
 
 **Features:**
@@ -212,7 +214,7 @@ agk_compiler.exe my_business_app.agk
 **Quick Start:**
 ```bash
 # Copy the template
-cp bootloader_template.agk my_bootloader.agk
+cp templates/bootloader_template.agk my_bootloader.agk
 
 # Compile with C backend for system programming
 # Using standalone executable with C backend
@@ -224,7 +226,7 @@ agk_compiler.exe my_bootloader.agk --backend c
 # Build for your target system (BIOS, UEFI, etc.)
 ```
 
-### 9. OS Kernel Template (`kernel_template.agk`) - NEW!
+### 9. OS Kernel Template (`templates/kernel_template.agk`) - NEW!
 **Perfect for:** Operating System Kernels, System Programming, Low-Level Software
 
 **Features:**
@@ -241,7 +243,7 @@ agk_compiler.exe my_bootloader.agk --backend c
 **Quick Start:**
 ```bash
 # Copy the template
-cp kernel_template.agk my_kernel.agk
+cp templates/kernel_template.agk my_kernel.agk
 
 # Compile with C backend for system programming
 # Using standalone executable with C backend
@@ -253,7 +255,7 @@ agk_compiler.exe my_kernel.agk --backend c
 # Build kernel image for your OS
 ```
 
-### 10. Device Driver Template (`driver_template.agk`) - NEW!
+### 10. Device Driver Template (`templates/driver_template.agk`) - NEW!
 **Perfect for:** Hardware Device Drivers, System Extensions, I/O Device Management
 
 **Features:**
@@ -269,7 +271,7 @@ agk_compiler.exe my_kernel.agk --backend c
 **Quick Start:**
 ```bash
 # Copy the template
-cp driver_template.agk my_device_driver.agk
+cp templates/driver_template.agk my_device_driver.agk
 
 # Compile with C backend for hardware access
 # Using standalone executable with C backend
@@ -281,7 +283,7 @@ agk_compiler.exe my_device_driver.agk --backend c
 # Build kernel module or integrated driver
 ```
 
-### 11. Smart Home Device Template (`smart_home_template.agk`) - NEW!
+### 11. Smart Home Device Template (`templates/smart_home_template.agk`) - NEW!
 **Perfect for:** Smart Home Devices, IoT Sensors, Home Automation
 
 **Features:**
@@ -296,7 +298,7 @@ agk_compiler.exe my_device_driver.agk --backend c
 **Quick Start:**
 ```bash
 # Copy the template
-cp smart_home_template.agk my_smart_device.agk
+cp templates/smart_home_template.agk my_smart_device.agk
 
 # Configure device settings and sensors
 # Compile for your target microcontroller
@@ -307,7 +309,7 @@ cp smart_home_template.agk my_smart_device.agk
 agk_compiler.exe my_smart_device.agk --backend microcontroller
 ```
 
-### 12. Industrial IoT Template (`industrial_iot_template.agk`) - NEW!
+### 12. Industrial IoT Template (`templates/industrial_iot_template.agk`) - NEW!
 **Perfect for:** Industrial Automation, Manufacturing, Process Control
 
 **Features:**
@@ -322,7 +324,7 @@ agk_compiler.exe my_smart_device.agk --backend microcontroller
 **Quick Start:**
 ```bash
 # Copy the template
-cp industrial_iot_template.agk my_industrial_monitor.agk
+cp templates/industrial_iot_template.agk my_industrial_monitor.agk
 
 # Configure industrial protocols and sensors
 # Compile for industrial hardware platform
@@ -333,7 +335,7 @@ cp industrial_iot_template.agk my_industrial_monitor.agk
 agk_compiler.exe my_industrial_monitor.agk --backend industrial
 ```
 
-### 13. Microcontroller Template (`microcontroller_template.agk`) - NEW!
+### 13. Microcontroller Template (`templates/microcontroller_template.agk`) - NEW!
 **Perfect for:** Embedded Systems, IoT Devices, Sensor Networks
 
 **Features:**
@@ -348,7 +350,7 @@ agk_compiler.exe my_industrial_monitor.agk --backend industrial
 **Quick Start:**
 ```bash
 # Copy the template
-cp microcontroller_template.agk my_embedded_device.agk
+cp templates/microcontroller_template.agk my_embedded_device.agk
 
 # Configure pin mappings and peripherals
 # Compile for your specific microcontroller
@@ -359,7 +361,7 @@ cp microcontroller_template.agk my_embedded_device.agk
 agk_compiler.exe my_embedded_device.agk --backend microcontroller --target esp32
 ```
 
-### 14. Edge Computing Template (`edge_computing_template.agk`) - NEW!
+### 14. Edge Computing Template (`templates/edge_computing_template.agk`) - NEW!
 **Perfect for:** Edge AI, Real-Time Analytics, Local Processing
 
 **Features:**
@@ -374,7 +376,7 @@ agk_compiler.exe my_embedded_device.agk --backend microcontroller --target esp32
 **Quick Start:**
 ```bash
 # Copy the template
-cp edge_computing_template.agk my_edge_device.agk
+cp templates/edge_computing_template.agk my_edge_device.agk
 
 # Configure AI models and processing pipelines
 # Compile for edge computing hardware
@@ -457,7 +459,7 @@ The enhanced `agk_browser_full.agk` template demonstrates the full power of the 
 
 In addition to application templates, AGK provides comprehensive templates for learning and using each standard library:
 
-### Database Library Template (`database_template.agk`)
+### Database Library Template (`templates/database_template.agk`)
 **Learn:** SQLite database operations, CRUD functionality, data management
 
 **Features:**
@@ -469,7 +471,7 @@ In addition to application templates, AGK provides comprehensive templates for l
 
 **Quick Start:**
 ```bash
-cp database_template.agk database_demo.agk
+cp templates/database_template.agk database_demo.agk
 # Compile and run (using standalone executable)
 ./agk_compiler database_demo.agk
 
@@ -1164,9 +1166,10 @@ These templates are designed to:
 
 **Remember:** These are comprehensive starting points, not finished products. The AGK ecosystem now provides:
 
-- **14 Application Templates**: Desktop, Web, Mobile, Browser, AI, Server, General Business, Bootloader, Kernel, Device Driver, Smart Home, Industrial IoT, Microcontroller, Edge Computing
+- **16 Application Templates**: Desktop, Web, Mobile, Browser, AI, Server, General Business, Bootloader, Kernel, Device Driver, Smart Home, Industrial IoT, Microcontroller, Edge Computing, Android, iOS, TV, Wearable
 - **23 Library Templates**: Complete coverage of all 38 standard libraries including Math, String, Crypto, Hardware, OS, IO, List, Date, Power, Graphics, Security, and System AST
 - **Production-Ready Code**: 15,000+ lines of professional examples
+- **Professional Organization**: All templates in dedicated `templates/` directory
 - **OS Development Support**: Complete operating system development capabilities
 - **IoT Development Support**: Comprehensive Internet of Things capabilities
 - **Complete Documentation**: Comprehensive guides and usage examples
