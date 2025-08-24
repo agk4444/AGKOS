@@ -1,0 +1,373 @@
+# AGK Security Template - Cryptographic Security & Package Verification
+# This template demonstrates comprehensive security operations including
+# key management, package signing, vulnerability scanning, and encryption
+# Perfect for: Secure applications, package distribution, authentication systems
+
+import security
+import crypto
+import io
+import logging
+import json
+import fs
+
+# Global configuration
+define constant PASSPHRASE as String = "demo_passphrase_123"
+define constant TEST_PACKAGE as String = "demo_package.agk"
+define constant KEY_FINGERPRINT_FILE as String = "trusted_keys.json"
+
+# Main application entry point
+define function main:
+    # Initialize logging for the security application
+    create logger as Logger
+    set logger to logging.get_logger("Security_App")
+    logging.set_level(logger, logging.INFO)
+    logging.add_console_handler(logger)
+
+    logging.info(logger, "Starting AGK Security Application")
+
+    # Run the main application loop
+    run_security_application_loop(logger)
+
+# Main application loop with menu-driven interface
+define function run_security_application_loop that takes logger as Logger:
+    create running as Boolean
+    set running to true
+
+    while running:
+        io.println("\n🔐 AGK Security Management System")
+        io.println("1. Generate Keypair")
+        io.println("2. Display Key Information")
+        io.println("3. Sign Package")
+        io.println("4. Verify Package Signature")
+        io.println("5. Scan Package for Vulnerabilities")
+        io.println("6. Encrypt/Decrypt Data")
+        io.println("7. Trust Management")
+        io.println("8. Comprehensive Package Verification")
+        io.println("9. Hash Data")
+        io.println("10. Exit")
+        io.print("Enter your choice (1-10): ")
+
+        create choice as String
+        set choice to io.read_line()
+
+        if choice == "1":
+            generate_keypair_demo(logger)
+        else if choice == "2":
+            display_key_info_demo(logger)
+        else if choice == "3":
+            sign_package_demo(logger)
+        else if choice == "4":
+            verify_signature_demo(logger)
+        else if choice == "5":
+            scan_vulnerabilities_demo(logger)
+        else if choice == "6":
+            encryption_demo(logger)
+        else if choice == "7":
+            trust_management_demo(logger)
+        else if choice == "8":
+            comprehensive_verification_demo(logger)
+        else if choice == "9":
+            hash_demo(logger)
+        else if choice == "10":
+            set running to false
+            logging.info(logger, "Security application shutting down")
+        else:
+            io.println("❌ Invalid choice. Please try again.")
+
+# Generate cryptographic keypair
+define function generate_keypair_demo that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "keypair_generation")
+
+    io.println("\n🔑 Generating RSA Keypair...")
+    io.println("Passphrase: " + PASSPHRASE)
+
+    create success as Boolean
+    set success to security.generate_keypair(PASSPHRASE)
+
+    logging.end_timer(timer)
+
+    if success:
+        io.println("✅ Keypair generated successfully!")
+        io.println("Private and public keys saved to key storage")
+
+        create fingerprint as String
+        set fingerprint to security.get_key_fingerprint()
+        io.println("Public key fingerprint: " + fingerprint)
+
+        logging.info(logger, "RSA keypair generated successfully")
+    else:
+        io.println("❌ Failed to generate keypair")
+        logging.error(logger, "Keypair generation failed")
+
+# Display key information
+define function display_key_info_demo that takes logger as Logger:
+    io.println("\n📋 Key Information:")
+
+    create fingerprint as String
+    set fingerprint to security.get_key_fingerprint()
+
+    if fingerprint != "":
+        io.println("Public Key Fingerprint (SHA256): " + fingerprint)
+        io.println("Key Status: Available for cryptographic operations")
+
+        # Load public key
+        create public_key as String
+        set public_key to security.load_public_key()
+
+        if public_key != "":
+            io.println("Public Key: Loaded and ready")
+        else:
+            io.println("Public Key: Not available")
+
+        logging.info(logger, "Key information displayed")
+    else:
+        io.println("❌ No keys found. Generate a keypair first.")
+        logging.warning(logger, "No keys available for display")
+
+# Sign a package
+define function sign_package_demo that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "package_signing")
+
+    io.println("\n✍️ Signing Package: " + TEST_PACKAGE)
+
+    # Create a demo package file
+    create demo_content as String
+    set demo_content to "# Demo AGK Package\nprint('Hello from signed package!')\n"
+    fs.write_file(TEST_PACKAGE, demo_content)
+
+    create signature as String
+    set signature to security.sign_package(TEST_PACKAGE, PASSPHRASE)
+
+    logging.end_timer(timer)
+
+    if signature != "":
+        io.println("✅ Package signed successfully!")
+        io.println("Signature: " + signature)
+
+        # Save signature to file
+        create sig_file as String
+        set sig_file to TEST_PACKAGE + ".sig"
+        fs.write_file(sig_file, signature)
+        io.println("Signature saved to: " + sig_file)
+
+        logging.info(logger, "Package signed: " + TEST_PACKAGE)
+    else:
+        io.println("❌ Failed to sign package")
+        logging.error(logger, "Package signing failed")
+
+# Verify package signature
+define function verify_signature_demo that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "signature_verification")
+
+    io.println("\n🔍 Verifying Package Signature: " + TEST_PACKAGE)
+
+    # Load signature from file
+    create sig_file as String
+    set sig_file to TEST_PACKAGE + ".sig"
+
+    if fs.file_exists(sig_file):
+        create signature as String
+        set signature to fs.read_file(sig_file)
+
+        create is_valid as Boolean
+        set is_valid to security.verify_signature(TEST_PACKAGE, signature)
+
+        if is_valid:
+            io.println("✅ Package signature is VALID")
+            io.println("Package integrity confirmed")
+            logging.info(logger, "Package signature verified successfully")
+        else:
+            io.println("❌ Package signature is INVALID")
+            logging.error(logger, "Package signature verification failed")
+    else:
+        io.println("❌ Signature file not found: " + sig_file)
+        io.println("Sign the package first to create a signature")
+
+    logging.end_timer(timer)
+
+# Scan for vulnerabilities
+define function scan_vulnerabilities_demo that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "vulnerability_scan")
+
+    io.println("\n🛡️ Scanning Package for Vulnerabilities: " + TEST_PACKAGE)
+
+    create scan_result as Object
+    set scan_result to security.scan_package(TEST_PACKAGE)
+
+    logging.end_timer(timer)
+
+    io.println("Scan Results:")
+    io.println("─" * 40)
+    io.println("Risk Level: " + scan_result["risk_level"])
+    io.println("Risk Score: " + string(scan_result["risk_score"]) + "/10")
+
+    create issues as List
+    set issues to scan_result["issues"]
+
+    if length(issues) > 0:
+        io.println("Issues Found: " + string(length(issues)))
+        create i as Integer
+        set i to 0
+        while i < length(issues):
+            create issue as Object
+            set issue to issues[i]
+            io.println("  " + issue["severity"] + ": " + issue["message"])
+            set i to i + 1
+    else:
+        io.println("✅ No security issues found")
+
+    logging.info(logger, "Security scan completed - Risk level: " + scan_result["risk_level"])
+
+# Encrypt and decrypt data
+define function encryption_demo that takes logger as Logger:
+    io.println("\n🔒 Encryption/Decryption Demo")
+
+    io.print("Enter text to encrypt: ")
+    create plaintext as String
+    set plaintext to io.read_line()
+
+    if plaintext == "":
+        set plaintext to "This is a secret message!"
+
+    io.print("Enter encryption key: ")
+    create key as String
+    set key to io.read_line()
+
+    if key == "":
+        set key to "demo_encryption_key_123"
+
+    # Encrypt the data
+    create timer as Timer
+    set timer to logging.start_timer(logger, "encryption")
+
+    create encrypted as String
+    set encrypted to security.encrypt_data(plaintext, key)
+
+    logging.end_timer(timer)
+
+    io.println("Original: " + plaintext)
+    io.println("Encrypted: " + encrypted)
+
+    # Decrypt the data
+    set timer to logging.start_timer(logger, "decryption")
+
+    create decrypted as String
+    set decrypted to security.decrypt_data(encrypted, key)
+
+    logging.end_timer(timer)
+
+    io.println("Decrypted: " + decrypted)
+
+    if plaintext == decrypted:
+        io.println("✅ Encryption/Decryption successful!")
+        logging.info(logger, "Encryption/decryption test passed")
+    else:
+        io.println("❌ Encryption/Decryption failed")
+        logging.error(logger, "Encryption/decryption test failed")
+
+# Trust management demo
+define function trust_management_demo that takes logger as Logger:
+    io.println("\n🤝 Trust Management System")
+
+    create fingerprint as String
+    set fingerprint to security.get_key_fingerprint()
+
+    if fingerprint != "":
+        io.println("Current Key Fingerprint: " + fingerprint)
+
+        io.print("Add current key to trusted keys? (y/n): ")
+        create add_trusted as String
+        set add_trusted to io.read_line()
+
+        if add_trusted == "y":
+            security.add_trusted_key(fingerprint, "Demo Key", "Generated for demonstration purposes")
+            io.println("✅ Key added to trusted keys")
+
+            # Check if key is trusted
+            create is_trusted as Boolean
+            set is_trusted to security.is_trusted_key(fingerprint)
+
+            if is_trusted:
+                io.println("✅ Key is now trusted")
+                logging.info(logger, "Key added to trust store")
+            else:
+                io.println("❌ Failed to verify trust status")
+        else:
+            io.println("ℹ️ Trust management cancelled")
+    else:
+        io.println("❌ No keys available. Generate a keypair first.")
+
+# Comprehensive package verification
+define function comprehensive_verification_demo that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "comprehensive_verification")
+
+    io.println("\n🔬 Comprehensive Package Verification: " + TEST_PACKAGE)
+
+    # Load signature if available
+    create signature as String
+    set signature to ""
+    create sig_file as String
+    set sig_file to TEST_PACKAGE + ".sig"
+
+    if fs.file_exists(sig_file):
+        set signature to fs.read_file(sig_file)
+
+    # Get current key fingerprint
+    create fingerprint as String
+    set fingerprint to security.get_key_fingerprint()
+
+    create verification_result as Object
+    set verification_result to security.verify_package(TEST_PACKAGE, signature, fingerprint)
+
+    logging.end_timer(timer)
+
+    io.println("Verification Results:")
+    io.println("─" * 50)
+    io.println("Integrity Check: " + (verification_result["integrity_check"] ? "✅ PASSED" : "❌ FAILED"))
+    io.println("Signature Check: " + (verification_result["signature_check"] ? "✅ PASSED" : "❌ FAILED"))
+    io.println("Fingerprint Check: " + (verification_result["fingerprint_check"] ? "✅ PASSED" : "❌ FAILED"))
+    io.println("Overall Verification: " + (verification_result["verified"] ? "✅ PASSED" : "❌ FAILED"))
+
+    create security_scan as Object
+    set security_scan to verification_result["security_scan"]
+
+    io.println("Security Scan: " + security_scan["risk_level"] + " risk")
+    io.println("Risk Score: " + string(security_scan["risk_score"]) + "/10")
+
+    create issues as List
+    set issues to verification_result["issues"]
+
+    if length(issues) > 0:
+        io.println("\nIssues:")
+        create i as Integer
+        set i to 0
+        while i < length(issues):
+            io.println("  - " + issues[i])
+            set i to i + 1
+
+    logging.info(logger, "Comprehensive verification completed - Status: " +
+                (verification_result["verified"] ? "PASSED" : "FAILED"))
+
+# Hash data demo
+define function hash_demo that takes logger as Logger:
+    io.println("\n🔢 Data Hashing Demo")
+
+    io.print("Enter text to hash: ")
+    create data as String
+    set data to io.read_line()
+
+    if data == "":
+        set data to "This is test data for hashing"
+
+    io.println("\nSHA256 Hash: " + security.hash_data(data, "sha256"))
+    io.println("SHA512 Hash: " + security.hash_data(data, "sha512"))
+
+    logging.info(logger, "Data hashing demonstration completed")
+
+# Initialize the application
+main()

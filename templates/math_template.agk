@@ -1,0 +1,692 @@
+# AGK Math Template - Mathematical Operations & Calculations
+# This template demonstrates comprehensive mathematical operations including
+# basic arithmetic, trigonometry, algebra, geometry, and statistical functions
+# Perfect for: Scientific applications, engineering calculations, data analysis, games
+
+import math
+import io
+import logging
+import json
+
+# Global configuration
+define constant PRECISION as Integer = 6
+define constant TEST_VALUES as List = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+# Main application entry point
+define function main:
+    # Initialize logging for the math application
+    create logger as Logger
+    set logger to logging.get_logger("Math_App")
+    logging.set_level(logger, logging.INFO)
+    logging.add_console_handler(logger)
+
+    logging.info(logger, "Starting AGK Math Application")
+
+    # Run the main application loop
+    run_math_application_loop(logger)
+
+# Main application loop with menu-driven interface
+define function run_math_application_loop that takes logger as Logger:
+    create running as Boolean
+    set running to true
+
+    while running:
+        io.println("\n🔢 AGK Mathematics Environment")
+        io.println("1. Basic Arithmetic Operations")
+        io.println("2. Trigonometric Functions")
+        io.println("3. Exponential & Logarithmic Functions")
+        io.println("4. Statistical Calculations")
+        io.println("5. Geometry Calculations")
+        io.println("6. Number Theory Functions")
+        io.println("7. Complex Number Operations")
+        io.println("8. Matrix Operations")
+        io.println("9. Calculus Functions")
+        io.println("10. Constants & Utilities")
+        io.println("11. Exit")
+        io.print("Enter your choice (1-11): ")
+
+        create choice as String
+        set choice to io.read_line()
+
+        if choice == "1":
+            basic_arithmetic_demo(logger)
+        else if choice == "2":
+            trigonometry_demo(logger)
+        else if choice == "3":
+            exponential_demo(logger)
+        else if choice == "4":
+            statistics_demo(logger)
+        else if choice == "5":
+            geometry_demo(logger)
+        else if choice == "6":
+            number_theory_demo(logger)
+        else if choice == "7":
+            complex_numbers_demo(logger)
+        else if choice == "8":
+            matrix_demo(logger)
+        else if choice == "9":
+            calculus_demo(logger)
+        else if choice == "10":
+            constants_demo(logger)
+        else if choice == "11":
+            set running to false
+            logging.info(logger, "Math application shutting down")
+        else:
+            io.println("❌ Invalid choice. Please try again.")
+
+# Basic arithmetic operations demonstration
+define function basic_arithmetic_demo that takes logger as Logger:
+    io.println("\n➕ Basic Arithmetic Operations")
+
+    io.print("Enter first number: ")
+    create num1 as Float
+    set num1 to float(io.read_line())
+
+    io.print("Enter second number: ")
+    create num2 as Float
+    set num2 to float(io.read_line())
+
+    io.println("Results:")
+    io.println("─" * 30)
+    io.println("Addition: " + string(num1) + " + " + string(num2) + " = " + string(num1 + num2))
+    io.println("Subtraction: " + string(num1) + " - " + string(num2) + " = " + string(num1 - num2))
+    io.println("Multiplication: " + string(num1) + " × " + string(num2) + " = " + string(num1 * num2))
+
+    if num2 != 0:
+        io.println("Division: " + string(num1) + " ÷ " + string(num2) + " = " + string(num1 / num2))
+        io.println("Modulo: " + string(num1) + " % " + string(num2) + " = " + string(num1 % num2))
+    else:
+        io.println("❌ Division by zero not allowed")
+
+    io.println("Power: " + string(num1) + "^" + string(num2) + " = " + string(power(num1, num2)))
+    io.println("Square root of " + string(num1) + " = " + string(math.sqrt(num1)))
+    io.println("Absolute value of " + string(num1) + " = " + string(math.absolute(num1)))
+
+    logging.info(logger, "Basic arithmetic operations completed")
+
+# Trigonometric functions demonstration
+define function trigonometry_demo that takes logger as Logger:
+    io.println("\n📐 Trigonometric Functions")
+
+    io.print("Enter angle in degrees: ")
+    create angle_deg as Float
+    set angle_deg to float(io.read_line())
+
+    create angle_rad as Float
+    set angle_rad to angle_deg * math.pi() / 180.0
+
+    io.println("Results for " + string(angle_deg) + " degrees:")
+    io.println("─" * 40)
+    io.println("Sine: sin(" + string(angle_deg) + "°) = " + string(sin(angle_rad)))
+    io.println("Cosine: cos(" + string(angle_deg) + "°) = " + string(cos(angle_rad)))
+    io.println("Tangent: tan(" + string(angle_deg) + "°) = " + string(tan(angle_rad)))
+
+    if cos(angle_rad) != 0:
+        io.println("Cotangent: cot(" + string(angle_deg) + "°) = " + string(1.0 / tan(angle_rad)))
+    else:
+        io.println("Cotangent: undefined (cosine is zero)")
+
+    if sin(angle_rad) != 0:
+        io.println("Secant: sec(" + string(angle_deg) + "°) = " + string(1.0 / cos(angle_rad)))
+        io.println("Cosecant: csc(" + string(angle_deg) + "°) = " + string(1.0 / sin(angle_rad)))
+    else:
+        io.println("Secant/Cosecant: undefined (sine is zero)")
+
+    logging.info(logger, "Trigonometric calculations completed")
+
+# Exponential and logarithmic functions
+define function exponential_demo that takes logger as Logger:
+    io.println("\n📈 Exponential & Logarithmic Functions")
+
+    io.print("Enter a positive number: ")
+    create num as Float
+    set num to float(io.read_line())
+
+    if num > 0:
+        io.println("Results for " + string(num) + ":")
+        io.println("─" * 30)
+        io.println("Natural logarithm: ln(" + string(num) + ") = " + string(log(num)))
+        io.println("Base-10 logarithm: log₁₀(" + string(num) + ") = " + string(log10(num)))
+        io.println("Exponential: e^" + string(num) + " = " + string(exp(num)))
+        io.println("Power of 2: 2^" + string(num) + " = " + string(power(2, num)))
+        io.println("Square: " + string(num) + "² = " + string(power(num, 2)))
+        io.println("Cube: " + string(num) + "³ = " + string(power(num, 3)))
+    else:
+        io.println("❌ Please enter a positive number")
+
+    logging.info(logger, "Exponential/logarithmic operations completed")
+
+# Statistical calculations
+define function statistics_demo that takes logger as Logger:
+    io.println("\n📊 Statistical Calculations")
+
+    create data as List
+    set data to TEST_VALUES
+
+    io.println("Using test dataset: " + join_strings(data, ", "))
+
+    create mean_val as Float
+    set mean_val to calculate_mean(data)
+    io.println("Mean (Average): " + string(mean_val))
+
+    create median_val as Float
+    set median_val to calculate_median(data)
+    io.println("Median: " + string(median_val))
+
+    create std_dev as Float
+    set std_dev to calculate_standard_deviation(data)
+    io.println("Standard Deviation: " + string(std_dev))
+
+    create variance_val as Float
+    set variance_val to calculate_variance(data)
+    io.println("Variance: " + string(variance_val))
+
+    create min_val as Float
+    set min_val to find_minimum(data)
+    io.println("Minimum: " + string(min_val))
+
+    create max_val as Float
+    set max_val to find_maximum(data)
+    io.println("Maximum: " + string(max_val))
+
+    create range_val as Float
+    set range_val to max_val - min_val
+    io.println("Range: " + string(range_val))
+
+    logging.info(logger, "Statistical calculations completed")
+
+# Geometry calculations
+define function geometry_demo that takes logger as Logger:
+    io.println("\n📏 Geometry Calculations")
+
+    io.println("1. Circle calculations")
+    io.println("2. Rectangle calculations")
+    io.println("3. Triangle calculations")
+    io.println("4. Sphere calculations")
+    io.print("Choose geometry type (1-4): ")
+
+    create choice as String
+    set choice to io.read_line()
+
+    if choice == "1":
+        io.print("Enter radius: ")
+        create radius as Float
+        set radius to float(io.read_line())
+
+        create circumference as Float
+        set circumference to 2 * math.pi() * radius
+        create area as Float
+        set area to math.pi() * radius * radius
+
+        io.println("Circle Results:")
+        io.println("Circumference: " + string(circumference))
+        io.println("Area: " + string(area))
+
+    else if choice == "2":
+        io.print("Enter length: ")
+        create length as Float
+        set length to float(io.read_line())
+
+        io.print("Enter width: ")
+        create width as Float
+        set width to float(io.read_line())
+
+        create perimeter as Float
+        set perimeter to 2 * (length + width)
+        create area as Float
+        set area to length * width
+
+        io.println("Rectangle Results:")
+        io.println("Perimeter: " + string(perimeter))
+        io.println("Area: " + string(area))
+
+    else if choice == "3":
+        io.print("Enter side A: ")
+        create a as Float
+        set a to float(io.read_line())
+
+        io.print("Enter side B: ")
+        create b as Float
+        set b to float(io.read_line())
+
+        io.print("Enter side C: ")
+        create c as Float
+        set c to float(io.read_line())
+
+        if is_valid_triangle(a, b, c):
+            create perimeter as Float
+            set perimeter to a + b + c
+            create semi_perimeter as Float
+            set semi_perimeter to perimeter / 2
+            create area as Float
+            set area to math.sqrt(semi_perimeter * (semi_perimeter - a) * (semi_perimeter - b) * (semi_perimeter - c))
+
+            io.println("Triangle Results:")
+            io.println("Perimeter: " + string(perimeter))
+            io.println("Area: " + string(area))
+        else:
+            io.println("❌ Invalid triangle sides")
+
+    else if choice == "4":
+        io.print("Enter radius: ")
+        create radius as Float
+        set radius to float(io.read_line())
+
+        create volume as Float
+        set volume to (4.0 / 3.0) * math.pi() * radius * radius * radius
+        create surface_area as Float
+        set surface_area to 4 * math.pi() * radius * radius
+
+        io.println("Sphere Results:")
+        io.println("Volume: " + string(volume))
+        io.println("Surface Area: " + string(surface_area))
+
+    logging.info(logger, "Geometry calculations completed")
+
+# Number theory functions
+define function number_theory_demo that takes logger as Logger:
+    io.println("\n🔢 Number Theory Functions")
+
+    io.print("Enter an integer: ")
+    create num as Integer
+    set num to int(io.read_line())
+
+    io.println("Results for " + string(num) + ":")
+    io.println("─" * 30)
+    io.println("Is even: " + (is_even(num) ? "Yes" : "No"))
+    io.println("Is odd: " + (is_odd(num) ? "Yes" : "No"))
+    io.println("Is prime: " + (is_prime(num) ? "Yes" : "No"))
+    io.println("Is perfect square: " + (is_perfect_square(num) ? "Yes" : "No"))
+
+    if num > 0:
+        create factors as List
+        set factors to find_factors(num)
+        io.println("Factors: " + join_strings(factors, ", "))
+    else:
+        io.println("❌ Please enter a positive integer for factors")
+
+    logging.info(logger, "Number theory operations completed")
+
+# Complex number operations
+define function complex_numbers_demo that takes logger as Logger:
+    io.println("\n🔄 Complex Number Operations")
+
+    io.print("Enter real part of first complex number: ")
+    create real1 as Float
+    set real1 to float(io.read_line())
+
+    io.print("Enter imaginary part of first complex number: ")
+    create imag1 as Float
+    set imag1 to float(io.read_line())
+
+    io.print("Enter real part of second complex number: ")
+    create real2 as Float
+    set real2 to float(io.read_line())
+
+    io.print("Enter imaginary part of second complex number: ")
+    create imag2 as Float
+    set imag2 to float(io.read_line())
+
+    io.println("Complex Number 1: " + string(real1) + " + " + string(imag1) + "i")
+    io.println("Complex Number 2: " + string(real2) + " + " + string(imag2) + "i")
+
+    # Addition
+    create add_real as Float
+    set add_real to real1 + real2
+    create add_imag as Float
+    set add_imag to imag1 + imag2
+    io.println("Addition: " + string(add_real) + " + " + string(add_imag) + "i")
+
+    # Subtraction
+    create sub_real as Float
+    set sub_real to real1 - real2
+    create sub_imag as Float
+    set sub_imag to imag1 - imag2
+    io.println("Subtraction: " + string(sub_real) + " + " + string(sub_imag) + "i")
+
+    # Magnitude
+    create mag1 as Float
+    set mag1 to math.sqrt(real1 * real1 + imag1 * imag1)
+    create mag2 as Float
+    set mag2 to math.sqrt(real2 * real2 + imag2 * imag2)
+    io.println("Magnitude 1: " + string(mag1))
+    io.println("Magnitude 2: " + string(mag2))
+
+    logging.info(logger, "Complex number operations completed")
+
+# Matrix operations (simplified)
+define function matrix_demo that takes logger as Logger:
+    io.println("\n📊 Matrix Operations (2x2 matrices)")
+
+    io.println("Matrix A:")
+    create matrix_a as List
+    set matrix_a to [[1, 2], [3, 4]]
+
+    io.println("Matrix B:")
+    create matrix_b as List
+    set matrix_b to [[5, 6], [7, 8]]
+
+    display_matrix("Matrix A", matrix_a)
+    display_matrix("Matrix B", matrix_b)
+
+    # Matrix addition
+    create sum_matrix as List
+    set sum_matrix to add_matrices(matrix_a, matrix_b)
+    display_matrix("A + B", sum_matrix)
+
+    logging.info(logger, "Matrix operations completed")
+
+# Calculus functions (basic)
+define function calculus_demo that takes logger as Logger:
+    io.println("\n📉 Basic Calculus Functions")
+
+    io.print("Enter coefficient a: ")
+    create a as Float
+    set a to float(io.read_line())
+
+    io.print("Enter coefficient b: ")
+    create b as Float
+    set b to float(io.read_line())
+
+    io.print("Enter coefficient c: ")
+    create c as Float
+    set c to float(io.read_line())
+
+    io.println("Quadratic equation: " + string(a) + "x² + " + string(b) + "x + " + string(c) + " = 0")
+
+    create discriminant as Float
+    set discriminant to b * b - 4 * a * c
+
+    io.println("Discriminant: " + string(discriminant))
+
+    if discriminant > 0:
+        create root1 as Float
+        set root1 to (-b + math.sqrt(discriminant)) / (2 * a)
+        create root2 as Float
+        set root2 to (-b - math.sqrt(discriminant)) / (2 * a)
+        io.println("Roots: " + string(root1) + ", " + string(root2))
+    else if discriminant == 0:
+        create root as Float
+        set root to -b / (2 * a)
+        io.println("Double root: " + string(root))
+    else:
+        io.println("Complex roots (not supported in this demo)")
+
+    logging.info(logger, "Calculus operations completed")
+
+# Constants and utilities
+define function constants_demo that takes logger as Logger:
+    io.println("\n🔧 Mathematical Constants & Utilities")
+
+    io.println("Mathematical Constants:")
+    io.println("─" * 30)
+    io.println("π (Pi): " + string(math.pi()))
+    io.println("e (Euler's number): " + string(math.e()))
+    io.println("φ (Golden ratio): " + string((1 + math.sqrt(5)) / 2))
+    io.println("√2 (Square root of 2): " + string(math.sqrt(2)))
+    io.println("ln(2): " + string(log(2)))
+    io.println("ln(10): " + string(log(10)))
+
+    io.println("\nRandom Numbers:")
+    io.println("─" * 20)
+    create i as Integer
+    set i to 0
+    while i < 5:
+        io.println("Random [0,1): " + string(random()))
+        set i to i + 1
+
+    logging.info(logger, "Constants and utilities displayed")
+
+# Helper functions for statistics
+define function calculate_mean that takes data as List and returns Float:
+    if length(data) == 0:
+        return 0.0
+
+    create sum as Float
+    set sum to 0.0
+    create i as Integer
+    set i to 0
+    while i < length(data):
+        set sum to sum + data[i]
+        set i to i + 1
+
+    return sum / length(data)
+
+define function calculate_median that takes data as List and returns Float:
+    if length(data) == 0:
+        return 0.0
+
+    create sorted_data as List
+    set sorted_data to sort_list(data)
+
+    create middle as Integer
+    set middle to length(data) / 2
+
+    if length(data) % 2 == 0:
+        return (sorted_data[middle - 1] + sorted_data[middle]) / 2.0
+    else:
+        return sorted_data[middle]
+
+define function calculate_variance that takes data as List and returns Float:
+    if length(data) <= 1:
+        return 0.0
+
+    create mean_val as Float
+    set mean_val to calculate_mean(data)
+
+    create sum_squares as Float
+    set sum_squares to 0.0
+    create i as Integer
+    set i to 0
+    while i < length(data):
+        create diff as Float
+        set diff to data[i] - mean_val
+        set sum_squares to sum_squares + diff * diff
+        set i to i + 1
+
+    return sum_squares / (length(data) - 1)
+
+define function calculate_standard_deviation that takes data as List and returns Float:
+    return math.sqrt(calculate_variance(data))
+
+define function find_minimum that takes data as List and returns Float:
+    if length(data) == 0:
+        return 0.0
+
+    create min_val as Float
+    set min_val to data[0]
+    create i as Integer
+    set i to 1
+    while i < length(data):
+        if data[i] < min_val:
+            set min_val to data[i]
+        set i to i + 1
+
+    return min_val
+
+define function find_maximum that takes data as List and returns Float:
+    if length(data) == 0:
+        return 0.0
+
+    create max_val as Float
+    set max_val to data[0]
+    create i as Integer
+    set i to 1
+    while i < length(data):
+        if data[i] > max_val:
+            set max_val to data[i]
+        set i to i + 1
+
+    return max_val
+
+define function sort_list that takes data as List and returns List:
+    create result as List
+    set result to copy_list(data)
+
+    # Simple bubble sort
+    create i as Integer
+    set i to 0
+    while i < length(result):
+        create j as Integer
+        set j to 0
+        while j < length(result) - i - 1:
+            if result[j] > result[j + 1]:
+                create temp as Float
+                set temp to result[j]
+                set result[j] to result[j + 1]
+                set result[j + 1] to temp
+            set j to j + 1
+        set i to i + 1
+
+    return result
+
+define function copy_list that takes data as List and returns List:
+    create result as List
+    set result to []
+    create i as Integer
+    set i to 0
+    while i < length(data):
+        add data[i] to result
+        set i to i + 1
+    return result
+
+# Helper functions for geometry
+define function is_valid_triangle that takes a as Float, b as Float, c as Float and returns Boolean:
+    return (a + b > c) and (a + c > b) and (b + c > a)
+
+# Helper functions for number theory
+define function is_even that takes num as Integer and returns Boolean:
+    return num % 2 == 0
+
+define function is_odd that takes num as Integer and returns Boolean:
+    return num % 2 != 0
+
+define function is_prime that takes num as Integer and returns Boolean:
+    if num <= 1:
+        return false
+    if num <= 3:
+        return true
+    if num % 2 == 0 or num % 3 == 0:
+        return false
+
+    create i as Integer
+    set i to 5
+    while i * i <= num:
+        if num % i == 0 or num % (i + 2) == 0:
+            return false
+        set i to i + 6
+
+    return true
+
+define function is_perfect_square that takes num as Integer and returns Boolean:
+    if num < 0:
+        return false
+
+    create root as Integer
+    set root to int(math.sqrt(num))
+    return root * root == num
+
+define function find_factors that takes num as Integer and returns List:
+    create factors as List
+    set factors to []
+
+    create i as Integer
+    set i to 1
+    while i * i <= num:
+        if num % i == 0:
+            add i to factors
+            if i != num / i:
+                add (num / i) to factors
+        set i to i + 1
+
+    return sort_list(factors)
+
+# Helper functions for complex numbers and matrices
+define function display_matrix that takes name as String, matrix as List:
+    io.println(name + ":")
+    create i as Integer
+    set i to 0
+    while i < length(matrix):
+        create row as List
+        set row to matrix[i]
+        io.println("  " + join_strings(row, " "))
+        set i to i + 1
+
+define function add_matrices that takes a as List, b as List and returns List:
+    create result as List
+    set result to []
+
+    create i as Integer
+    set i to 0
+    while i < length(a):
+        create row as List
+        set row to []
+        create j as Integer
+        set j to 0
+        while j < length(a[i]):
+            add (a[i][j] + b[i][j]) to row
+            set j to j + 1
+        add row to result
+        set i to i + 1
+
+    return result
+
+# Utility functions
+define function join_strings that takes items as List, separator as String and returns String:
+    create result as String
+    set result to ""
+    create first as Boolean
+    set first to true
+
+    create i as Integer
+    set i to 0
+    while i < length(items):
+        if not first:
+            set result to result + separator
+        else:
+            set first to false
+        set result to result + string(items[i])
+        set i to i + 1
+
+    return result
+
+# Placeholder implementations for missing functions
+define function power that takes base as Float, exponent as Float and returns Float:
+    if exponent == 0:
+        return 1.0
+    if exponent == 1:
+        return base
+
+    create result as Float
+    set result to 1.0
+    create i as Integer
+    set i to 0
+    while i < int(exponent):
+        set result to result * base
+        set i to i + 1
+
+    return result
+
+define function sin that takes x as Float and returns Float:
+    return math.sin(x)
+
+define function cos that takes x as Float and returns Float:
+    return math.cos(x)
+
+define function tan that takes x as Float and returns Float:
+    return math.tan(x)
+
+define function log that takes x as Float and returns Float:
+    return math.log(x)
+
+define function log10 that takes x as Float and returns Float:
+    return math.log10(x)
+
+define function exp that takes x as Float and returns Float:
+    return math.exp(x)
+
+define function random that returns Float:
+    return 0.5  # Placeholder
+
+# Initialize the application
+main()

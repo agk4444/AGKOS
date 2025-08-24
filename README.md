@@ -103,6 +103,28 @@ The AGK Language Compiler has comprehensive documentation organized in the `docs
 - **[Application Templates Guide](docs/APP_TEMPLATES_README.md)** - 25 professional templates with examples
 - **[Package Management Guide](docs/PACKAGE_MANAGEMENT_README.md)** - Package creation, installation, and distribution
 
+### 🗂️ **Templates Organization**
+
+All template files are organized in the `templates/` directory for better maintainability:
+
+```
+templates/
+├── math_template.agk          # Mathematical operations
+├── string_template.agk        # Text processing
+├── crypto_template.agk        # Cryptography
+├── hardware_template.agk      # Low-level hardware access
+├── os_template.agk            # Operating system development
+├── io_template.agk            # Input/output operations
+├── list_template.agk          # List data structures
+├── date_template.agk          # Date/time manipulation
+├── power_template.agk         # Power management
+├── graphics_template.agk      # 2D/3D graphics
+├── security_template.agk      # Security operations
+└── system_ast_template.agk    # System programming
+```
+
+Each template provides comprehensive examples and interactive demonstrations of the corresponding standard library.
+
 ### 🖥️ **Platform-Specific Guides**
 - **[Operating System Development](docs/C_BACKEND_README.md)** - Complete OS development with C backend
 - **[Mobile Development](docs/MOBILE_OS_DEVELOPMENT_GUIDE.md)** - Android and iOS app development

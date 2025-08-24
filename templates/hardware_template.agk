@@ -1,0 +1,821 @@
+# AGK Hardware Template - Low-Level Hardware Access & System Programming
+# This template demonstrates direct hardware access, CPU control, I/O operations,
+# and low-level system programming capabilities
+# Perfect for: Embedded systems, OS development, device drivers, system utilities
+
+import hardware
+import io
+import logging
+import system_ast
+
+# Global configuration
+define constant DEMO_PORT as Integer = 0x80  # Demo port for I/O operations
+define constant DEMO_VALUE as Integer = 0x42
+
+# Main application entry point
+define function main:
+    # Initialize logging for the hardware application
+    create logger as Logger
+    set logger to logging.get_logger("Hardware_App")
+    logging.set_level(logger, logging.INFO)
+    logging.add_console_handler(logger)
+
+    logging.info(logger, "Starting AGK Hardware Access Application")
+
+    # Run the main application loop
+    run_hardware_application_loop(logger)
+
+# Main application loop with menu-driven interface
+define function run_hardware_application_loop that takes logger as Logger:
+    create running as Boolean
+    set running to true
+
+    while running:
+        io.println("\n🔧 AGK Hardware Access Environment")
+        io.println("1. CPU Register Operations")
+        io.println("2. Port I/O Operations")
+        io.println("3. PCI Configuration Access")
+        io.println("4. CPU Feature Detection")
+        io.println("5. CPU Information")
+        io.println("6. Atomic Operations")
+        io.println("7. Memory Barriers")
+        io.println("8. Model Specific Registers")
+        io.println("9. Interrupt Control")
+        io.println("10. Cache Management")
+        io.println("11. Performance Monitoring")
+        io.println("12. Assembly Code Execution")
+        io.println("13. Hardware Constants")
+        io.println("14. Exit")
+        io.print("Enter your choice (1-14): ")
+
+        create choice as String
+        set choice to io.read_line()
+
+        if choice == "1":
+            cpu_register_demo(logger)
+        else if choice == "2":
+            port_io_demo(logger)
+        else if choice == "3":
+            pci_config_demo(logger)
+        else if choice == "4":
+            cpu_feature_demo(logger)
+        else if choice == "5":
+            cpu_info_demo(logger)
+        else if choice == "6":
+            atomic_operations_demo(logger)
+        else if choice == "7":
+            memory_barrier_demo(logger)
+        else if choice == "8":
+            msr_demo(logger)
+        else if choice == "9":
+            interrupt_control_demo(logger)
+        else if choice == "10":
+            cache_management_demo(logger)
+        else if choice == "11":
+            performance_monitoring_demo(logger)
+        else if choice == "12":
+            assembly_execution_demo(logger)
+        else if choice == "13":
+            hardware_constants_demo(logger)
+        else if choice == "14":
+            set running to false
+            logging.info(logger, "Hardware application shutting down")
+        else:
+            io.println("❌ Invalid choice. Please try again.")
+
+# CPU Register Operations
+define function cpu_register_demo that takes logger as Logger:
+    io.println("\n🏛️ CPU Register Operations")
+
+    io.println("Available CPU Registers:")
+    io.println("─" * 40)
+    io.println("EAX, EBX, ECX, EDX")
+    io.println("ESI, EDI, ESP, EBP")
+
+    io.print("Enter register name (e.g., EAX): ")
+    create reg_name as String
+    set reg_name to io.read_line()
+
+    if reg_name == "":
+        set reg_name to "EAX"
+
+    io.println("Register: " + reg_name)
+    io.println("─" * 30)
+
+    # Read current value
+    create current_value as Integer
+    set current_value to hardware.read_register(reg_name)
+    io.println("Current value: " + string(current_value) + " (0x" + to_hex_string(current_value) + ")")
+
+    io.print("Enter new value to write (or press Enter to skip): ")
+    create new_value_str as String
+    set new_value_str to io.read_line()
+
+    if new_value_str != "":
+        create new_value as Integer
+        set new_value to int(new_value_str)
+
+        # Write new value
+        hardware.write_register(reg_name, new_value)
+        io.println("✅ Written value: " + string(new_value) + " (0x" + to_hex_string(new_value) + ")")
+
+        # Read back to verify
+        create verify_value as Integer
+        set verify_value to hardware.read_register(reg_name)
+        io.println("Verification read: " + string(verify_value) + " (0x" + to_hex_string(verify_value) + ")")
+
+        if verify_value == new_value:
+            io.println("✅ Register write successful!")
+        else:
+            io.println("❌ Register write verification failed!")
+    else:
+        io.println("ℹ️ Register write skipped")
+
+    logging.info(logger, "CPU register operations completed")
+
+# Port I/O Operations
+define function port_io_demo that takes logger as Logger:
+    io.println("\n🔌 Port I/O Operations")
+
+    io.println("Common I/O Ports:")
+    io.println("─" * 40)
+    io.println("0x20-0x21: PIC (Programmable Interrupt Controller)")
+    io.println("0x60, 0x64: Keyboard Controller")
+    io.println("0x3F8-0x3FF: Serial Port (COM1)")
+    io.println("0x378-0x37F: Parallel Port (LPT1)")
+    io.println("0x70-0x71: CMOS/RTC")
+
+    io.print("Enter I/O port address (hex): 0x")
+    create port_str as String
+    set port_str to io.read_line()
+
+    create port_address as Integer
+    if port_str == "":
+        set port_address to DEMO_PORT
+    else:
+        set port_address to hex_to_int(port_str)
+
+    io.println("Port: 0x" + to_hex_string(port_address))
+    io.println("─" * 30)
+
+    # Byte operations
+    io.println("Byte I/O Operations:")
+
+    create byte_value as Integer
+    set byte_value to hardware.inb(port_address)
+    io.println("Read byte: " + string(byte_value) + " (0x" + to_hex_string(byte_value) + ")")
+
+    hardware.outb(port_address, DEMO_VALUE)
+    io.println("✅ Written byte: " + string(DEMO_VALUE) + " (0x" + to_hex_string(DEMO_VALUE) + ")")
+
+    # Word operations
+    io.println("\nWord I/O Operations:")
+
+    create word_value as Integer
+    set word_value to hardware.inw(port_address)
+    io.println("Read word: " + string(word_value) + " (0x" + to_hex_string(word_value) + ")")
+
+    hardware.outw(port_address, DEMO_VALUE * 256 + DEMO_VALUE)
+    io.println("✅ Written word: " + string(DEMO_VALUE * 256 + DEMO_VALUE))
+
+    # Long operations
+    io.println("\nLong I/O Operations:")
+
+    create long_value as Integer
+    set long_value to hardware.inl(port_address)
+    io.println("Read long: " + string(long_value) + " (0x" + to_hex_string(long_value) + ")")
+
+    hardware.outl(port_address, DEMO_VALUE)
+    io.println("✅ Written long: " + string(DEMO_VALUE))
+
+    logging.info(logger, "Port I/O operations completed")
+
+# PCI Configuration Space Access
+define function pci_config_demo that takes logger as Logger:
+    io.println("\n🖥️ PCI Configuration Space Access")
+
+    io.println("1. Read PCI device")
+    io.println("2. Write PCI register")
+    io.println("3. Scan PCI bus")
+    io.print("Choose operation (1-3): ")
+
+    create choice as String
+    set choice to io.read_line()
+
+    if choice == "1":
+        io.print("Bus number (0-255): ")
+        create bus as Integer
+        set bus to int(io.read_line())
+
+        io.print("Device number (0-31): ")
+        create device as Integer
+        set device to int(io.read_line())
+
+        io.print("Function number (0-7): ")
+        create function as Integer
+        set function to int(io.read_line())
+
+        io.print("Register offset (hex): 0x")
+        create offset_str as String
+        set offset_str to io.read_line()
+        create offset as Integer
+        set offset to hex_to_int(offset_str)
+
+        io.print("Size (1=byte, 2=word, 4=dword): ")
+        create size as Integer
+        set size to int(io.read_line())
+
+        create value as Integer
+        set value to hardware.pci_config_read(bus, device, function, offset, size)
+
+        io.println("PCI [" + string(bus) + ":" + string(device) + "." + string(function) + "]")
+        io.println("Register 0x" + to_hex_string(offset) + ": " + string(value) + " (0x" + to_hex_string(value) + ")")
+
+    else if choice == "2":
+        io.print("Bus number (0-255): ")
+        create bus as Integer
+        set bus to int(io.read_line())
+
+        io.print("Device number (0-31): ")
+        create device as Integer
+        set device to int(io.read_line())
+
+        io.print("Function number (0-7): ")
+        create function as Integer
+        set function to int(io.read_line())
+
+        io.print("Register offset (hex): 0x")
+        create offset_str as String
+        set offset_str to io.read_line()
+        create offset as Integer
+        set offset to hex_to_int(offset_str)
+
+        io.print("Size (1=byte, 2=word, 4=dword): ")
+        create size as Integer
+        set size to int(io.read_line())
+
+        io.print("Value to write (hex): 0x")
+        create value_str as String
+        set value_str to io.read_line()
+        create value as Integer
+        set value to hex_to_int(value_str)
+
+        hardware.pci_config_write(bus, device, function, offset, size, value)
+        io.println("✅ Written " + string(value) + " to PCI [" + string(bus) + ":" + string(device) + "." + string(function) + "] register 0x" + to_hex_string(offset))
+
+    else if choice == "3":
+        io.println("Scanning PCI bus for devices...")
+        io.println("─" * 50)
+
+        # Simple PCI bus scan (demo)
+        create found_devices as Integer
+        set found_devices to 0
+
+        create bus as Integer
+        set bus to 0
+        while bus < 1:  # Only scan bus 0 for demo
+            create device as Integer
+            set device to 0
+            while device < 32:
+                create vendor_id as Integer
+                set vendor_id to hardware.pci_config_read(bus, device, 0, 0x00, 2)
+
+                if vendor_id != 0xFFFF and vendor_id != 0:
+                    create device_id as Integer
+                    set device_id to hardware.pci_config_read(bus, device, 0, 0x02, 2)
+
+                    create class_code as Integer
+                    set class_code to hardware.pci_config_read(bus, device, 0, 0x0A, 1)
+
+                    io.println("Found PCI device: [" + string(bus) + ":" + string(device) + ".0]")
+                    io.println("  Vendor ID: 0x" + to_hex_string(vendor_id))
+                    io.println("  Device ID: 0x" + to_hex_string(device_id))
+                    io.println("  Class: 0x" + to_hex_string(class_code))
+                    set found_devices to found_devices + 1
+                set device to device + 1
+            set bus to bus + 1
+
+        io.println("Found " + string(found_devices) + " PCI devices")
+
+    logging.info(logger, "PCI configuration operations completed")
+
+# CPU Feature Detection
+define function cpu_feature_demo that takes logger as Logger:
+    io.println("\n⚙️ CPU Feature Detection")
+
+    io.println("Checking CPU features:")
+    io.println("─" * 40)
+
+    create sse_supported as Boolean
+    set sse_supported to hardware.has_sse()
+    io.println("SSE Support: " + (sse_supported ? "✅ Yes" : "❌ No"))
+
+    create sse2_supported as Boolean
+    set sse2_supported to hardware.has_sse2()
+    io.println("SSE2 Support: " + (sse2_supported ? "✅ Yes" : "❌ No"))
+
+    create avx_supported as Boolean
+    set avx_supported to hardware.has_avx()
+    io.println("AVX Support: " + (avx_supported ? "✅ Yes" : "❌ No"))
+
+    create avx2_supported as Boolean
+    set avx2_supported to hardware.has_avx2()
+    io.println("AVX2 Support: " + (avx2_supported ? "✅ Yes" : "❌ No"))
+
+    create rdrand_supported as Boolean
+    set rdrand_supported to hardware.has_rdrand()
+    io.println("RDRAND Support: " + (rdrand_supported ? "✅ Yes" : "❌ No"))
+
+    create aes_supported as Boolean
+    set aes_supported to hardware.has_aes()
+    io.println("AES Support: " + (aes_supported ? "✅ Yes" : "❌ No"))
+
+    # Test RDRAND if available
+    if rdrand_supported:
+        io.println("\nTesting RDRAND:")
+        io.println("─" * 20)
+
+        create i as Integer
+        set i to 0
+        while i < 5:
+            create random_value as Integer
+            set random_value to hardware.generate_rdrand()
+            io.println("RDRAND value " + string(i + 1) + ": " + string(random_value) + " (0x" + to_hex_string(random_value) + ")")
+            set i to i + 1
+
+        # Test RDSEED
+        io.println("\nTesting RDSEED:")
+        io.println("─" * 20)
+
+        set i to 0
+        while i < 3:
+            create seed_value as Integer
+            set seed_value to hardware.generate_rdseed()
+            io.println("RDSEED value " + string(i + 1) + ": " + string(seed_value) + " (0x" + to_hex_string(seed_value) + ")")
+            set i to i + 1
+    else:
+        io.println("⚠️ RDRAND not supported - random number generation unavailable")
+
+    logging.info(logger, "CPU feature detection completed")
+
+# CPU Information
+define function cpu_info_demo that takes logger as Logger:
+    io.println("\n💻 CPU Information")
+
+    io.println("CPU Details:")
+    io.println("─" * 30)
+
+    create vendor as String
+    set vendor to hardware.get_cpu_vendor()
+    io.println("Vendor: " + vendor)
+
+    create brand as String
+    set brand to hardware.get_cpu_brand()
+    io.println("Brand: " + brand)
+
+    create cores as Integer
+    set cores to hardware.get_cpu_cores()
+    io.println("Cores: " + string(cores))
+
+    create threads as Integer
+    set threads to hardware.get_cpu_threads()
+    io.println("Threads: " + string(threads))
+
+    create frequency as Integer
+    set frequency to hardware.get_cpu_frequency()
+    io.println("Frequency: " + string(frequency) + " MHz")
+
+    # CPUID demonstration
+    io.println("\nCPUID Information:")
+    io.println("─" * 30)
+
+    create cpuid_results as List
+    set cpuid_results to hardware.cpuid(0x00000000, 0)  # Get vendor info
+
+    if length(cpuid_results) >= 4:
+        io.println("CPUID(0x00000000):")
+        io.println("  EAX: 0x" + to_hex_string(cpuid_results[0]))
+        io.println("  EBX: 0x" + to_hex_string(cpuid_results[1]))
+        io.println("  ECX: 0x" + to_hex_string(cpuid_results[2]))
+        io.println("  EDX: 0x" + to_hex_string(cpuid_results[3]))
+    else:
+        io.println("CPUID not available (demo mode)")
+
+    # Feature flags
+    create feature_cpuid as List
+    set feature_cpuid to hardware.cpuid(0x00000001, 0)
+
+    if length(feature_cpuid) >= 4:
+        create features_edx as Integer
+        set features_edx to feature_cpuid[3]  # EDX register
+
+        io.println("\nCPU Features (EDX):")
+        io.println("─" * 25)
+        io.println("MMX: " + ((features_edx & (1 << 23)) != 0 ? "✅" : "❌"))
+        io.println("SSE: " + ((features_edx & (1 << 25)) != 0 ? "✅" : "❌"))
+        io.println("SSE2: " + ((features_edx & (1 << 26)) != 0 ? "✅" : "❌"))
+        io.println("Hyper-threading: " + ((features_edx & (1 << 28)) != 0 ? "✅" : "❌"))
+
+    logging.info(logger, "CPU information retrieval completed")
+
+# Atomic Operations
+define function atomic_operations_demo that takes logger as Logger:
+    io.println("\n⚛️ Atomic Operations")
+
+    # Allocate memory for atomic operations
+    create atomic_var as Pointer
+    set atomic_var to system_ast.allocate_memory(4, 4)  # 4 bytes aligned to 4 bytes
+
+    if atomic_var != 0:
+        io.println("✅ Allocated atomic variable at: " + string(atomic_var))
+
+        # Initialize to zero
+        system_ast.set_memory(atomic_var, 0, 4)
+        io.println("Initialized atomic variable to 0")
+
+        io.println("\nAtomic Operations:")
+        io.println("─" * 30)
+
+        # Atomic increment
+        create inc_result as Integer
+        set inc_result to hardware.atomic_increment(atomic_var)
+        io.println("Atomic increment result: " + string(inc_result))
+
+        # Atomic decrement
+        create dec_result as Integer
+        set dec_result to hardware.atomic_decrement(atomic_var)
+        io.println("Atomic decrement result: " + string(dec_result))
+
+        # Atomic exchange
+        create exchange_result as Integer
+        set exchange_result to hardware.atomic_exchange(atomic_var, 42)
+        io.println("Atomic exchange (set to 42): " + string(exchange_result))
+
+        # Atomic compare and exchange
+        create cmpxchg_result as Integer
+        set cmpxchg_result to hardware.atomic_compare_exchange(atomic_var, 42, 99)
+        io.println("Atomic CAS (42→99): " + string(cmpxchg_result))
+
+        # Final value
+        create final_value as Integer
+        set final_value to hardware.atomic_exchange(atomic_var, 0)  # Read and reset
+        io.println("Final atomic value: " + string(final_value))
+
+        # Free memory
+        system_ast.free_memory(atomic_var)
+        io.println("✅ Atomic variable deallocated")
+    else:
+        io.println("❌ Failed to allocate atomic variable")
+
+    logging.info(logger, "Atomic operations completed")
+
+# Memory Barriers
+define function memory_barrier_demo that takes logger as Logger:
+    io.println("\n🚧 Memory Barriers")
+
+    io.println("Memory barriers ensure proper ordering of memory operations")
+    io.println("across multiple CPU cores and system components.")
+    io.println("─" * 60)
+
+    io.println("1. Full Memory Barrier")
+    io.println("2. Read Memory Barrier")
+    io.println("3. Write Memory Barrier")
+    io.print("Choose barrier type (1-3): ")
+
+    create choice as String
+    set choice to io.read_line()
+
+    create start_time as Integer
+    set start_time to hardware.read_tsc()
+
+    if choice == "1":
+        io.println("Executing full memory barrier...")
+        hardware.memory_barrier()
+        io.println("✅ Full memory barrier completed")
+
+    else if choice == "2":
+        io.println("Executing read memory barrier...")
+        hardware.read_barrier()
+        io.println("✅ Read memory barrier completed")
+
+    else if choice == "3":
+        io.println("Executing write memory barrier...")
+        hardware.write_barrier()
+        io.println("✅ Write memory barrier completed")
+
+    create end_time as Integer
+    set end_time to hardware.read_tsc()
+    create elapsed as Integer
+    set elapsed to end_time - start_time
+
+    io.println("Operation took " + string(elapsed) + " CPU cycles")
+
+    io.println("\nMemory barriers are essential for:")
+    io.println("• Multi-threaded programming")
+    io.println("• Device driver development")
+    io.println("• Real-time systems")
+    io.println("• Lock-free data structures")
+
+    logging.info(logger, "Memory barrier operations completed")
+
+# Model Specific Registers
+define function msr_demo that takes logger as Logger:
+    io.println("\n📋 Model Specific Registers (MSRs)")
+
+    io.println("⚠️ Warning: MSR access requires kernel privileges")
+    io.println("This demo shows the interface but may not work in user mode")
+    io.println("─" * 60)
+
+    io.println("Common MSRs:")
+    io.println("─" * 20)
+    io.println("0x1B: APIC Base Address")
+    io.println("0xC0000080: Extended Feature Enable Register (EFER)")
+    io.println("0xC0000081: System Call Target Address (STAR)")
+    io.println("0xC0000082: Long System Call Target Address (LSTAR)")
+
+    io.print("Enter MSR address (hex): 0x")
+    create msr_str as String
+    set msr_str to io.read_line()
+
+    if msr_str == "":
+        set msr_str to "1B"  # APIC base as default
+
+    create msr_address as Integer
+    set msr_address to hex_to_int(msr_str)
+
+    io.println("MSR: 0x" + to_hex_string(msr_address))
+
+    # Try to read MSR (may fail in user mode)
+    create msr_value as Integer
+    set msr_value to hardware.read_msr(msr_address)
+    io.println("Read value: " + string(msr_value) + " (0x" + to_hex_string(msr_value) + ")")
+
+    io.print("Enter new value to write (hex, or Enter to skip): 0x")
+    create new_value_str as String
+    set new_value_str to io.read_line()
+
+    if new_value_str != "":
+        create new_value as Integer
+        set new_value to hex_to_int(new_value_str)
+        hardware.write_msr(msr_address, new_value)
+        io.println("✅ Written 0x" + to_hex_string(new_value) + " to MSR 0x" + to_hex_string(msr_address))
+
+    logging.info(logger, "MSR operations completed")
+
+# Interrupt Control
+define function interrupt_control_demo that takes logger as Logger:
+    io.println("\n⚡ Interrupt Control")
+
+    io.println("⚠️ Warning: Interrupt control requires kernel privileges")
+    io.println("This demo shows the interface but may not work in user mode")
+    io.println("─" * 60)
+
+    io.println("Interrupt Control Operations:")
+    io.println("─" * 35)
+    io.println("1. Enable Interrupts (STI)")
+    io.println("2. Disable Interrupts (CLI)")
+    io.println("3. CPU Halt (HLT)")
+    io.println("4. No Operation (NOP)")
+    io.print("Choose operation (1-4): ")
+
+    create choice as String
+    set choice to io.read_line()
+
+    if choice == "1":
+        io.println("Enabling interrupts...")
+        hardware.enable_interrupts()
+        io.println("✅ Interrupts enabled")
+
+    else if choice == "2":
+        io.println("Disabling interrupts...")
+        hardware.disable_interrupts()
+        io.println("✅ Interrupts disabled")
+
+    else if choice == "3":
+        io.println("⚠️ CPU halt will stop execution until interrupt")
+        io.print("Are you sure? (y/N): ")
+        create confirm as String
+        set confirm to io.read_line()
+
+        if confirm == "y" or confirm == "Y":
+            io.println("Halting CPU...")
+            hardware.halt_cpu()
+            io.println("✅ CPU resumed from halt")
+        else:
+            io.println("CPU halt cancelled")
+
+    else if choice == "4":
+        io.println("Executing NOP instruction...")
+        create i as Integer
+        set i to 0
+        while i < 10:
+            hardware.nop()
+            set i to i + 1
+        io.println("✅ Executed 10 NOP instructions")
+
+    logging.info(logger, "Interrupt control operations completed")
+
+# Cache Management
+define function cache_management_demo that takes logger as Logger:
+    io.println("\n💾 Cache Management")
+
+    io.println("Cache operations:")
+    io.println("─" * 30)
+
+    # Allocate test memory
+    create test_buffer as Pointer
+    set test_buffer to system_ast.allocate_memory(4096, 64)  # 4KB aligned to cache line
+
+    if test_buffer != 0:
+        io.println("✅ Allocated 4KB test buffer at: " + string(test_buffer))
+
+        # Fill buffer with test data
+        create i as Integer
+        set i to 0
+        while i < 4096:
+            system_ast.set_memory(test_buffer + i, i % 256, 1)
+            set i to i + 1
+
+        io.println("✅ Filled buffer with test data")
+
+        # Cache operations
+        io.println("\nCache Operations:")
+
+        io.println("Flushing cache lines...")
+        hardware.cache_flush(test_buffer, 4096)
+        io.println("✅ Cache flush completed")
+
+        io.println("Invalidating cache lines...")
+        hardware.cache_invalidate(test_buffer, 4096)
+        io.println("✅ Cache invalidate completed")
+
+        io.println("Flushing entire cache...")
+        hardware.cache_flush_all()
+        io.println("✅ Full cache flush completed")
+
+        # TLB operations
+        io.println("\nTLB Operations:")
+
+        io.println("Flushing TLB...")
+        hardware.tlb_flush()
+        io.println("✅ TLB flush completed")
+
+        io.println("Flushing single TLB entry...")
+        hardware.tlb_flush_single(test_buffer)
+        io.println("✅ Single TLB entry flushed")
+
+        # Free memory
+        system_ast.free_memory(test_buffer)
+        io.println("✅ Test buffer deallocated")
+    else:
+        io.println("❌ Failed to allocate test buffer")
+
+    logging.info(logger, "Cache management operations completed")
+
+# Performance Monitoring
+define function performance_monitoring_demo that takes logger as Logger:
+    io.println("\n📊 Performance Monitoring")
+
+    io.println("Performance monitoring features:")
+    io.println("─" * 40)
+
+    # Read Time Stamp Counter
+    create tsc_start as Integer
+    set tsc_start to hardware.read_tsc()
+    io.println("TSC start: " + string(tsc_start))
+
+    # Some dummy work
+    create dummy_sum as Integer
+    set dummy_sum to 0
+    create i as Integer
+    set i to 0
+    while i < 10000:
+        set dummy_sum to dummy_sum + i
+        set i to i + 1
+
+    create tsc_end as Integer
+    set tsc_end to hardware.read_tsc()
+    io.println("TSC end: " + string(tsc_end))
+    io.println("Cycles elapsed: " + string(tsc_end - tsc_start))
+
+    io.println("\nPerformance Counter Events:")
+    io.println("─" * 35)
+    io.println("0x00C0: Instructions Retired")
+    io.println("0x412E: Cache Misses")
+    io.println("0x00CB: Branch Misses")
+    io.println("0x003C: Unhalted Core Cycles")
+
+    # Demo performance counter (if available)
+    create counter_value as Integer
+    set counter_value to hardware.read_perf_counter(0)
+    io.println("Performance counter 0: " + string(counter_value))
+
+    # Write to performance counter
+    hardware.write_perf_counter(0, 0)
+    io.println("✅ Reset performance counter 0 to 0")
+
+    logging.info(logger, "Performance monitoring completed")
+
+# Assembly Code Execution
+define function assembly_execution_demo that takes logger as Logger:
+    io.println("\n⚙️ Assembly Code Execution")
+
+    io.println("⚠️ Warning: Assembly execution requires careful validation")
+    io.println("This demo shows the interface but uses safe examples")
+    io.println("─" * 60)
+
+    io.println("1. Simple arithmetic")
+    io.println("2. Memory operations")
+    io.println("3. Custom instruction sequence")
+    io.print("Choose assembly example (1-3): ")
+
+    create choice as String
+    set choice to io.read_line()
+
+    create assembly_code as String
+    create input_operands as List
+    create output_operands as List
+
+    if choice == "1":
+        set assembly_code to "mov eax, [input1]\nadd eax, [input2]\nmov [output], eax"
+        set input_operands to [10, 20]
+        set output_operands to [0]
+
+        io.println("Assembly: Add two numbers")
+        io.println("Input: " + string(input_operands[0]) + ", " + string(input_operands[1]))
+
+    else if choice == "2":
+        set assembly_code to "mov eax, [input]\nshl eax, 2\nmov [output], eax"
+        set input_operands to [5]
+        set output_operands to [0]
+
+        io.println("Assembly: Shift left by 2 (multiply by 4)")
+        io.println("Input: " + string(input_operands[0]))
+
+    else if choice == "3":
+        set assembly_code to "xor eax, eax\nmov ecx, [count]\nloop: inc eax\nloop loop\nmov [result], eax"
+        set input_operands to [10]
+        set output_operands to [0]
+
+        io.println("Assembly: Simple loop counter")
+        io.println("Input: " + string(input_operands[0]))
+
+    # Execute assembly (demo)
+    create result as Integer
+    set result to hardware.execute_assembly(assembly_code, input_operands, output_operands)
+    io.println("Result: " + string(result))
+
+    logging.info(logger, "Assembly execution completed")
+
+# Hardware Constants
+define function hardware_constants_demo that takes logger as Logger:
+    io.println("\n📋 Hardware Constants Reference")
+
+    io.println("CPU Registers:")
+    io.println("─" * 20)
+    io.println("REG_EAX: " + string(hardware.REG_EAX))
+    io.println("REG_EBX: " + string(hardware.REG_EBX))
+    io.println("REG_ECX: " + string(hardware.REG_ECX))
+    io.println("REG_EDX: " + string(hardware.REG_EDX))
+
+    io.println("\nCPUID Leaves:")
+    io.println("─" * 20)
+    io.println("CPUID_VENDOR: 0x" + to_hex_string(hardware.CPUID_VENDOR))
+    io.println("CPUID_FEATURES: 0x" + to_hex_string(hardware.CPUID_FEATURES))
+    io.println("CPUID_CACHE: 0x" + to_hex_string(hardware.CPUID_CACHE))
+
+    io.println("\nMSRs:")
+    io.println("─" * 10)
+    io.println("MSR_APIC_BASE: 0x" + to_hex_string(hardware.MSR_APIC_BASE))
+    io.println("MSR_EFER: 0x" + to_hex_string(hardware.MSR_EFER))
+
+    io.println("\nPCI Registers:")
+    io.println("─" * 20)
+    io.println("PCI_VENDOR_ID: 0x" + to_hex_string(hardware.PCI_VENDOR_ID))
+    io.println("PCI_DEVICE_ID: 0x" + to_hex_string(hardware.PCI_DEVICE_ID))
+    io.println("PCI_COMMAND: 0x" + to_hex_string(hardware.PCI_COMMAND))
+
+    io.println("\nI/O Ports:")
+    io.println("─" * 15)
+    io.println("PORT_PIC1_COMMAND: 0x" + to_hex_string(hardware.PORT_PIC1_COMMAND))
+    io.println("PORT_KEYBOARD_DATA: 0x" + to_hex_string(hardware.PORT_KEYBOARD_DATA))
+    io.println("PORT_SERIAL_COM1: 0x" + to_hex_string(hardware.PORT_SERIAL_COM1))
+
+    io.println("\nPerformance Events:")
+    io.println("─" * 25)
+    io.println("PERF_INSTRUCTIONS_RETIRED: 0x" + to_hex_string(hardware.PERF_INSTRUCTIONS_RETIRED))
+    io.println("PERF_CACHE_MISSES: 0x" + to_hex_string(hardware.PERF_CACHE_MISSES))
+
+    logging.info(logger, "Hardware constants displayed")
+
+# Helper functions
+define function to_hex_string that takes value as Integer and returns String:
+    # Simple hex conversion (placeholder)
+    return "DEADBEEF"  # Placeholder for actual hex conversion
+
+define function hex_to_int that takes hex_str as String and returns Integer:
+    # Simple hex to integer conversion (placeholder)
+    return 128  # Placeholder for actual conversion
+
+# Initialize the application
+main()

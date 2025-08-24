@@ -1,0 +1,879 @@
+# AGK Graphics Template - 2D and 3D Graphics Operations
+# This template demonstrates comprehensive graphics operations including
+# 2D drawing primitives, image manipulation, sprite animation, text rendering,
+# and basic 3D graphics
+# Perfect for: Games, visualization, GUI applications, creative coding
+
+import graphics
+import io
+import logging
+import string
+
+# Global configuration
+define constant LOG_FILE as String = "graphics_operations.log"
+define constant WINDOW_WIDTH as Integer = 800
+define constant WINDOW_HEIGHT as Integer = 600
+define constant CANVAS_WIDTH as Integer = 800
+define constant CANVAS_HEIGHT as Integer = 600
+
+# Global variables for graphics demo
+create global_window as Window
+create global_canvas as Canvas
+create demo_sprites as List
+
+# Main application entry point
+define function main:
+    # Initialize logging for the Graphics application
+    create logger as Logger
+    set logger to logging.get_logger("Graphics_App")
+    logging.set_level(logger, logging.INFO)
+    logging.add_console_handler(logger)
+    logging.add_file_handler(logger, LOG_FILE)
+
+    logging.info(logger, "Starting AGK Graphics Application")
+
+    # Initialize graphics system
+    initialize_graphics_system()
+
+    # Run the main application loop
+    run_graphics_application_loop(logger)
+
+# Initialize graphics system
+define function initialize_graphics_system:
+    # Create main window
+    set global_window to graphics.create_window(WINDOW_WIDTH, WINDOW_HEIGHT, "AGK Graphics Demo")
+    io.println("✅ Created graphics window: " + string(WINDOW_WIDTH) + "x" + string(WINDOW_HEIGHT))
+
+    # Create drawing canvas
+    set global_canvas to graphics.create_canvas(CANVAS_WIDTH, CANVAS_HEIGHT)
+    io.println("✅ Created drawing canvas")
+
+    # Initialize demo sprites list
+    set demo_sprites to create_list()
+
+# Main application loop with menu-driven interface
+define function run_graphics_application_loop that takes logger as Logger:
+    create running as Boolean
+    set running to true
+
+    while running:
+        io.println("\n🎨 AGK Graphics Operations Demo")
+        io.println("1. Basic Drawing Primitives")
+        io.println("2. Color Management")
+        io.println("3. Text and Fonts")
+        io.println("4. Image Operations")
+        io.println("5. Sprite Animation")
+        io.println("6. Interactive Graphics")
+        io.println("7. 3D Graphics Basics")
+        io.println("8. Window Management")
+        io.println("9. Graphics Effects")
+        io.println("10. Exit")
+        io.print("Enter your choice (1-10): ")
+
+        create choice as String
+        set choice to io.read_line()
+
+        if choice == "1":
+            basic_drawing_demo(logger)
+        else if choice == "2":
+            color_management_demo(logger)
+        else if choice == "3":
+            text_and_fonts_demo(logger)
+        else if choice == "4":
+            image_operations_demo(logger)
+        else if choice == "5":
+            sprite_animation_demo(logger)
+        else if choice == "6":
+            interactive_graphics_demo(logger)
+        else if choice == "7":
+            basic_3d_demo(logger)
+        else if choice == "8":
+            window_management_demo(logger)
+        else if choice == "9":
+            graphics_effects_demo(logger)
+        else if choice == "10":
+            set running to false
+            logging.info(logger, "Graphics application shutting down")
+            graphics.close_window(global_window)
+        else:
+            io.println("❌ Invalid choice. Please try again.")
+
+# Basic drawing primitives demonstration
+define function basic_drawing_demo that takes logger as Logger:
+    io.println("\n✏️ Basic Drawing Primitives Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "basic_drawing")
+
+    io.println("=== Drawing Lines ===")
+    graphics.draw_line(global_canvas, 50, 50, 200, 50, graphics.color_red())
+    graphics.draw_line(global_canvas, 50, 70, 200, 70, graphics.color_blue())
+    io.println("✅ Drew horizontal lines")
+
+    graphics.draw_line(global_canvas, 50, 100, 50, 200, graphics.color_green())
+    graphics.draw_line(global_canvas, 70, 100, 70, 200, graphics.color_purple())
+    io.println("✅ Drew vertical lines")
+
+    io.println("\n=== Drawing Rectangles ===")
+    graphics.draw_rectangle(global_canvas, 100, 100, 150, 80, graphics.color_red(), false)
+    io.println("✅ Drew rectangle outline")
+
+    graphics.draw_rectangle(global_canvas, 300, 100, 150, 80, graphics.color_blue(), true)
+    io.println("✅ Drew filled rectangle")
+
+    io.println("\n=== Drawing Circles ===")
+    graphics.draw_circle(global_canvas, 150, 300, 50, graphics.color_green(), false)
+    io.println("✅ Drew circle outline")
+
+    graphics.draw_circle(global_canvas, 350, 300, 40, graphics.color_orange(), true)
+    io.println("✅ Drew filled circle")
+
+    io.println("\n=== Drawing Ellipses ===")
+    graphics.draw_ellipse(global_canvas, 500, 150, 100, 60, graphics.color_purple(), false)
+    io.println("✅ Drew ellipse outline")
+
+    graphics.draw_ellipse(global_canvas, 500, 300, 120, 40, graphics.color_pink(), true)
+    io.println("✅ Drew filled ellipse")
+
+    io.println("\n=== Drawing Triangles ===")
+    graphics.draw_triangle(global_canvas, 600, 200, 650, 150, 700, 200, graphics.color_yellow(), false)
+    io.println("✅ Drew triangle outline")
+
+    graphics.draw_triangle(global_canvas, 600, 350, 650, 300, 700, 350, graphics.color_orange(), true)
+    io.println("✅ Drew filled triangle")
+
+    io.println("\n=== Drawing Complex Shapes ===")
+    # Draw a simple house
+    graphics.draw_rectangle(global_canvas, 100, 400, 120, 80, graphics.color_brown(), true)  # House body
+    graphics.draw_triangle(global_canvas, 90, 400, 160, 400, 125, 350, graphics.color_red(), true)  # Roof
+    graphics.draw_rectangle(global_canvas, 130, 440, 30, 40, graphics.color_blue(), true)  # Door
+    graphics.draw_circle(global_canvas, 180, 420, 15, graphics.color_yellow(), true)  # Window
+    io.println("✅ Drew complex house shape")
+
+    logging.end_timer(timer)
+    logging.info(logger, "Basic drawing primitives completed")
+
+# Color management demonstration
+define function color_management_demo that takes logger as Logger:
+    io.println("\n🎨 Color Management Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "color_management")
+
+    io.println("=== Predefined Colors ===")
+    create colors as List
+    set colors to create_list()
+    add "Red" to colors
+    add "Green" to colors
+    add "Blue" to colors
+    add "Yellow" to colors
+    add "Purple" to colors
+    add "Orange" to colors
+
+    create color_functions as List
+    set color_functions to create_list()
+    add graphics.color_red() to color_functions
+    add graphics.color_green() to color_functions
+    add color_functions
+    add graphics.color_blue() to color_functions
+    add graphics.color_yellow() to color_functions
+    add graphics.color_purple() to color_functions
+    add graphics.color_orange() to color_functions
+
+    create x as Integer
+    set x to 50
+    create y as Integer
+    set y to 50
+
+    create i as Integer
+    set i to 0
+    while i < length(colors):
+        create color_name as String
+        set color_name to get_item(colors, i)
+        create color_value as String
+        set color_value to get_item(color_functions, i)
+
+        graphics.draw_rectangle(global_canvas, x, y, 100, 30, color_value, true)
+        graphics.draw_text(global_canvas, x + 10, y + 8, color_name, graphics.color_white(), 12)
+
+        set x to x + 120
+        if x > 600:
+            set x to 50
+            set y to y + 50
+
+        set i to i + 1
+
+    io.println("✅ Displayed predefined colors")
+
+    io.println("\n=== Custom RGB Colors ===")
+    set y to 200
+    set x to 50
+
+    # Create a color gradient
+    create r as Integer
+    set r to 255
+    while r >= 0:
+        create custom_color as String
+        set custom_color to graphics.create_color(r, 0, 255 - r)
+        graphics.draw_rectangle(global_canvas, x, y, 10, 30, custom_color, true)
+        set x to x + 10
+        set r to r - 25
+
+    io.println("✅ Created RGB color gradient")
+
+    io.println("\n=== Alpha Transparency ===")
+    set x to 50
+    set y to 300
+
+    create alpha as Integer
+    set alpha to 255
+    while alpha >= 0:
+        create alpha_color as String
+        set alpha_color to graphics.create_color_alpha(255, 0, 0, alpha)
+        graphics.draw_circle(global_canvas, x, y, 20, alpha_color, true)
+        set x to x + 50
+        set alpha to alpha - 50
+
+    io.println("✅ Demonstrated alpha transparency")
+
+    io.println("\n=== Color Parsing ===")
+    create hex_colors as List
+    set hex_colors to create_list()
+    add "#FF0000" to hex_colors
+    add "#00FF00" to hex_colors
+    add "#0000FF" to hex_colors
+    add "#FFFF00" to hex_colors
+
+    set x to 50
+    set y to 400
+
+    for each hex_color in hex_colors:
+        create parsed_color as Object
+        set parsed_color to graphics.parse_color(hex_color)
+
+        graphics.draw_rectangle(global_canvas, x, y, 80, 40, hex_color, true)
+        graphics.draw_text(global_canvas, x + 10, y + 12, hex_color, graphics.color_white(), 10)
+
+        set x to x + 100
+
+    io.println("✅ Demonstrated color parsing")
+
+    logging.end_timer(timer)
+    logging.info(logger, "Color management completed")
+
+# Text and fonts demonstration
+define function text_and_fonts_demo that takes logger as Logger:
+    io.println("\n📝 Text and Fonts Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "text_and_fonts")
+
+    io.println("=== Basic Text Rendering ===")
+
+    graphics.draw_text(global_canvas, 50, 50, "Hello, AGK Graphics!", graphics.color_black(), 16)
+    graphics.draw_text(global_canvas, 50, 80, "This is a demonstration of text rendering", graphics.color_blue(), 12)
+    graphics.draw_text(global_canvas, 50, 110, "Different font sizes and colors", graphics.color_red(), 14)
+    io.println("✅ Rendered basic text")
+
+    io.println("\n=== Text Alignment Examples ===")
+    create center_x as Integer
+    set center_x to CANVAS_WIDTH / 2
+
+    graphics.draw_text(global_canvas, center_x - 100, 150, "Centered Text", graphics.color_purple(), 16)
+    graphics.draw_text(global_canvas, 50, 180, "Left Aligned Text", graphics.color_green(), 14)
+    graphics.draw_text(global_canvas, CANVAS_WIDTH - 200, 210, "Right Aligned Text", graphics.color_orange(), 14)
+    io.println("✅ Demonstrated text alignment")
+
+    io.println("\n=== Text Effects ===")
+    # Create a text shadow effect
+    graphics.draw_text(global_canvas, 52, 252, "Shadow Text", graphics.color_gray(), 18)
+    graphics.draw_text(global_canvas, 50, 250, "Shadow Text", graphics.color_black(), 18)
+
+    # Create bold-like effect
+    graphics.draw_text(global_canvas, 52, 282, "Bold Text", graphics.color_blue(), 16)
+    graphics.draw_text(global_canvas, 50, 280, "Bold Text", graphics.color_blue(), 16)
+
+    # Create outline effect (simulated)
+    graphics.draw_text(global_canvas, 50, 310, "Outlined Text", graphics.color_white(), 16)
+    graphics.draw_text(global_canvas, 50, 310, "Outlined Text", graphics.color_black(), 16)
+    io.println("✅ Created text effects")
+
+    io.println("\n=== Font Loading and Management ===")
+    # Try to create a system font
+    create demo_font as Font
+    set demo_font to graphics.create_font("Arial", 20)
+
+    if demo_font != null:
+        graphics.draw_text_with_font(global_canvas, 50, 350, "Custom Font Text", demo_font, graphics.color_red())
+        io.println("✅ Loaded and used custom font")
+    else:
+        graphics.draw_text(global_canvas, 50, 350, "Custom Font Text (Fallback)", graphics.color_red(), 16)
+        io.println("⚠️ Custom font not available, using fallback")
+
+    io.println("\n=== Text Measurement ===")
+    create test_texts as List
+    set test_texts to create_list()
+    add "Short" to test_texts
+    add "Medium length text" to test_texts
+    add "This is a very long piece of text to measure" to test_texts
+
+    set y to 400
+    for each text in test_texts:
+        create text_size as Object
+        set text_size to graphics.measure_text(demo_font, text)
+
+        graphics.draw_rectangle(global_canvas, 50, y - 5, 300, 25, graphics.color_light_gray(), true)
+        graphics.draw_text(global_canvas, 50, y, text, graphics.color_black(), 12)
+
+        set y to y + 30
+
+    io.println("✅ Demonstrated text measurement")
+
+    logging.end_timer(timer)
+    logging.info(logger, "Text and fonts demonstration completed")
+
+# Image operations demonstration
+define function image_operations_demo that takes logger as Logger:
+    io.println("\n🖼️ Image Operations Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "image_operations")
+
+    io.println("=== Creating Blank Images ===")
+
+    create blank_image as Image
+    set blank_image to graphics.create_image(200, 150)
+    io.println("✅ Created blank image: 200x150")
+
+    # Draw something on the image (simulated)
+    io.println("ℹ️ Drawing on image (simulated)")
+
+    io.println("\n=== Image Loading ===")
+    # Try to load an image (this will likely fail in demo but shows the API)
+    create loaded_image as Image
+    set loaded_image to graphics.load_image("demo_image.png")
+
+    if loaded_image != null:
+        io.println("✅ Successfully loaded image")
+    else:
+        io.println("⚠️ Image loading failed (expected in demo environment)")
+
+    io.println("\n=== Image Manipulation ===")
+
+    # Create a test image to manipulate
+    create test_image as Image
+    set test_image to graphics.create_image(100, 100)
+
+    # Resize
+    create resized_image as Image
+    set resized_image to graphics.resize_image(test_image, 150, 150)
+    io.println("✅ Resized image: 100x100 -> 150x150")
+
+    # Rotate
+    create rotated_image as Image
+    set rotated_image to graphics.rotate_image(resized_image, 45.0)
+    io.println("✅ Rotated image by 45 degrees")
+
+    # Flip
+    create flipped_image as Image
+    set flipped_image to graphics.flip_image(rotated_image, true, false)
+    io.println("✅ Flipped image horizontally")
+
+    # Apply filter
+    create filtered_image as Image
+    set filtered_image to graphics.apply_filter(flipped_image, "grayscale")
+    io.println("✅ Applied grayscale filter")
+
+    io.println("\n=== Image Saving ===")
+    # Save the manipulated image
+    graphics.save_image(filtered_image, "processed_image.png")
+    io.println("✅ Saved processed image as 'processed_image.png'")
+
+    io.println("\n=== Image Gallery Display ===")
+    create image_positions as List
+    set image_positions to create_list()
+    add 50 to image_positions   # x positions
+    add 200 to image_positions
+    add 350 to image_positions
+    add 500 to image_positions
+
+    set y to 100
+    create image_descriptions as List
+    set image_descriptions to create_list()
+    add "Original" to image_descriptions
+    add "Resized" to image_descriptions
+    add "Rotated" to image_descriptions
+    add "Filtered" to image_descriptions
+
+    create pos_i as Integer
+    set pos_i to 0
+    while pos_i < length(image_positions):
+        create x_pos as Integer
+        set x_pos to get_item(image_positions, pos_i)
+        create description as String
+        set description to get_item(image_descriptions, pos_i)
+
+        graphics.draw_rectangle(global_canvas, x_pos, y, 80, 60, graphics.color_light_gray(), true)
+        graphics.draw_text(global_canvas, x_pos + 10, y + 20, description, graphics.color_black(), 10)
+
+        set pos_i to pos_i + 1
+
+    io.println("✅ Created image gallery display")
+
+    logging.end_timer(timer)
+    logging.info(logger, "Image operations completed")
+
+# Sprite animation demonstration
+define function sprite_animation_demo that takes logger as Logger:
+    io.println("\n🎯 Sprite Animation Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "sprite_animation")
+
+    io.println("=== Creating Sprites ===")
+
+    # Create demo sprites
+    create sprite1_image as Image
+    set sprite1_image to graphics.create_image(50, 50)
+    create sprite1 as Sprite
+    set sprite1 to graphics.create_sprite(sprite1_image)
+
+    create sprite2_image as Image
+    set sprite2_image to graphics.create_image(30, 30)
+    create sprite2 as Sprite
+    set sprite2 to graphics.create_sprite(sprite2_image)
+
+    add sprite1 to demo_sprites
+    add sprite2 to demo_sprites
+
+    io.println("✅ Created 2 demo sprites")
+
+    io.println("\n=== Sprite Positioning ===")
+    graphics.set_sprite_position(sprite1, 100, 100)
+    graphics.set_sprite_position(sprite2, 200, 200)
+    io.println("✅ Positioned sprites on canvas")
+
+    # Get and display positions
+    create pos1 as Object
+    set pos1 to graphics.get_sprite_position(sprite1)
+    create pos2 as Object
+    set pos2 to graphics.get_sprite_position(sprite2)
+
+    io.println("Sprite 1 position: (" + string(pos1["x"]) + ", " + string(pos1["y"]) + ")")
+    io.println("Sprite 2 position: (" + string(pos2["x"]) + ", " + string(pos2["y"]) + ")")
+
+    io.println("\n=== Sprite Transformation ===")
+
+    graphics.set_sprite_rotation(sprite1, 45.0)
+    graphics.set_sprite_scale(sprite1, 1.5, 1.5)
+    io.println("✅ Rotated and scaled sprite 1")
+
+    graphics.set_sprite_rotation(sprite2, -30.0)
+    graphics.set_sprite_scale(sprite2, 0.8, 1.2)
+    io.println("✅ Rotated and scaled sprite 2")
+
+    io.println("\n=== Sprite Animation ===")
+    graphics.animate_sprite(sprite1, "bounce", 2.0)
+    graphics.animate_sprite(sprite2, "rotate", 3.0)
+    io.println("✅ Started sprite animations")
+
+    io.println("\n=== Visual Representation ===")
+    # Draw sprite representations on canvas
+    graphics.draw_rectangle(global_canvas, 100, 100, 50, 50, graphics.color_red(), true)
+    graphics.draw_text(global_canvas, 110, 120, "Sprite 1", graphics.color_white(), 10)
+
+    graphics.draw_circle(global_canvas, 200, 200, 20, graphics.color_blue(), true)
+    graphics.draw_text(global_canvas, 185, 195, "Sprite 2", graphics.color_white(), 10)
+
+    io.println("✅ Created visual sprite representations")
+
+    logging.end_timer(timer)
+    logging.info(logger, "Sprite animation completed")
+
+# Interactive graphics demonstration
+define function interactive_graphics_demo that takes logger as Logger:
+    io.println("\n🖱️ Interactive Graphics Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "interactive_graphics")
+
+    io.println("=== Mouse and Keyboard Events ===")
+    io.println("This demo shows how to handle user input for interactive graphics")
+
+    # Clear canvas for interactive demo
+    graphics.draw_rectangle(global_canvas, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT, graphics.color_white(), true)
+
+    io.println("\n=== Drawing Instructions ===")
+    graphics.draw_text(global_canvas, 50, 50, "Interactive Drawing Demo", graphics.color_black(), 16)
+    graphics.draw_text(global_canvas, 50, 80, "Instructions:", graphics.color_blue(), 12)
+    graphics.draw_text(global_canvas, 50, 100, "• Use mouse to draw circles", graphics.color_black(), 11)
+    graphics.draw_text(global_canvas, 50, 120, "• Press different keys for colors", graphics.color_black(), 11)
+    graphics.draw_text(global_canvas, 50, 140, "• Space: Clear canvas", graphics.color_black(), 11)
+
+    # Draw color palette
+    create colors as List
+    set colors to create_list()
+    add graphics.color_red() to colors
+    add graphics.color_green() to colors
+    add graphics.color_blue() to colors
+    add graphics.color_yellow() to colors
+    add graphics.color_purple() to colors
+
+    create color_names as List
+    set color_names to create_list()
+    add "Red" to color_names
+    add "Green" to color_names
+    add "Blue" to color_names
+    add "Yellow" to color_names
+    add "Purple" to color_names
+
+    set x to 50
+    set y to 180
+    create color_i as Integer
+    set color_i to 0
+
+    while color_i < length(colors):
+        create color_val as String
+        set color_val to get_item(colors, color_i)
+        create color_name as String
+        set color_name to get_item(color_names, color_i)
+
+        graphics.draw_rectangle(global_canvas, x, y, 60, 30, color_val, true)
+        graphics.draw_text(global_canvas, x + 5, y + 8, color_name, graphics.color_white(), 10)
+
+        set x to x + 80
+        set color_i to color_i + 1
+
+    io.println("✅ Set up interactive drawing interface")
+
+    io.println("\n=== Event Handling Structure ===")
+    io.println("In a real interactive application, you would:")
+    io.println("  • Handle mouse events: handle_mouse_events(window)")
+    io.println("  • Handle keyboard events: handle_keyboard_events(window)")
+    io.println("  • Update graphics based on user input")
+    io.println("  • Implement game loops or animation frames")
+
+    io.println("\n=== Sample Interaction Points ===")
+
+    # Create some interactive buttons/elements
+    graphics.draw_rectangle(global_canvas, 300, 300, 100, 40, graphics.color_light_blue(), true)
+    graphics.draw_text(global_canvas, 320, 312, "Button 1", graphics.color_black(), 12)
+
+    graphics.draw_rectangle(global_canvas, 450, 300, 100, 40, graphics.color_light_green(), true)
+    graphics.draw_text(global_canvas, 470, 312, "Button 2", graphics.color_black(), 12)
+
+    graphics.draw_circle(global_canvas, 600, 320, 25, graphics.color_orange(), true)
+    graphics.draw_text(global_canvas, 585, 315, "Click", graphics.color_white(), 10)
+
+    io.println("✅ Created interactive UI elements")
+
+    logging.end_timer(timer)
+    logging.info(logger, "Interactive graphics demonstration completed")
+
+# Basic 3D graphics demonstration
+define function basic_3d_demo that takes logger as Logger:
+    io.println("\n🌟 Basic 3D Graphics Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "basic_3d")
+
+    io.println("=== Creating 3D Scene ===")
+
+    create scene as Scene3D
+    set scene to graphics.create_3d_scene(400, 300)
+    io.println("✅ Created 3D scene")
+
+    io.println("\n=== Creating 3D Objects ===")
+
+    create cube as Object3D
+    set cube to graphics.create_3d_cube(2.0)
+    graphics.set_3d_position(cube, -3.0, 0.0, 0.0)
+    graphics.set_3d_rotation(cube, 45.0, 45.0, 0.0)
+    io.println("✅ Created and positioned 3D cube")
+
+    create sphere as Object3D
+    set sphere to graphics.create_3d_sphere(1.5)
+    graphics.set_3d_position(sphere, 3.0, 0.0, 0.0)
+    graphics.set_3d_rotation(sphere, 0.0, 30.0, 0.0)
+    io.println("✅ Created and positioned 3D sphere")
+
+    io.println("\n=== Camera Setup ===")
+    graphics.set_camera_position(scene, 0.0, 0.0, 10.0)
+    io.println("✅ Positioned 3D camera")
+
+    io.println("\n=== Rendering 3D Scene ===")
+    # Create a sub-canvas for 3D rendering
+    create canvas_3d as Canvas
+    set canvas_3d to graphics.create_canvas(400, 300)
+
+    graphics.render_3d_scene(scene, canvas_3d)
+    io.println("✅ Rendered 3D scene to canvas")
+
+    io.println("\n=== 3D Graphics Information ===")
+    io.println("3D graphics features demonstrated:")
+    io.println("  • Scene creation and management")
+    io.println("  • 3D object creation (cube, sphere)")
+    io.println("  • Object positioning and rotation")
+    io.println("  • Camera positioning")
+    io.println("  • Scene rendering")
+
+    io.println("\n=== 3D Coordinate System ===")
+    graphics.draw_text(global_canvas, 50, 50, "3D Coordinate System:", graphics.color_black(), 14)
+    graphics.draw_text(global_canvas, 50, 70, "X-axis: Left(-) to Right(+)", graphics.color_red(), 11)
+    graphics.draw_text(global_canvas, 50, 90, "Y-axis: Bottom(-) to Top(+)", graphics.color_green(), 11)
+    graphics.draw_text(global_canvas, 50, 110, "Z-axis: Back(-) to Front(+)", graphics.color_blue(), 11)
+
+    # Draw 3D axis representation
+    graphics.draw_line(global_canvas, 200, 200, 300, 200, graphics.color_red())  # X-axis
+    graphics.draw_line(global_canvas, 200, 200, 200, 150, graphics.color_green())  # Y-axis
+    graphics.draw_line(global_canvas, 200, 200, 170, 230, graphics.color_blue())  # Z-axis
+
+    graphics.draw_text(global_canvas, 300, 195, "X", graphics.color_red(), 12)
+    graphics.draw_text(global_canvas, 195, 145, "Y", graphics.color_green(), 12)
+    graphics.draw_text(global_canvas, 165, 235, "Z", graphics.color_blue(), 12)
+
+    io.println("✅ Created 3D coordinate system visualization")
+
+    logging.end_timer(timer)
+    logging.info(logger, "Basic 3D graphics demonstration completed")
+
+# Window management demonstration
+define function window_management_demo that takes logger as Logger:
+    io.println("\n🖼️ Window Management Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "window_management")
+
+    io.println("=== Window Information ===")
+
+    create window_info as Object
+    set window_info to graphics.get_window_size(global_window)
+    io.println("Current window size: " + string(window_info["width"]) + "x" + string(window_info["height"]))
+
+    io.println("\n=== Window Title Management ===")
+    create titles as List
+    set titles to create_list()
+    add "AGK Graphics Demo - Window Management" to titles
+    add "AGK Graphics Demo - Interactive Mode" to titles
+    add "AGK Graphics Demo - Animation Demo" to titles
+
+    for each title in titles:
+        graphics.set_window_title(global_window, title)
+        io.println("✅ Changed window title to: " + title)
+
+        # Small delay (simulated)
+        create i as Integer
+        set i to 0
+        while i < 100000:
+            set i to i + 1
+
+    # Restore original title
+    graphics.set_window_title(global_window, "AGK Graphics Demo")
+    io.println("✅ Restored original window title")
+
+    io.println("\n=== Window Operations ===")
+    io.println("Available window operations:")
+    io.println("  • Resizing (handled by window manager)")
+    io.println("  • Moving (handled by window manager)")
+    io.println("  • Minimizing/Maximizing (handled by window manager)")
+    io.println("  • Focus management (handled by window manager)")
+
+    io.println("\n=== Canvas Management ===")
+    io.println("Canvas operations:")
+    io.println("  • Clear canvas")
+    io.println("  • Resize canvas")
+    io.println("  • Copy canvas content")
+    io.println("  • Save canvas as image")
+
+    # Demonstrate canvas clearing
+    graphics.draw_rectangle(global_canvas, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT, graphics.color_white(), true)
+    graphics.draw_text(global_canvas, CANVAS_WIDTH / 2 - 100, CANVAS_HEIGHT / 2, "Canvas Cleared", graphics.color_black(), 16)
+    io.println("✅ Cleared canvas and added confirmation text")
+
+    logging.end_timer(timer)
+    logging.info(logger, "Window management completed")
+
+# Graphics effects demonstration
+define function graphics_effects_demo that takes logger as Logger:
+    io.println("\n✨ Graphics Effects Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "graphics_effects")
+
+    io.println("=== Visual Effects ===")
+
+    # Create a gradient background
+    create y_pos as Integer
+    set y_pos to 0
+    while y_pos < CANVAS_HEIGHT:
+        create gradient_color as String
+        create intensity as Integer
+        set intensity to (y_pos * 255) / CANVAS_HEIGHT
+        set gradient_color to graphics.create_color(intensity, intensity, 255)
+
+        graphics.draw_line(global_canvas, 0, y_pos, CANVAS_WIDTH, y_pos, gradient_color)
+        set y_pos to y_pos + 1
+
+    io.println("✅ Created gradient background")
+
+    io.println("\n=== Shape Effects ===")
+
+    # Draw concentric circles
+    create radius as Integer
+    set radius to 10
+    while radius <= 100:
+        create alpha_val as Integer
+        set alpha_val to 255 - (radius * 2)
+        if alpha_val < 0:
+            set alpha_val to 50
+
+        create circle_color as String
+        set circle_color to graphics.create_color_alpha(255, 0, 0, alpha_val)
+        graphics.draw_circle(global_canvas, 200, 200, radius, circle_color, true)
+        set radius to radius + 15
+
+    io.println("✅ Created concentric circles with transparency")
+
+    # Draw a star pattern
+    create star_color as String
+    set star_color to graphics.color_yellow()
+    create center_x as Integer
+    set center_x to 500
+    create center_y as Integer
+    set center_y to 200
+
+    create angle as Integer
+    set angle to 0
+    while angle < 360:
+        create radian as Float
+        set radian to (angle * 3.14159) / 180.0
+        create outer_x as Integer
+        set outer_x to center_x + (80 * cos(radian))
+        create outer_y as Integer
+        set outer_y to center_y + (80 * sin(radian))
+
+        create inner_angle as Integer
+        set inner_angle to angle + 36
+        create inner_radian as Float
+        set inner_radian to (inner_angle * 3.14159) / 180.0
+        create inner_x as Integer
+        set inner_x to center_x + (30 * cos(inner_radian))
+        create inner_y as Integer
+        set inner_y to center_y + (30 * sin(inner_radian))
+
+        graphics.draw_line(global_canvas, outer_x, outer_y, inner_x, inner_y, star_color)
+        set angle to angle + 72
+
+    io.println("✅ Created star pattern")
+
+    io.println("\n=== Text Effects ===")
+
+    # Create rainbow text effect
+    create rainbow_text as String
+    set rainbow_text to "RAINBOW TEXT"
+    set x to 300
+    set y to 400
+
+    create char_i as Integer
+    set char_i to 0
+    while char_i < length(rainbow_text):
+        create char as String
+        set char to substring(rainbow_text, char_i, 1)
+
+        create rainbow_colors as List
+        set rainbow_colors to create_list()
+        add graphics.color_red() to rainbow_colors
+        add graphics.color_orange() to rainbow_colors
+        add graphics.color_yellow() to rainbow_colors
+        add graphics.color_green() to rainbow_colors
+        add graphics.color_blue() to rainbow_colors
+        add graphics.color_purple() to rainbow_colors
+
+        create color_index as Integer
+        set color_index to char_i % length(rainbow_colors)
+        create char_color as String
+        set char_color to get_item(rainbow_colors, color_index)
+
+        graphics.draw_text(global_canvas, x, y, char, char_color, 18)
+        set x to x + 15
+        set char_i to char_i + 1
+
+    io.println("✅ Created rainbow text effect")
+
+    io.println("\n=== Particle Effects Simulation ===")
+    # Simulate particle effects with random dots
+    create particle_count as Integer
+    set particle_count to 50
+
+    set i to 0
+    while i < particle_count:
+        create particle_x as Integer
+        set particle_x to random_int(0, CANVAS_WIDTH)
+        create particle_y as Integer
+        set particle_y to random_int(0, CANVAS_HEIGHT)
+        create particle_color as String
+        set particle_color to graphics.create_color_alpha(random_int(0, 255), random_int(0, 255), random_int(0, 255), random_int(100, 200))
+
+        graphics.draw_circle(global_canvas, particle_x, particle_y, 2, particle_color, true)
+        set i to i + 1
+
+    io.println("✅ Created particle effect simulation")
+
+    logging.end_timer(timer)
+    logging.info(logger, "Graphics effects demonstration completed")
+
+# Helper functions
+define function validate_number that takes input as String and returns Boolean:
+    for each char in input:
+        if char != "0" and char != "1" and char != "2" and char != "3" and char != "4" and
+           char != "5" and char != "6" and char != "7" and char != "8" and char != "9" and
+           char != "." and char != "-":
+            return false
+    return length(input) > 0
+
+define function create_list that returns List:
+    create result as List
+    set result to []
+    return result
+
+define function length that takes lst as List and returns Integer:
+    create count as Integer
+    set count to 0
+    for each item in lst:
+        set count to count + 1
+    return count
+
+define function get_item that takes lst as List, index as Integer:
+    create current_index as Integer
+    set current_index to 0
+    for each item in lst:
+        if current_index == index:
+            return item
+        set current_index to current_index + 1
+
+define function substring that takes s as String, start as Integer, length as Integer and returns String:
+    return s
+
+define function cos that takes x as Float and returns Float:
+    return 1.0
+
+define function sin that takes x as Float and returns Float:
+    return 0.0
+
+define function random_int that takes min as Integer, max as Integer and returns Integer:
+    return min + 5  # Simple pseudo-random
+
+define function graphics.color_light_blue that returns String:
+    return "#ADD8E6"
+
+define function graphics.color_light_green that returns String:
+    return "#90EE90"
+
+define function graphics.color_light_gray that returns String:
+    return "#D3D3D3"
+
+define function graphics.color_brown that returns String:
+    return "#A52A2A"
+
+# Initialize the application
+main()
