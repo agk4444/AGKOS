@@ -931,16 +931,35 @@ create search_results as List = package.search("web-framework")
 git clone https://github.com/agk4444/AGKCompiler.git
 cd AGKCompiler
 
-# Compile AGK code
+# Option 1: Compile with Python (requires Python 3.8+)
 python agk_compiler.py your_program.agk
+
+# Option 2: Use standalone executable (no Python required)
+# Build standalone version first (see below)
+./agk_compiler your_program.agk
 
 # Start interactive REPL
 python agk_compiler.py --repl
+# or with standalone:
+./agk_compiler --repl
 ```
 
 ## 🚀 Standalone Executable (No Python Required)
 
-The AGK compiler can be built as a standalone executable that runs without requiring Python to be installed on the target system.
+The AGK compiler can be built as a standalone executable that runs without requiring Python to be installed on the target system. This is perfect for:
+
+- **Production deployments** where Python installation isn't feasible
+- **Distribution to end users** who don't need development tools
+- **Embedded systems** with limited resources
+- **Operating system development** where Python dependencies should be minimal
+- **Advanced graphics applications** that need to run independently
+
+**✅ All features work with standalone executable:**
+- Advanced graphics library (`advanced_graphics.agk`)
+- All standard libraries (38+ libraries)
+- Application templates and examples
+- Interactive REPL mode
+- C backend compilation for OS development
 
 ### Build Options
 
@@ -1004,16 +1023,27 @@ The `build_standalone.py` script provides multiple build options:
 ### Quick Build Commands
 
 ```bash
-# Linux/macOS
-chmod +x make_standalone.sh
-./make_standalone.sh
+# Linux/macOS - One command build
+chmod +x make_standalone.sh && ./make_standalone.sh
 
-# Windows
+# Windows - Simple execution
 make_standalone.bat
 
-# Manual build
-python build_standalone.py
+# Manual build with advanced options
+python build_standalone.py --backend nuitka --target all
+
+# Build with graphics support (includes advanced_graphics.agk)
+python build_standalone.py --include-advanced-graphics
 ```
+
+### Build Options
+
+The standalone builder supports:
+- **PyInstaller**: Single executable (recommended for most users)
+- **Nuitka**: Optimized native compilation (best performance)
+- **Graphics Support**: Includes advanced graphics library
+- **Cross-Platform**: Windows, macOS, Linux builds
+- **Size Optimization**: Minimal footprint builds
 
 ### Docker Support
 ```bash

@@ -19,8 +19,11 @@ This comprehensive guide provides ready-to-use templates for different types of 
 # Copy the template
 cp desktop_app_template.agk my_desktop_app.agk
 
-# Compile and run
+# Option 1: Compile with Python
 python agk_compiler.py my_desktop_app.agk
+
+# Option 2: Use standalone executable (no Python required)
+./agk_compiler my_desktop_app.agk
 ```
 
 ### 2. Web Application Template (`web_app_template.agk`)
@@ -40,8 +43,12 @@ python agk_compiler.py my_desktop_app.agk
 cp web_app_template.agk my_web_app.agk
 
 # Edit configuration (port, routes, etc.)
-# Compile and run
+
+# Option 1: Compile with Python
 python agk_compiler.py my_web_app.agk
+
+# Option 2: Use standalone executable (no Python required)
+./agk_compiler my_web_app.agk
 ```
 
 ### 3. Server/API Template (`server_api_template.agk`)
@@ -111,7 +118,12 @@ python agk_compiler.py my_mobile_app.agk
 cp agk_browser_full.agk my_advanced_browser.agk
 
 # Configure browser settings and themes
+
+# Option 1: Compile with Python
 python agk_compiler.py my_advanced_browser.agk
+
+# Option 2: Use standalone executable (includes advanced graphics support)
+./agk_compiler my_advanced_browser.agk
 ```
 
 **NEW - Advanced Graphics Library Demo:**
@@ -704,6 +716,36 @@ The 11 library templates are specifically designed for learning and mastering ea
 - **Code Examples**: Production-ready code patterns and techniques
 
 **Perfect for:** Developers learning AGK, students, workshops, and self-paced learning
+
+## 🚀 Standalone Executable Support
+
+All AGK templates now support compilation with the standalone executable, eliminating the need for Python installation on target systems.
+
+### Benefits:
+- **No Python Dependency**: Works on systems without Python installed
+- **Faster Startup**: Optimized native compilation options
+- **Smaller Distribution**: Single executable file
+- **Production Ready**: Perfect for end-user applications
+- **Advanced Graphics**: Full support for `advanced_graphics.agk` library
+
+### Usage:
+```bash
+# Build standalone executable first
+python build_standalone.py --include-advanced-graphics
+
+# Use with any template
+./agk_compiler desktop_app_template.agk
+./agk_compiler my_web_app.agk
+./agk_compiler agk_browser_full.agk  # Includes advanced graphics
+
+# Interactive REPL with standalone
+./agk_compiler --repl
+```
+
+### Build Options:
+- **PyInstaller**: `python build_standalone.py` (recommended)
+- **Nuitka**: `python build_standalone.py --backend nuitka` (fastest)
+- **With Graphics**: `python build_standalone.py --include-advanced-graphics`
 
 ## 🚀 Deployment Options
 
