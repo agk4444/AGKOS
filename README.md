@@ -94,6 +94,24 @@ The compiler consists of several key components:
 5. **Symbol Table**: Manages variables, functions, and types
 6. **Error Reporter**: Provides clear, helpful error messages
 
+## 📚 Documentation
+
+The AGK Language Compiler has comprehensive documentation organized in the `docs/` folder:
+
+### 📋 **Core Documentation**
+- **[Installation Guide](docs/INSTALL.md)** - Complete setup and installation instructions
+- **[Application Templates Guide](docs/APP_TEMPLATES_README.md)** - 25 professional templates with examples
+- **[Package Management Guide](docs/PACKAGE_MANAGEMENT_README.md)** - Package creation, installation, and distribution
+
+### 🖥️ **Platform-Specific Guides**
+- **[Operating System Development](docs/C_BACKEND_README.md)** - Complete OS development with C backend
+- **[Mobile Development](docs/MOBILE_OS_DEVELOPMENT_GUIDE.md)** - Android and iOS app development
+- **[Multi-Platform Development](docs/PLATFORM_DEVELOPMENT_GUIDE.md)** - Wearables, TV, automotive platforms
+- **[IoT Development](docs/PLATFORM_DEVELOPMENT_GUIDE.md#iot-development)** - Internet of Things development
+
+### 📊 **Specialized Documentation**
+- **[Templates Summary](docs/AGK_TEMPLATES_SUMMARY.md)** - Overview of all available templates
+
 ## Standard Library System
 
 AGK includes a comprehensive standard library system with **38 powerful libraries**:
