@@ -253,9 +253,9 @@ class SystemProgrammingBackend(CBackend):
             return False
 
     def create_bare_metal_program(self,
-                                 agk_source: str,
-                                 target_arch: str = "arm",
-                                 linker_script: str = None) -> bool:
+                                  agk_source: str,
+                                  target_arch: str = "arm",
+                                  linker_script: str = None) -> bool:
         """Create a bare-metal program from AGK source"""
         try:
             from agk_c_build import BareMetalBuildSystem
@@ -279,6 +279,56 @@ class SystemProgrammingBackend(CBackend):
 
         except Exception as e:
             print(f"ERROR: Bare-metal program creation failed: {e}")
+            return False
+
+    def create_mobile_app(self,
+                         agk_source: str,
+                         target_platform: str = "android",
+                         target_arch: str = "arm64",
+                         api_level: int = 21,
+                         ndk_path: str = None,
+                         sdk_path: str = None) -> bool:
+        """Create a mobile app from AGK source"""
+        try:
+            from agk_c_build import MobileBuildSystem
+
+            # Switch to mobile build system
+            mobile_build = MobileBuildSystem(self.project_name)
+            mobile_build.set_target_platform(target_platform)
+            mobile_build.set_target_arch(target_arch)
+            mobile_build.set_api_level(api_level)
+
+            if ndk_path:
+                mobile_build.set_ndk_path(ndk_path)
+            if sdk_path:
+                mobile_build.set_sdk_path(sdk_path)
+
+            # Add mobile-specific libraries
+            if target_platform == "android":
+                mobile_build.add_library("android")
+                mobile_build.add_library("log")
+                mobile_build.add_library("EGL")
+                mobile_build.add_library("GLESv3")
+                mobile_build.add_library("OpenSLES")
+            elif target_platform == "ios":
+                mobile_build.add_library("UIKit")
+                mobile_build.add_library("Foundation")
+                mobile_build.add_library("CoreGraphics")
+                mobile_build.add_library("QuartzCore")
+                mobile_build.add_library("OpenGLES")
+
+            self.build_system = mobile_build
+
+            # Generate mobile C code
+            c_source_file = os.path.join(self.output_dir, f"{self.project_name}.c")
+            if not self.compile_agk_to_c(agk_source, c_source_file):
+                return False
+
+            # Build mobile app
+            return self.build_project([c_source_file])
+
+        except Exception as e:
+            print(f"ERROR: Mobile app creation failed: {e}")
             return False
 
 

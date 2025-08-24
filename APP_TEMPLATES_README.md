@@ -230,6 +230,94 @@ python agk_compiler.py my_device_driver.agk --backend c
 # Build kernel module or integrated driver
 ```
 
+### 11. Smart Home Device Template (`smart_home_template.agk`) - NEW!
+**Perfect for:** Smart Home Devices, IoT Sensors, Home Automation
+
+**Features:**
+- Environmental monitoring (temperature, humidity, air quality)
+- Motion detection and security monitoring
+- Energy usage tracking and optimization
+- Voice assistant integration
+- Cloud connectivity and data synchronization
+- Battery optimization for long-term deployment
+- Local processing and edge computing capabilities
+
+**Quick Start:**
+```bash
+# Copy the template
+cp smart_home_template.agk my_smart_device.agk
+
+# Configure device settings and sensors
+# Compile for your target microcontroller
+python agk_compiler.py my_smart_device.agk --backend microcontroller
+```
+
+### 12. Industrial IoT Template (`industrial_iot_template.agk`) - NEW!
+**Perfect for:** Industrial Automation, Manufacturing, Process Control
+
+**Features:**
+- SCADA system integration
+- PLC communication protocols (Modbus, OPC-UA)
+- Asset monitoring and predictive maintenance
+- Production line efficiency tracking
+- Quality control and defect detection
+- Safety system integration and compliance
+- Industrial protocol support and data logging
+
+**Quick Start:**
+```bash
+# Copy the template
+cp industrial_iot_template.agk my_industrial_monitor.agk
+
+# Configure industrial protocols and sensors
+# Compile for industrial hardware platform
+python agk_compiler.py my_industrial_monitor.agk --backend industrial
+```
+
+### 13. Microcontroller Template (`microcontroller_template.agk`) - NEW!
+**Perfect for:** Embedded Systems, IoT Devices, Sensor Networks
+
+**Features:**
+- Complete microcontroller setup and configuration
+- Digital and analog I/O operations
+- Communication protocols (I2C, SPI, UART, CAN)
+- Timer and interrupt handling
+- Power management and sleep modes
+- Real-time data processing and filtering
+- EEPROM and non-volatile storage
+
+**Quick Start:**
+```bash
+# Copy the template
+cp microcontroller_template.agk my_embedded_device.agk
+
+# Configure pin mappings and peripherals
+# Compile for your specific microcontroller
+python agk_compiler.py my_embedded_device.agk --backend microcontroller --target esp32
+```
+
+### 14. Edge Computing Template (`edge_computing_template.agk`) - NEW!
+**Perfect for:** Edge AI, Real-Time Analytics, Local Processing
+
+**Features:**
+- Real-time data filtering and smoothing
+- Machine learning inference at the edge
+- Anomaly detection and alerting
+- Data compression and optimization
+- Local decision making and automation
+- Bandwidth-efficient data transmission
+- Offline processing and caching
+
+**Quick Start:**
+```bash
+# Copy the template
+cp edge_computing_template.agk my_edge_device.agk
+
+# Configure AI models and processing pipelines
+# Compile for edge computing hardware
+python agk_compiler.py my_edge_device.agk --backend edge
+```
+
 ## 📚 Library Templates
 
 In addition to application templates, AGK provides comprehensive templates for learning and using each standard library:
@@ -512,8 +600,8 @@ define function my_helper_function:
 - **GTO Library**: Game theory, optimization algorithms
 
 ### Best Practices Demonstrated:
-- ✅ Complete ecosystem with 25 standard libraries
-- ✅ 19 professional templates (10 application + 11 library templates)
+- ✅ Complete ecosystem with 38 standard libraries
+- ✅ 25 professional templates (14 application + 11 library templates)
 - ✅ Modular code structure and design patterns
 - ✅ Comprehensive error handling and logging
 - ✅ User input validation and data sanitization
@@ -596,10 +684,11 @@ These templates are designed to:
 
 **Remember:** These are comprehensive starting points, not finished products. The AGK ecosystem now provides:
 
-- **10 Application Templates**: Desktop, Web, Mobile, Browser, AI, Server, General Business, Bootloader, Kernel, Device Driver
-- **11 Library Templates**: Complete coverage of all 25 standard libraries
-- **Production-Ready Code**: 15,000+ lines of professional examples
+- **14 Application Templates**: Desktop, Web, Mobile, Browser, AI, Server, General Business, Bootloader, Kernel, Device Driver, Smart Home, Industrial IoT, Microcontroller, Edge Computing
+- **11 Library Templates**: Complete coverage of all 38 standard libraries
+- **Production-Ready Code**: 35,000+ lines of professional examples
 - **OS Development Support**: Complete operating system development capabilities
+- **IoT Development Support**: Comprehensive Internet of Things capabilities
 - **Complete Documentation**: Comprehensive guides and usage examples
 - **Best Practices**: Industry-standard patterns and techniques
 

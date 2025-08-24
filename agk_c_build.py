@@ -440,6 +440,11 @@ class BareMetalBuildSystem(CBuildSystem):
                 "-mcpu=cortex-m4",
                 "-mthumb"
             ])
+        elif arch == "arm64" or arch == "aarch64":
+            self.compiler_flags.extend([
+                "-mcpu=cortex-a53",
+                "-march=armv8-a"
+            ])
         elif arch == "x86":
             self.compiler_flags.extend([
                 "-m32"
@@ -448,6 +453,242 @@ class BareMetalBuildSystem(CBuildSystem):
             self.compiler_flags.extend([
                 "-m64"
             ])
+
+
+class MobileBuildSystem(CBuildSystem):
+    """Build system for mobile applications (Android/iOS)"""
+
+    def __init__(self, project_name: str = "agk_mobile_app"):
+        super().__init__(project_name)
+        self.target_platform: str = "android"  # android or ios
+        self.target_arch: str = "arm64"  # arm, arm64, x86, x86_64
+        self.api_level: int = 21  # Android API level
+        self.ndk_path: str = ""
+        self.sdk_path: str = ""
+        self.mobile_specific: bool = True
+
+        # Mobile-specific flags
+        self.compiler_flags.extend([
+            "-fPIC",
+            "-fvisibility=hidden",
+            "-DANDROID" if self.target_platform == "android" else "-DIOS"
+        ])
+
+    def set_target_platform(self, platform: str):
+        """Set target mobile platform (android/ios)"""
+        self.target_platform = platform.lower()
+        if platform == "ios":
+            self.compiler_flags = [flag for flag in self.compiler_flags if "ANDROID" not in flag]
+            self.compiler_flags.append("-DIOS")
+        else:
+            self.compiler_flags = [flag for flag in self.compiler_flags if "IOS" not in flag]
+            self.compiler_flags.append("-DANDROID")
+
+    def set_target_arch(self, arch: str):
+        """Set target architecture for mobile"""
+        self.target_arch = arch
+
+        # Architecture-specific flags for mobile
+        if arch == "arm":
+            self.compiler_flags.extend([
+                "-march=armv7-a",
+                "-mfloat-abi=softfp",
+                "-mfpu=vfpv3-d16"
+            ])
+        elif arch == "arm64" or arch == "aarch64":
+            self.compiler_flags.extend([
+                "-march=armv8-a"
+            ])
+        elif arch == "x86":
+            self.compiler_flags.extend([
+                "-march=i686",
+                "-m32"
+            ])
+        elif arch == "x86_64":
+            self.compiler_flags.extend([
+                "-march=x86-64",
+                "-m64"
+            ])
+
+    def set_ndk_path(self, ndk_path: str):
+        """Set Android NDK path"""
+        self.ndk_path = ndk_path
+
+    def set_sdk_path(self, sdk_path: str):
+        """Set Android SDK path"""
+        self.sdk_path = sdk_path
+
+    def set_api_level(self, level: int):
+        """Set Android API level"""
+        self.api_level = level
+
+    def get_mobile_compiler(self) -> str:
+        """Get the appropriate compiler for mobile platform"""
+        if self.target_platform == "android":
+            if self.ndk_path:
+                # Use NDK compiler
+                arch_map = {
+                    "arm": "armv7a-linux-androideabi",
+                    "arm64": "aarch64-linux-android",
+                    "x86": "i686-linux-android",
+                    "x86_64": "x86_64-linux-android"
+                }
+                triple = arch_map.get(self.target_arch, "aarch64-linux-android")
+                return f"{self.ndk_path}/toolchains/llvm/prebuilt/linux-x86_64/bin/{triple}{self.api_level}-clang"
+            else:
+                return "clang"  # Fallback
+        elif self.target_platform == "ios":
+            return "clang"  # iOS uses clang
+        else:
+            return "gcc"
+
+    def generate_mobile_makefile(self, output_dir: str = ".") -> str:
+        """Generate a Makefile for mobile builds"""
+        makefile_path = os.path.join(output_dir, "Makefile")
+
+        cc = self.get_mobile_compiler()
+        cflags = " ".join(self.compiler_flags)
+        ldflags = " ".join(self.linker_flags)
+
+        # Add include directories
+        for inc_dir in self.include_dirs:
+            cflags += f" -I{inc_dir}"
+
+        # Add library directories
+        for lib_dir in self.library_dirs:
+            ldflags += f" -L{lib_dir}"
+
+        # Add libraries
+        libs = " ".join([f"-l{lib}" for lib in self.libraries])
+
+        if self.target_platform == "android":
+            # Android-specific libraries
+            libs += " -landroid -llog -lEGL -lGLESv3 -lOpenSLES"
+            # Android-specific flags
+            cflags += f" -D__ANDROID_API__={self.api_level}"
+            if self.ndk_path:
+                cflags += f" -I{self.ndk_path}/sysroot/usr/include"
+                cflags += f" -I{self.ndk_path}/sysroot/usr/include/android"
+        elif self.target_platform == "ios":
+            # iOS-specific libraries
+            libs += " -framework UIKit -framework Foundation -framework CoreGraphics -framework QuartzCore -framework OpenGLES"
+            # iOS-specific flags
+            cflags += " -fobjc-abi-version=2 -fobjc-arc"
+
+        makefile_content = f"""# Generated Mobile Makefile for {self.project_name}
+CC = {cc}
+CFLAGS = {cflags}
+LDFLAGS = {ldflags}
+LIBS = {libs}
+
+TARGET = {self.project_name}
+SOURCES = {" ".join([os.path.basename(f) for f in self.source_files])}
+OBJECTS = $(SOURCES:.c=.o)
+
+# Platform-specific targets
+.PHONY: all clean install apk ipa
+
+all: $(TARGET)
+
+$(TARGET): $(OBJECTS)
+\t$(CC) $(LDFLAGS) -o $@ $^ $(LIBS)
+
+%.o: %.c
+\t$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+\trm -f $(OBJECTS) $(TARGET) $(TARGET).apk $(TARGET).ipa
+
+apk: $(TARGET)
+\t@echo "Building Android APK..."
+\t@# Create APK structure
+\t@mkdir -p apk/lib/{self.get_android_abi()}
+\t@mkdir -p apk/assets
+\t@mkdir -p apk/res
+\t@# Copy native library
+\t@cp $(TARGET) apk/lib/{self.get_android_abi()}/lib$(TARGET).so
+\t@# Generate AndroidManifest.xml
+\t@make android_manifest
+\t@# Build APK using aapt/zipalign/apksigner (simplified)
+\t@cd apk && zip -r ../$(TARGET).apk .
+\t@echo "APK created: $(TARGET).apk"
+
+ipa: $(TARGET)
+\t@echo "Building iOS IPA..."
+\t@# Create IPA structure
+\t@mkdir -p ipa/Payload/{self.project_name}.app
+\t@# Copy executable
+\t@cp $(TARGET) ipa/Payload/{self.project_name}.app/
+\t@# Generate Info.plist
+\t@make ios_plist
+\t@# Build IPA (simplified)
+\t@cd ipa && zip -r ../$(TARGET).ipa Payload/
+\t@echo "IPA created: $(TARGET).ipa"
+
+android_manifest:
+\t@echo "<?xml version=\\"1.0\\" encoding=\\"utf-8\\"?>" > apk/AndroidManifest.xml
+\t@echo "<manifest xmlns:android=\\"http://schemas.android.com/apk/res/android\\"" >> apk/AndroidManifest.xml
+\t@echo "    package=\\"{self.project_name}\\" android:versionCode=\\"1\\" android:versionName=\\"1.0\\">" >> apk/AndroidManifest.xml
+\t@echo "    <uses-sdk android:minSdkVersion=\\"16\\" android:targetSdkVersion=\\"{self.api_level}\\" />" >> apk/AndroidManifest.xml
+\t@echo "    <application android:label=\\"{self.project_name}\\" android:hasCode=\\"false\\">" >> apk/AndroidManifest.xml
+\t@echo "        <activity android:name=\\"android.app.NativeActivity\\"" >> apk/AndroidManifest.xml
+\t@echo "            android:label=\\"{self.project_name}\\" android:configChanges=\\"orientation|keyboardHidden\\">" >> apk/AndroidManifest.xml
+\t@echo "            <meta-data android:name=\\"android.app.lib_name\\" android:value=\\"{self.project_name}\\" />" >> apk/AndroidManifest.xml
+\t@echo "            <intent-filter>" >> apk/AndroidManifest.xml
+\t@echo "                <action android:name=\\"android.intent.action.MAIN\\" />" >> apk/AndroidManifest.xml
+\t@echo "                <category android:name=\\"android.intent.category.LAUNCHER\\" />" >> apk/AndroidManifest.xml
+\t@echo "            </intent-filter>" >> apk/AndroidManifest.xml
+\t@echo "        </activity>" >> apk/AndroidManifest.xml
+\t@echo "    </application>" >> apk/AndroidManifest.xml
+\t@echo "</manifest>" >> apk/AndroidManifest.xml
+
+ios_plist:
+\t@# Generate iOS Info.plist
+\t@echo "<?xml version=\\"1.0\\" encoding=\\"UTF-8\\"?>" > ipa/Payload/{self.project_name}.app/Info.plist
+\t@echo "<!DOCTYPE plist PUBLIC \\"-//Apple//DTD PLIST 1.0//EN\\" \\"http://www.apple.com/DTDs/PropertyList-1.0.dtd\\">" >> ipa/Payload/{self.project_name}.app/Info.plist
+\t@echo "<plist version=\\"1.0\\">" >> ipa/Payload/{self.project_name}.app/Info.plist
+\t@echo "<dict>" >> ipa/Payload/{self.project_name}.app/Info.plist
+\t@echo "    <key>CFBundleExecutable</key>" >> ipa/Payload/{self.project_name}.app/Info.plist
+\t@echo "    <string>{self.project_name}</string>" >> ipa/Payload/{self.project_name}.app/Info.plist
+\t@echo "    <key>CFBundleIdentifier</key>" >> ipa/Payload/{self.project_name}.app/Info.plist
+\t@echo "    <string>com.agk.{self.project_name}</string>" >> ipa/Payload/{self.project_name}.app/Info.plist
+\t@echo "    <key>CFBundleName</key>" >> ipa/Payload/{self.project_name}.app/Info.plist
+\t@echo "    <string>{self.project_name}</string>" >> ipa/Payload/{self.project_name}.app/Info.plist
+\t@echo "    <key>CFBundleVersion</key>" >> ipa/Payload/{self.project_name}.app/Info.plist
+\t@echo "    <string>1.0</string>" >> ipa/Payload/{self.project_name}.app/Info.plist
+\t@echo "    <key>LSRequiresIPhoneOS</key>" >> ipa/Payload/{self.project_name}.app/Info.plist
+\t@echo "    <true/>" >> ipa/Payload/{self.project_name}.app/Info.plist
+\t@echo "</dict>" >> ipa/Payload/{self.project_name}.app/Info.plist
+\t@echo "</plist>" >> ipa/Payload/{self.project_name}.app/Info.plist
+
+install: $(TARGET)
+\t@echo "Installing {self.project_name} for {self.target_platform}..."
+
+help:
+\t@echo "Available targets:"
+\t@echo "  all      - Build the mobile app"
+\t@echo "  apk      - Build Android APK"
+\t@echo "  ipa      - Build iOS IPA"
+\t@echo "  clean    - Remove build artifacts"
+\t@echo "  install  - Install the app"
+\t@echo "  help     - Show this help"
+"""
+
+        # Write Makefile
+        with open(makefile_path, 'w') as f:
+            f.write(makefile_content)
+
+        return makefile_path
+
+    def get_android_abi(self) -> str:
+        """Get Android ABI for current target architecture"""
+        abi_map = {
+            "arm": "armeabi-v7a",
+            "arm64": "arm64-v8a",
+            "x86": "x86",
+            "x86_64": "x86_64"
+        }
+        return abi_map.get(self.target_arch, "arm64-v8a")
 
     def generate_bare_metal_makefile(self, output_dir: str = ".") -> str:
         """Generate a Makefile for bare-metal builds"""
@@ -515,6 +756,8 @@ def create_build_system(project_type: str = "application", **kwargs) -> CBuildSy
         return KernelBuildSystem(**kwargs)
     elif project_type == "bare_metal":
         return BareMetalBuildSystem(**kwargs)
+    elif project_type == "mobile":
+        return MobileBuildSystem(**kwargs)
     else:
         return CBuildSystem(**kwargs)
 

@@ -1,0 +1,415 @@
+# AGK Wearable Device Hardware Access Library
+# Provides wearable-specific hardware access and device management
+# Supports smartwatches, fitness trackers, AR glasses, and other wearables
+
+# Device Information
+define function get_wearable_device_model() as String:
+    """Get wearable device model"""
+    external function wearable_get_device_model() from "wearable.so" as String
+    return wearable_get_device_model()
+
+define function get_wearable_device_type() as String:
+    """Get wearable device type (watch, fitness_tracker, glasses, etc.)"""
+    external function wearable_get_device_type() from "wearable.so" as String
+    return wearable_get_device_type()
+
+define function get_wearable_os_version() as String:
+    """Get wearable OS version"""
+    external function wearable_get_os_version() from "wearable.so" as String
+    return wearable_get_os_version()
+
+define function is_wearable_paired() as Boolean:
+    """Check if wearable is paired with phone"""
+    external function wearable_is_paired() from "wearable.so" as Boolean
+    return wearable_is_paired()
+
+# Display and UI
+define function get_display_brightness() as Float:
+    """Get display brightness (0.0 to 1.0)"""
+    external function wearable_get_display_brightness() from "wearable.so" as Float
+    return wearable_get_display_brightness()
+
+define function set_display_brightness(brightness as Float) as void:
+    """Set display brightness (0.0 to 1.0)"""
+    external function wearable_set_display_brightness(level as Float) from "wearable.so" as void
+    wearable_set_display_brightness(brightness)
+
+define function get_display_size() as List:
+    """Get display size [width, height] in pixels"""
+    external function wearable_get_display_size() from "wearable.so" as pointer
+    return wearable_get_display_size()
+
+define function vibrate_pattern(pattern as List) as void:
+    """Vibrate device with custom pattern"""
+    external function wearable_vibrate_pattern(pat as pointer) from "wearable.so" as void
+    wearable_vibrate_pattern(pattern)
+
+define function get_screen_shape() as String:
+    """Get screen shape (round, square, rectangular)"""
+    external function wearable_get_screen_shape() from "wearable.so" as String
+    return wearable_get_screen_shape()
+
+# Health and Fitness Sensors
+define function start_heart_rate_monitoring() as Integer:
+    """Start heart rate monitoring and return session ID"""
+    external function wearable_start_heart_rate_monitoring() from "wearable.so" as Integer
+    return wearable_start_heart_rate_monitoring()
+
+define function stop_heart_rate_monitoring(session_id as Integer) as void:
+    """Stop heart rate monitoring"""
+    external function wearable_stop_heart_rate_monitoring(id as Integer) from "wearable.so" as void
+    wearable_stop_heart_rate_monitoring(session_id)
+
+define function get_current_heart_rate() as Integer:
+    """Get current heart rate in BPM"""
+    external function wearable_get_current_heart_rate() from "wearable.so" as Integer
+    return wearable_get_current_heart_rate()
+
+define function get_heart_rate_variability() as Float:
+    """Get heart rate variability"""
+    external function wearable_get_heart_rate_variability() from "wearable.so" as Float
+    return wearable_get_heart_rate_variability()
+
+define function start_step_counting() as Integer:
+    """Start step counting and return session ID"""
+    external function wearable_start_step_counting() from "wearable.so" as Integer
+    return wearable_start_step_counting()
+
+define function stop_step_counting(session_id as Integer) as void:
+    """Stop step counting"""
+    external function wearable_stop_step_counting(id as Integer) from "wearable.so" as void
+    wearable_stop_step_counting(session_id)
+
+define function get_step_count() as Integer:
+    """Get current step count"""
+    external function wearable_get_step_count() from "wearable.so" as Integer
+    return wearable_get_step_count()
+
+define function get_daily_steps() as Integer:
+    """Get daily step count"""
+    external function wearable_get_daily_steps() from "wearable.so" as Integer
+    return wearable_get_daily_steps()
+
+define function get_calories_burned() as Float:
+    """Get calories burned today"""
+    external function wearable_get_calories_burned() from "wearable.so" as Float
+    return wearable_get_calories_burned()
+
+define function get_distance_traveled() as Float:
+    """Get distance traveled today in meters"""
+    external function wearable_get_distance_traveled() from "wearable.so" as Float
+    return wearable_get_distance_traveled()
+
+# Sleep Tracking
+define function start_sleep_tracking() as Integer:
+    """Start sleep tracking and return session ID"""
+    external function wearable_start_sleep_tracking() from "wearable.so" as Integer
+    return wearable_start_sleep_tracking()
+
+define function stop_sleep_tracking(session_id as Integer) as void:
+    """Stop sleep tracking"""
+    external function wearable_stop_sleep_tracking(id as Integer) from "wearable.so" as void
+    wearable_stop_sleep_tracking(session_id)
+
+define function get_sleep_duration() as Float:
+    """Get last sleep duration in hours"""
+    external function wearable_get_sleep_duration() from "wearable.so" as Float
+    return wearable_get_sleep_duration()
+
+define function get_sleep_quality() as String:
+    """Get sleep quality (excellent, good, fair, poor)"""
+    external function wearable_get_sleep_quality() from "wearable.so" as String
+    return wearable_get_sleep_quality()
+
+define function get_deep_sleep_duration() as Float:
+    """Get deep sleep duration in hours"""
+    external function wearable_get_deep_sleep_duration() from "wearable.so" as Float
+    return wearable_get_deep_sleep_duration()
+
+define function get_light_sleep_duration() as Float:
+    """Get light sleep duration in hours"""
+    external function wearable_get_light_sleep_duration() from "wearable.so" as Float
+    return wearable_get_light_sleep_duration()
+
+define function get_rem_sleep_duration() as Float:
+    """Get REM sleep duration in hours"""
+    external function wearable_get_rem_sleep_duration() from "wearable.so" as Float
+    return wearable_get_rem_sleep_duration()
+
+# Blood Oxygen (SpO2)
+define function start_spo2_monitoring() as Integer:
+    """Start blood oxygen monitoring and return session ID"""
+    external function wearable_start_spo2_monitoring() from "wearable.so" as Integer
+    return wearable_start_spo2_monitoring()
+
+define function stop_spo2_monitoring(session_id as Integer) as void:
+    """Stop blood oxygen monitoring"""
+    external function wearable_stop_spo2_monitoring(id as Integer) from "wearable.so" as void
+    wearable_stop_spo2_monitoring(session_id)
+
+define function get_current_spo2() as Float:
+    """Get current blood oxygen saturation (0.0 to 1.0)"""
+    external function wearable_get_current_spo2() from "wearable.so" as Float
+    return wearable_get_current_spo2()
+
+# Body Temperature
+define function get_body_temperature() as Float:
+    """Get body temperature in Celsius"""
+    external function wearable_get_body_temperature() from "wearable.so" as Float
+    return wearable_get_body_temperature()
+
+define function get_ambient_temperature() as Float:
+    """Get ambient temperature in Celsius"""
+    external function wearable_get_ambient_temperature() from "wearable.so" as Float
+    return wearable_get_ambient_temperature()
+
+# Skin Temperature
+define function get_skin_temperature() as Float:
+    """Get skin temperature in Celsius"""
+    external function wearable_get_skin_temperature() from "wearable.so" as Float
+    return wearable_get_skin_temperature()
+
+# ECG/Heart Monitoring
+define function start_ecg_monitoring() as Integer:
+    """Start ECG monitoring and return session ID"""
+    external function wearable_start_ecg_monitoring() from "wearable.so" as Integer
+    return wearable_start_ecg_monitoring()
+
+define function stop_ecg_monitoring(session_id as Integer) as void:
+    """Stop ECG monitoring"""
+    external function wearable_stop_ecg_monitoring(id as Integer) from "wearable.so" as void
+    wearable_stop_ecg_monitoring(session_id)
+
+define function get_ecg_data() as List:
+    """Get ECG data as list of voltage readings"""
+    external function wearable_get_ecg_data() from "wearable.so" as pointer
+    return wearable_get_ecg_data()
+
+# AR Glasses Specific Functions
+define function is_ar_supported() as Boolean:
+    """Check if device supports AR"""
+    external function wearable_is_ar_supported() from "wearable.so" as Boolean
+    return wearable_is_ar_supported()
+
+define function start_ar_session() as Integer:
+    """Start AR session and return session ID"""
+    external function wearable_start_ar_session() from "wearable.so" as Integer
+    return wearable_start_ar_session()
+
+define function stop_ar_session(session_id as Integer) as void:
+    """Stop AR session"""
+    external function wearable_stop_ar_session(id as Integer) from "wearable.so" as void
+    wearable_stop_ar_session(session_id)
+
+define function get_camera_frame() as List:
+    """Get camera frame data for AR processing"""
+    external function wearable_get_camera_frame() from "wearable.so" as pointer
+    return wearable_get_camera_frame()
+
+define function overlay_ar_content(content as String, x as Float, y as Float, z as Float) as void:
+    """Overlay AR content at 3D coordinates"""
+    external function wearable_overlay_ar_content(text as String, pos_x as Float, pos_y as Float, pos_z as Float) from "wearable.so" as void
+    wearable_overlay_ar_content(content, x, y, z)
+
+define function track_face() as List:
+    """Track face and return [x, y, z, yaw, pitch, roll]"""
+    external function wearable_track_face() from "wearable.so" as pointer
+    return wearable_track_face()
+
+define function track_hand() as List:
+    """Track hand and return finger positions"""
+    external function wearable_track_hand() from "wearable.so" as pointer
+    return wearable_track_hand()
+
+# Gesture Recognition
+define function start_gesture_recognition() as Integer:
+    """Start gesture recognition and return session ID"""
+    external function wearable_start_gesture_recognition() from "wearable.so" as Integer
+    return wearable_start_gesture_recognition()
+
+define function stop_gesture_recognition(session_id as Integer) as void:
+    """Stop gesture recognition"""
+    external function wearable_stop_gesture_recognition(id as Integer) from "wearable.so" as void
+    wearable_stop_gesture_recognition(session_id)
+
+define function get_recognized_gesture() as String:
+    """Get currently recognized gesture"""
+    external function wearable_get_recognized_gesture() from "wearable.so" as String
+    return wearable_get_recognized_gesture()
+
+define function enable_gesture(gesture_name as String, enabled as Boolean) as void:
+    """Enable or disable specific gesture recognition"""
+    external function wearable_enable_gesture(name as String, en as Boolean) from "wearable.so" as void
+    wearable_enable_gesture(gesture_name, enabled)
+
+# Voice Commands (for smartwatches with microphones)
+define function start_voice_recognition() as Integer:
+    """Start voice recognition and return session ID"""
+    external function wearable_start_voice_recognition() from "wearable.so" as Integer
+    return wearable_start_voice_recognition()
+
+define function stop_voice_recognition(session_id as Integer) as void:
+    """Stop voice recognition"""
+    external function wearable_stop_voice_recognition(id as Integer) from "wearable.so" as void
+    wearable_stop_voice_recognition(session_id)
+
+define function get_voice_command() as String:
+    """Get recognized voice command"""
+    external function wearable_get_voice_command() from "wearable.so" as String
+    return wearable_get_voice_command()
+
+# Battery and Power Management
+define function get_battery_level() as Float:
+    """Get battery level (0.0 to 1.0)"""
+    external function wearable_get_battery_level() from "wearable.so" as Float
+    return wearable_get_battery_level()
+
+define function is_charging() as Boolean:
+    """Check if device is charging"""
+    external function wearable_is_charging() from "wearable.so" as Boolean
+    return wearable_is_charging()
+
+define function get_battery_health() as String:
+    """Get battery health status"""
+    external function wearable_get_battery_health() from "wearable.so" as String
+    return wearable_get_battery_health()
+
+define function enable_power_saving() as void:
+    """Enable power saving mode"""
+    external function wearable_enable_power_saving() from "wearable.so" as void
+    wearable_enable_power_saving()
+
+define function disable_power_saving() as void:
+    """Disable power saving mode"""
+    external function wearable_disable_power_saving() from "wearable.so" as void
+    wearable_disable_power_saving()
+
+# Watch Crown/Rotary Input (for smartwatches)
+define function is_crown_supported() as Boolean:
+    """Check if device has crown/rotary input"""
+    external function wearable_is_crown_supported() from "wearable.so" as Boolean
+    return wearable_is_crown_supported()
+
+define function get_crown_rotation() as Float:
+    """Get crown rotation delta"""
+    external function wearable_get_crown_rotation() from "wearable.so" as Float
+    return wearable_get_crown_rotation()
+
+define function is_crown_pressed() as Boolean:
+    """Check if crown is pressed"""
+    external function wearable_is_crown_pressed() from "wearable.so" as Boolean
+    return wearable_is_crown_pressed()
+
+# Touch Input (circular for round watches)
+define function get_touch_coordinates() as List:
+    """Get touch coordinates [x, y]"""
+    external function wearable_get_touch_coordinates() from "wearable.so" as pointer
+    return wearable_get_touch_coordinates()
+
+define function get_touch_force() as Float:
+    """Get touch force/pressure"""
+    external function wearable_get_touch_force() from "wearable.so" as Float
+    return wearable_get_touch_force()
+
+define function is_touch_active() as Boolean:
+    """Check if touch is active"""
+    external function wearable_is_touch_active() from "wearable.so" as Boolean
+    return wearable_is_touch_active()
+
+# Notification Management
+define function send_notification(title as String, message as String) as void:
+    """Send notification to wearable"""
+    external function wearable_send_notification(t as String, msg as String) from "wearable.so" as void
+    wearable_send_notification(title, message)
+
+define function dismiss_notification(notification_id as String) as void:
+    """Dismiss notification by ID"""
+    external function wearable_dismiss_notification(id as String) from "wearable.so" as void
+    wearable_dismiss_notification(notification_id)
+
+define function get_notification_count() as Integer:
+    """Get number of active notifications"""
+    external function wearable_get_notification_count() from "wearable.so" as Integer
+    return wearable_get_notification_count()
+
+# Watch Faces and Complications
+define function set_watch_face(face_name as String) as void:
+    """Set active watch face"""
+    external function wearable_set_watch_face(name as String) from "wearable.so" as void
+    wearable_set_watch_face(face_name)
+
+define function get_available_watch_faces() as List:
+    """Get list of available watch faces"""
+    external function wearable_get_available_watch_faces() from "wearable.so" as pointer
+    return wearable_get_available_watch_faces()
+
+define function add_complication(complication_type as String, position as String) as void:
+    """Add complication to watch face"""
+    external function wearable_add_complication(type as String, pos as String) from "wearable.so" as void
+    wearable_add_complication(complication_type, position)
+
+# Workout and Activity Tracking
+define function start_workout(workout_type as String) as Integer:
+    """Start workout and return session ID"""
+    external function wearable_start_workout(type as String) from "wearable.so" as Integer
+    return wearable_start_workout(workout_type)
+
+define function stop_workout(session_id as Integer) as void:
+    """Stop workout"""
+    external function wearable_stop_workout(id as Integer) from "wearable.so" as void
+    wearable_stop_workout(session_id)
+
+define function pause_workout(session_id as Integer) as void:
+    """Pause workout"""
+    external function wearable_pause_workout(id as Integer) from "wearable.so" as void
+    wearable_pause_workout(session_id)
+
+define function resume_workout(session_id as Integer) as void:
+    """Resume workout"""
+    external function wearable_resume_workout(id as Integer) from "wearable.so" as void
+    wearable_resume_workout(session_id)
+
+define function get_workout_metrics(session_id as Integer) as Object:
+    """Get workout metrics"""
+    external function wearable_get_workout_metrics(id as Integer) from "wearable.so" as pointer
+    return wearable_get_workout_metrics(session_id)
+
+# Constants
+create constant WEARABLE_TYPE_WATCH as String = "watch"
+create constant WEARABLE_TYPE_FITNESS_TRACKER as String = "fitness_tracker"
+create constant WEARABLE_TYPE_AR_GLASSES as String = "ar_glasses"
+create constant WEARABLE_TYPE_HEADSET as String = "headset"
+create constant WEARABLE_TYPE_RING as String = "ring"
+
+create constant GESTURE_TAP as String = "tap"
+create constant GESTURE_DOUBLE_TAP as String = "double_tap"
+create constant GESTURE_SWIPE_UP as String = "swipe_up"
+create constant GESTURE_SWIPE_DOWN as String = "swipe_down"
+create constant GESTURE_SWIPE_LEFT as String = "swipe_left"
+create constant GESTURE_SWIPE_RIGHT as String = "swipe_right"
+create constant GESTURE_SHAKE as String = "shake"
+create constant GESTURE_WRIST_ROTATION as String = "wrist_rotation"
+
+create constant WORKOUT_TYPE_RUNNING as String = "running"
+create constant WORKOUT_TYPE_WALKING as String = "walking"
+create constant WORKOUT_TYPE_CYCLING as String = "cycling"
+create constant WORKOUT_TYPE_SWIMMING as String = "swimming"
+create constant WORKOUT_TYPE_HIKING as String = "hiking"
+create constant WORKOUT_TYPE_STRENGTH as String = "strength"
+
+create constant COMPLICATION_TYPE_HEART_RATE as String = "heart_rate"
+create constant COMPLICATION_TYPE_STEPS as String = "steps"
+create constant COMPLICATION_TYPE_CALORIES as String = "calories"
+create constant COMPLICATION_TYPE_TIME as String = "time"
+create constant COMPLICATION_TYPE_WEATHER as String = "weather"
+create constant COMPLICATION_TYPE_BATTERY as String = "battery"
+
+create constant SLEEP_QUALITY_EXCELLENT as String = "excellent"
+create constant SLEEP_QUALITY_GOOD as String = "good"
+create constant SLEEP_QUALITY_FAIR as String = "fair"
+create constant SLEEP_QUALITY_POOR as String = "poor"
+
+create constant BATTERY_HEALTH_GOOD as String = "good"
+create constant BATTERY_HEALTH_FAIR as String = "fair"
+create constant BATTERY_HEALTH_POOR as String = "poor"
+create constant BATTERY_HEALTH_REPLACE as String = "replace"

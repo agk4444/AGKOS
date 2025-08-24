@@ -1,0 +1,452 @@
+# AGK TV Platform Hardware Access Library
+# Provides TV-specific hardware access and device management
+# Supports smart TVs, streaming devices, and set-top boxes
+
+# Device Information
+define function get_tv_model() as String:
+    """Get TV model"""
+    external function tv_get_model() from "tv.so" as String
+    return tv_get_model()
+
+define function get_tv_manufacturer() as String:
+    """Get TV manufacturer"""
+    external function tv_get_manufacturer() from "tv.so" as String
+    return tv_get_manufacturer()
+
+define function get_tv_os_version() as String:
+    """Get TV OS version"""
+    external function tv_get_os_version() from "tv.so" as String
+    return tv_get_os_version()
+
+define function get_screen_resolution() as List:
+    """Get screen resolution [width, height]"""
+    external function tv_get_screen_resolution() from "tv.so" as pointer
+    return tv_get_screen_resolution()
+
+define function get_screen_size_inches() as Float:
+    """Get screen size in inches"""
+    external function tv_get_screen_size() from "tv.so" as Float
+    return tv_get_screen_size()
+
+define function is_4k_supported() as Boolean:
+    """Check if 4K resolution is supported"""
+    external function tv_is_4k_supported() from "tv.so" as Boolean
+    return tv_is_4k_supported()
+
+define function is_hdr_supported() as Boolean:
+    """Check if HDR is supported"""
+    external function tv_is_hdr_supported() from "tv.so" as Boolean
+    return tv_is_hdr_supported()
+
+# Remote Control and Input
+define function get_remote_button_press() as String:
+    """Get pressed remote control button"""
+    external function tv_get_remote_button_press() from "tv.so" as String
+    return tv_get_remote_button_press()
+
+define function send_remote_command(button as String) as void:
+    """Send remote control command"""
+    external function tv_send_remote_command(btn as String) from "tv.so" as void
+    tv_send_remote_command(button)
+
+define function is_remote_connected() as Boolean:
+    """Check if remote control is connected"""
+    external function tv_is_remote_connected() from "tv.so" as Boolean
+    return tv_is_remote_connected()
+
+define function get_remote_type() as String:
+    """Get remote control type (bluetooth, ir, etc.)"""
+    external function tv_get_remote_type() from "tv.so" as String
+    return tv_get_remote_type()
+
+# Voice Control
+define function start_voice_listening() as Integer:
+    """Start voice listening and return session ID"""
+    external function tv_start_voice_listening() from "tv.so" as Integer
+    return tv_start_voice_listening()
+
+define function stop_voice_listening(session_id as Integer) as void:
+    """Stop voice listening"""
+    external function tv_stop_voice_listening(id as Integer) from "tv.so" as void
+    tv_stop_voice_listening(session_id)
+
+define function get_voice_command() as String:
+    """Get recognized voice command"""
+    external function tv_get_voice_command() from "tv.so" as String
+    return tv_get_voice_command()
+
+define function is_voice_supported() as Boolean:
+    """Check if voice control is supported"""
+    external function tv_is_voice_supported() from "tv.so" as Boolean
+    return tv_is_voice_supported()
+
+# Streaming and Content
+define function get_streaming_services() as List:
+    """Get available streaming services"""
+    external function tv_get_streaming_services() from "tv.so" as pointer
+    return tv_get_streaming_services()
+
+define function launch_streaming_app(service_name as String) as void:
+    """Launch streaming app"""
+    external function tv_launch_streaming_app(name as String) from "tv.so" as void
+    tv_launch_streaming_app(service_name)
+
+define function search_content(query as String) as List:
+    """Search for content across services"""
+    external function tv_search_content(q as String) from "tv.so" as pointer
+    return tv_search_content(query)
+
+define function play_content(content_id as String) as void:
+    """Play content by ID"""
+    external function tv_play_content(id as String) from "tv.so" as void
+    tv_play_content(content_id)
+
+define function pause_content() as void:
+    """Pause current content"""
+    external function tv_pause_content() from "tv.so" as void
+    tv_pause_content()
+
+define function stop_content() as void:
+    """Stop current content"""
+    external function tv_stop_content() from "tv.so" as void
+    tv_stop_content()
+
+define function get_playback_position() as Integer:
+    """Get current playback position in seconds"""
+    external function tv_get_playback_position() from "tv.so" as Integer
+    return tv_get_playback_position()
+
+define function set_playback_position(position as Integer) as void:
+    """Set playback position in seconds"""
+    external function tv_set_playback_position(pos as Integer) from "tv.so" as void
+    tv_set_playback_position(position)
+
+define function get_content_duration() as Integer:
+    """Get content duration in seconds"""
+    external function tv_get_content_duration() from "tv.so" as Integer
+    return tv_get_content_duration()
+
+# Screen and Display Control
+define function set_brightness(level as Float) as void:
+    """Set screen brightness (0.0 to 1.0)"""
+    external function tv_set_brightness(lvl as Float) from "tv.so" as void
+    tv_set_brightness(level)
+
+define function get_brightness() as Float:
+    """Get screen brightness (0.0 to 1.0)"""
+    external function tv_get_brightness() from "tv.so" as Float
+    return tv_get_brightness()
+
+define function set_contrast(level as Float) as void:
+    """Set screen contrast (0.0 to 1.0)"""
+    external function tv_set_contrast(lvl as Float) from "tv.so" as void
+    tv_set_contrast(level)
+
+define function set_picture_mode(mode as String) as void:
+    """Set picture mode (standard, movie, sport, etc.)"""
+    external function tv_set_picture_mode(m as String) from "tv.so" as void
+    tv_set_picture_mode(mode)
+
+define function get_picture_mode() as String:
+    """Get current picture mode"""
+    external function tv_get_picture_mode() from "tv.so" as String
+    return tv_get_picture_mode()
+
+define function enable_hdr() as void:
+    """Enable HDR"""
+    external function tv_enable_hdr() from "tv.so" as void
+    tv_enable_hdr()
+
+define function disable_hdr() as void:
+    """Disable HDR"""
+    external function tv_disable_hdr() from "tv.so" as void
+    tv_disable_hdr()
+
+define function is_hdr_enabled() as Boolean:
+    """Check if HDR is enabled"""
+    external function tv_is_hdr_enabled() from "tv.so" as Boolean
+    return tv_is_hdr_enabled()
+
+# Audio Control
+define function set_volume(level as Float) as void:
+    """Set volume (0.0 to 1.0)"""
+    external function tv_set_volume(lvl as Float) from "tv.so" as void
+    tv_set_volume(level)
+
+define function get_volume() as Float:
+    """Get current volume (0.0 to 1.0)"""
+    external function tv_get_volume() from "tv.so" as Float
+    return tv_get_volume()
+
+define function mute() as void:
+    """Mute audio"""
+    external function tv_mute() from "tv.so" as void
+    tv_mute()
+
+define function unmute() as void:
+    """Unmute audio"""
+    external function tv_unmute() from "tv.so" as void
+    tv_unmute()
+
+define function is_muted() as Boolean:
+    """Check if audio is muted"""
+    external function tv_is_muted() from "tv.so" as Boolean
+    return tv_is_muted()
+
+define function set_audio_mode(mode as String) as void:
+    """Set audio mode (stereo, surround, etc.)"""
+    external function tv_set_audio_mode(m as String) from "tv.so" as void
+    tv_set_audio_mode(mode)
+
+define function get_audio_mode() as String:
+    """Get current audio mode"""
+    external function tv_get_audio_mode() from "tv.so" as String
+    return tv_get_audio_mode()
+
+# Input and Output
+define function get_input_sources() as List:
+    """Get available input sources"""
+    external function tv_get_input_sources() from "tv.so" as pointer
+    return tv_get_input_sources()
+
+define function set_input_source(source as String) as void:
+    """Set input source (HDMI1, HDMI2, etc.)"""
+    external function tv_set_input_source(src as String) from "tv.so" as void
+    tv_set_input_source(source)
+
+define function get_current_input_source() as String:
+    """Get current input source"""
+    external function tv_get_current_input_source() from "tv.so" as String
+    return tv_get_current_input_source()
+
+define function is_hdmi_connected(port as String) as Boolean:
+    """Check if HDMI port is connected"""
+    external function tv_is_hdmi_connected(p as String) from "tv.so" as Boolean
+    return tv_is_hdmi_connected(port)
+
+# Channel and Broadcast TV
+define function scan_channels() as void:
+    """Scan for available channels"""
+    external function tv_scan_channels() from "tv.so" as void
+    tv_scan_channels()
+
+define function get_channel_list() as List:
+    """Get list of available channels"""
+    external function tv_get_channel_list() from "tv.so" as pointer
+    return tv_get_channel_list()
+
+define function set_channel(channel_number as Integer) as void:
+    """Set TV channel"""
+    external function tv_set_channel(num as Integer) from "tv.so" as void
+    tv_set_channel(channel_number)
+
+define function get_current_channel() as Integer:
+    """Get current channel number"""
+    external function tv_get_current_channel() from "tv.so" as Integer
+    return tv_get_current_channel()
+
+define function get_channel_info(channel_number as Integer) as Object:
+    """Get channel information"""
+    external function tv_get_channel_info(num as Integer) from "tv.so" as pointer
+    return tv_get_channel_info(channel_number)
+
+# Recording and DVR
+define function start_recording() as Integer:
+    """Start recording current content and return session ID"""
+    external function tv_start_recording() from "tv.so" as Integer
+    return tv_start_recording()
+
+define function stop_recording(session_id as Integer) as void:
+    """Stop recording"""
+    external function tv_stop_recording(id as Integer) from "tv.so" as void
+    tv_stop_recording(session_id)
+
+define function get_recordings() as List:
+    """Get list of recorded content"""
+    external function tv_get_recordings() from "tv.so" as pointer
+    return tv_get_recordings()
+
+define function delete_recording(recording_id as String) as void:
+    """Delete recording by ID"""
+    external function tv_delete_recording(id as String) from "tv.so" as void
+    tv_delete_recording(recording_id)
+
+define function play_recording(recording_id as String) as void:
+    """Play recording by ID"""
+    external function tv_play_recording(id as String) from "tv.so" as void
+    tv_play_recording(recording_id)
+
+# Smart Features
+define function get_weather_info() as Object:
+    """Get weather information"""
+    external function tv_get_weather_info() from "tv.so" as pointer
+    return tv_get_weather_info()
+
+define function get_news_headlines() as List:
+    """Get news headlines"""
+    external function tv_get_news_headlines() from "tv.so" as pointer
+    return tv_get_news_headlines()
+
+define function set_alarm(time as String, message as String) as void:
+    """Set TV alarm"""
+    external function tv_set_alarm(t as String, msg as String) from "tv.so" as void
+    tv_set_alarm(time, message)
+
+define function cancel_alarm(alarm_id as String) as void:
+    """Cancel alarm by ID"""
+    external function tv_cancel_alarm(id as String) from "tv.so" as void
+    tv_cancel_alarm(alarm_id)
+
+define function get_alarms() as List:
+    """Get list of active alarms"""
+    external function tv_get_alarms() from "tv.so" as pointer
+    return tv_get_alarms()
+
+# Network and Connectivity
+define function get_network_status() as String:
+    """Get network status (connected, disconnected, etc.)"""
+    external function tv_get_network_status() from "tv.so" as String
+    return tv_get_network_status()
+
+define function connect_to_wifi(ssid as String, password as String) as Boolean:
+    """Connect to WiFi network"""
+    external function tv_connect_to_wifi(s as String, p as String) from "tv.so" as Boolean
+    return tv_connect_to_wifi(ssid, password)
+
+define function get_wifi_ssid() as String:
+    """Get connected WiFi SSID"""
+    external function tv_get_wifi_ssid() from "tv.so" as String
+    return tv_get_wifi_ssid()
+
+define function get_ip_address() as String:
+    """Get TV IP address"""
+    external function tv_get_ip_address() from "tv.so" as String
+    return tv_get_ip_address()
+
+# Apps and Store
+define function get_installed_apps() as List:
+    """Get list of installed apps"""
+    external function tv_get_installed_apps() from "tv.so" as pointer
+    return tv_get_installed_apps()
+
+define function launch_app(app_name as String) as void:
+    """Launch app by name"""
+    external function tv_launch_app(name as String) from "tv.so" as void
+    tv_launch_app(app_name)
+
+define function close_app(app_name as String) as void:
+    """Close app by name"""
+    external function tv_close_app(name as String) from "tv.so" as void
+    tv_close_app(app_name)
+
+define function install_app(app_id as String) as void:
+    """Install app from store"""
+    external function tv_install_app(id as String) from "tv.so" as void
+    tv_install_app(app_id)
+
+define function uninstall_app(app_name as String) as void:
+    """Uninstall app"""
+    external function tv_uninstall_app(name as String) from "tv.so" as void
+    tv_uninstall_app(app_name)
+
+define function search_apps(query as String) as List:
+    """Search for apps in store"""
+    external function tv_search_apps(q as String) from "tv.so" as pointer
+    return tv_search_apps(query)
+
+# Power Management
+define function power_on() as void:
+    """Turn TV on"""
+    external function tv_power_on() from "tv.so" as void
+    tv_power_on()
+
+define function power_off() as void:
+    """Turn TV off"""
+    external function tv_power_off() from "tv.so" as void
+    tv_power_off()
+
+define function is_powered_on() as Boolean:
+    """Check if TV is powered on"""
+    external function tv_is_powered_on() from "tv.so" as Boolean
+    return tv_is_powered_on()
+
+define function set_power_timer(hours as Integer) as void:
+    """Set auto power off timer in hours"""
+    external function tv_set_power_timer(h as Integer) from "tv.so" as void
+    tv_set_power_timer(hours)
+
+define function cancel_power_timer() as void:
+    """Cancel auto power off timer"""
+    external function tv_cancel_power_timer() from "tv.so" as void
+    tv_cancel_power_timer()
+
+# Parental Controls
+define function enable_parental_controls() as void:
+    """Enable parental controls"""
+    external function tv_enable_parental_controls() from "tv.so" as void
+    tv_enable_parental_controls()
+
+define function disable_parental_controls() as void:
+    """Disable parental controls"""
+    external function tv_disable_parental_controls() from "tv.so" as void
+    tv_disable_parental_controls()
+
+define function is_parental_controls_enabled() as Boolean:
+    """Check if parental controls are enabled"""
+    external function tv_is_parental_controls_enabled() from "tv.so" as Boolean
+    return tv_is_parental_controls_enabled()
+
+define function set_parental_pin(pin as String) as void:
+    """Set parental control PIN"""
+    external function tv_set_parental_pin(p as String) from "tv.so" as void
+    tv_set_parental_pin(pin)
+
+define function set_content_rating_limit(rating as String) as void:
+    """Set content rating limit (G, PG, PG-13, R, etc.)"""
+    external function tv_set_content_rating_limit(r as String) from "tv.so" as String
+    tv_set_content_rating_limit(rating)
+
+# Constants
+create constant REMOTE_BUTTON_UP as String = "up"
+create constant REMOTE_BUTTON_DOWN as String = "down"
+create constant REMOTE_BUTTON_LEFT as String = "left"
+create constant REMOTE_BUTTON_RIGHT as String = "right"
+create constant REMOTE_BUTTON_OK as String = "ok"
+create constant REMOTE_BUTTON_BACK as String = "back"
+create constant REMOTE_BUTTON_HOME as String = "home"
+create constant REMOTE_BUTTON_MENU as String = "menu"
+create constant REMOTE_BUTTON_VOLUME_UP as String = "volume_up"
+create constant REMOTE_BUTTON_VOLUME_DOWN as String = "volume_down"
+create constant REMOTE_BUTTON_CHANNEL_UP as String = "channel_up"
+create constant REMOTE_BUTTON_CHANNEL_DOWN as String = "channel_down"
+create constant REMOTE_BUTTON_MUTE as String = "mute"
+create constant REMOTE_BUTTON_POWER as String = "power"
+
+create constant PICTURE_MODE_STANDARD as String = "standard"
+create constant PICTURE_MODE_MOVIE as String = "movie"
+create constant PICTURE_MODE_SPORT as String = "sport"
+create constant PICTURE_MODE_GAME as String = "game"
+create constant PICTURE_MODE_VIVID as String = "vivid"
+
+create constant AUDIO_MODE_STEREO as String = "stereo"
+create constant AUDIO_MODE_SURROUND as String = "surround"
+create constant AUDIO_MODE_DOLBY as String = "dolby"
+
+create constant INPUT_SOURCE_HDMI1 as String = "HDMI1"
+create constant INPUT_SOURCE_HDMI2 as String = "HDMI2"
+create constant INPUT_SOURCE_HDMI3 as String = "HDMI3"
+create constant INPUT_SOURCE_HDMI4 as String = "HDMI4"
+create constant INPUT_SOURCE_TV as String = "TV"
+create constant INPUT_SOURCE_AV as String = "AV"
+create constant INPUT_SOURCE_COMPONENT as String = "Component"
+create constant INPUT_SOURCE_PC as String = "PC"
+
+create constant NETWORK_STATUS_CONNECTED as String = "connected"
+create constant NETWORK_STATUS_DISCONNECTED as String = "disconnected"
+create constant NETWORK_STATUS_CONNECTING as String = "connecting"
+
+create constant CONTENT_RATING_G as String = "G"
+create constant CONTENT_RATING_PG as String = "PG"
+create constant CONTENT_RATING_PG13 as String = "PG-13"
+create constant CONTENT_RATING_R as String = "R"
+create constant CONTENT_RATING_NC17 as String = "NC-17"

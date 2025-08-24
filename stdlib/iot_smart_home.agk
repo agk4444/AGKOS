@@ -1,0 +1,826 @@
+# AGK IoT Smart Home Automation Library
+# Comprehensive smart home automation framework
+# Supports lighting, climate, security, entertainment, and appliance control
+
+# Home Automation Categories
+create constant CATEGORY_LIGHTING as String = "lighting"
+create constant CATEGORY_CLIMATE as String = "climate"
+create constant CATEGORY_SECURITY as String = "security"
+create constant CATEGORY_ENTERTAINMENT as String = "entertainment"
+create constant CATEGORY_APPLIANCES as String = "appliances"
+create constant CATEGORY_ENERGY as String = "energy"
+create constant CATEGORY_GARDEN as String = "garden"
+
+# Device Types
+create constant DEVICE_LIGHT as String = "light"
+create constant DEVICE_THERMOSTAT as String = "thermostat"
+create constant DEVICE_HVAC as String = "hvac"
+create constant DEVICE_CAMERA as String = "camera"
+create constant DEVICE_DOOR_LOCK as String = "door_lock"
+create constant DEVICE_ALARM as String = "alarm"
+create constant DEVICE_SPEAKER as String = "speaker"
+create constant DEVICE_TV as String = "tv"
+create constant DEVICE_REFRIGERATOR as String = "refrigerator"
+create constant DEVICE_WASHING_MACHINE as String = "washing_machine"
+create constant DEVICE_DISHWASHER as String = "dishwasher"
+create constant DEVICE_OVEN as String = "oven"
+create constant DEVICE_MICROWAVE as String = "microwave"
+create constant DEVICE_VACUUM as String = "vacuum"
+create constant DEVICE_IRRIGATION as String = "irrigation"
+
+# Smart Home Zones/Rooms
+create constant ZONE_LIVING_ROOM as String = "living_room"
+create constant ZONE_BEDROOM as String = "bedroom"
+create constant ZONE_KITCHEN as String = "kitchen"
+create constant ZONE_BATHROOM as String = "bathroom"
+create constant ZONE_OFFICE as String = "office"
+create constant ZONE_GARAGE as String = "garage"
+create constant ZONE_GARDEN as String = "garden"
+create constant ZONE_ENTRANCE as String = "entrance"
+create constant ZONE_HALLWAY as String = "hallway"
+
+# Automation Triggers
+create constant TRIGGER_TIME as String = "time"
+create constant TRIGGER_SENSOR as String = "sensor"
+create constant TRIGGER_MOTION as String = "motion"
+create constant TRIGGER_PRESENCE as String = "presence"
+create constant TRIGGER_VOICE as String = "voice"
+create constant TRIGGER_BUTTON as String = "button"
+create constant TRIGGER_SCHEDULE as String = "schedule"
+create constant TRIGGER_WEATHER as String = "weather"
+
+# Automation Actions
+create constant ACTION_TURN_ON as String = "turn_on"
+create constant ACTION_TURN_OFF as String = "turn_off"
+create constant ACTION_SET_BRIGHTNESS as String = "set_brightness"
+create constant ACTION_SET_TEMPERATURE as String = "set_temperature"
+create constant ACTION_SET_COLOR as String = "set_color"
+create constant ACTION_LOCK as String = "lock"
+create constant ACTION_UNLOCK as String = "unlock"
+create constant ACTION_ACTIVATE_SCENE as String = "activate_scene"
+create constant ACTION_SEND_NOTIFICATION as String = "send_notification"
+create constant ACTION_START_ROUTINE as String = "start_routine"
+
+# Smart Home Controller
+define function create_smart_home_controller() as SmartHomeController:
+    """Create smart home automation controller"""
+    external function smart_home_create_controller() from "iot_smart_home.so" as pointer
+    create controller as SmartHomeController
+    set controller["devices"] to []
+    set controller["scenes"] to []
+    set controller["routines"] to []
+    set controller["sensors"] to []
+    set controller["automation_enabled"] to false
+    return controller
+
+define function initialize_home_network(controller as SmartHomeController, network_config as Object) as Boolean:
+    """Initialize smart home network"""
+    external function smart_home_initialize_network(handle as pointer, config as pointer) from "iot_smart_home.so" as Boolean
+    return smart_home_initialize_network(controller["handle"], network_config)
+
+# Device Management
+define function add_home_device(controller as SmartHomeController, device_info as Object) as String:
+    """Add device to smart home system"""
+    external function smart_home_add_device(handle as pointer, info as pointer) from "iot_smart_home.so" as String
+    create device_id as String
+    set device_id to smart_home_add_device(controller["handle"], device_info)
+
+    if device_id != "":
+        create device as Object
+        set device["id"] to device_id
+        set device["info"] to device_info
+        set device["zone"] to device_info["zone"]
+        set device["category"] to device_info["category"]
+        set device["state"] to "off"
+        add device to controller["devices"]
+    end
+
+    return device_id
+
+define function remove_home_device(controller as SmartHomeController, device_id as String) as Boolean:
+    """Remove device from smart home system"""
+    external function smart_home_remove_device(handle as pointer, device_id as String) from "iot_smart_home.so" as Boolean
+    create success as Boolean
+    set success to smart_home_remove_device(controller["handle"], device_id)
+
+    if success:
+        create i as Integer
+        set i to 0
+        while i < list.length(controller["devices"]):
+            create device as Object
+            set device to controller["devices"][i]
+            if device["id"] == device_id:
+                remove device from controller["devices"] at i
+                break
+            end
+            set i to i + 1
+        end
+    end
+
+    return success
+
+define function get_home_devices(controller as SmartHomeController, category as String, zone as String) as List:
+    """Get devices by category and/or zone"""
+    create filtered_devices as List
+
+    create i as Integer
+    set i to 0
+    while i < list.length(controller["devices"]):
+        create device as Object
+        set device to controller["devices"][i]
+        create category_match as Boolean
+        set category_match to (category == "" or device["category"] == category)
+        create zone_match as Boolean
+        set zone_match to (zone == "" or device["zone"] == zone)
+
+        if category_match and zone_match:
+            add device to filtered_devices
+        end
+        set i to i + 1
+    end
+
+    return filtered_devices
+
+# Device Control Functions
+define function control_home_device(controller as SmartHomeController, device_id as String, action as String, parameters as Object) as Boolean:
+    """Control smart home device"""
+    external function smart_home_control_device(handle as pointer, device_id as String, action as String, params as pointer) from "iot_smart_home.so" as Boolean
+    return smart_home_control_device(controller["handle"], device_id, action, parameters)
+
+define function turn_on_device(controller as SmartHomeController, device_id as String) as Boolean:
+    """Turn on device"""
+    create params as Object
+    return control_home_device(controller, device_id, ACTION_TURN_ON, params)
+end
+
+define function turn_off_device(controller as SmartHomeController, device_id as String) as Boolean:
+    """Turn off device"""
+    create params as Object
+    return control_home_device(controller, device_id, ACTION_TURN_OFF, params)
+end
+
+define function set_device_brightness(controller as SmartHomeController, device_id as String, brightness as Integer) as Boolean:
+    """Set device brightness (0-100)"""
+    create params as Object
+    set params["brightness"] to brightness
+    return control_home_device(controller, device_id, ACTION_SET_BRIGHTNESS, params)
+end
+
+define function set_device_color(controller as SmartHomeController, device_id as String, color as String) as Boolean:
+    """Set device color (hex format)"""
+    create params as Object
+    set params["color"] to color
+    return control_home_device(controller, device_id, ACTION_SET_COLOR, params)
+end
+
+define function set_device_temperature(controller as SmartHomeController, device_id as String, temperature as Float) as Boolean:
+    """Set device temperature"""
+    create params as Object
+    set params["temperature"] to temperature
+    return control_home_device(controller, device_id, ACTION_SET_TEMPERATURE, params)
+end
+
+# Lighting Control
+define function create_lighting_scene(controller as SmartHomeController, scene_name as String, lighting_config as List) as String:
+    """Create lighting scene"""
+    external function smart_home_create_lighting_scene(handle as pointer, name as String, config as pointer) from "iot_smart_home.so" as String
+    return smart_home_create_lighting_scene(controller["handle"], scene_name, lighting_config)
+end
+
+define function activate_lighting_scene(controller as SmartHomeController, scene_id as String) as Boolean:
+    """Activate lighting scene"""
+    external function smart_home_activate_lighting_scene(handle as pointer, scene_id as String) from "iot_smart_home.so" as Boolean
+    return smart_home_activate_lighting_scene(controller["handle"], scene_id)
+end
+
+define function set_zone_lighting(controller as SmartHomeController, zone as String, brightness as Integer, color as String) as Boolean:
+    """Set lighting for entire zone"""
+    external function smart_home_set_zone_lighting(handle as pointer, zone as String, brightness as Integer, color as String) from "iot_smart_home.so" as Boolean
+    return smart_home_set_zone_lighting(controller["handle"], zone, brightness, color)
+end
+
+define function gradual_lighting_transition(controller as SmartHomeController, device_id as String, target_brightness as Integer, duration_ms as Integer) as Boolean:
+    """Gradually transition lighting"""
+    external function smart_home_gradual_lighting_transition(handle as pointer, device_id as String, brightness as Integer, duration as Integer) from "iot_smart_home.so" as Boolean
+    return smart_home_gradual_lighting_transition(controller["handle"], device_id, target_brightness, duration_ms)
+end
+
+# Climate Control
+define function create_climate_schedule(controller as SmartHomeController, zone as String, schedule_config as List) as String:
+    """Create climate control schedule"""
+    external function smart_home_create_climate_schedule(handle as pointer, zone as String, config as pointer) from "iot_smart_home.so" as String
+    return smart_home_create_climate_schedule(controller["handle"], zone, schedule_config)
+end
+
+define function set_climate_mode(controller as SmartHomeController, zone as String, mode as String, temperature as Float) as Boolean:
+    """Set climate control mode"""
+    external function smart_home_set_climate_mode(handle as pointer, zone as String, mode as String, temp as Float) from "iot_smart_home.so" as Boolean
+    return smart_home_set_climate_mode(controller["handle"], zone, mode, temperature)
+end
+
+define function get_climate_status(controller as SmartHomeController, zone as String) as Object:
+    """Get climate status for zone"""
+    external function smart_home_get_climate_status(handle as pointer, zone as String) from "iot_smart_home.so" as pointer
+    return smart_home_get_climate_status(controller["handle"], zone)
+end
+
+# Security System
+define function enable_security_system(controller as SmartHomeController, mode as String) as Boolean:
+    """Enable security system"""
+    external function smart_home_enable_security(handle as pointer, mode as String) from "iot_smart_home.so" as Boolean
+    return smart_home_enable_security(controller["handle"], mode)
+end
+
+define function disable_security_system(controller as SmartHomeController) as Boolean:
+    """Disable security system"""
+    external function smart_home_disable_security(handle as pointer) from "iot_smart_home.so" as Boolean
+    return smart_home_disable_security(controller["handle"])
+end
+
+define function get_security_status(controller as SmartHomeController) as Object:
+    """Get security system status"""
+    external function smart_home_get_security_status(handle as pointer) from "iot_smart_home.so" as pointer
+    return smart_home_get_security_status(controller["handle"])
+end
+
+define function trigger_security_alarm(controller as SmartHomeController, zone as String, alarm_type as String) as Boolean:
+    """Trigger security alarm"""
+    external function smart_home_trigger_alarm(handle as pointer, zone as String, type as String) from "iot_smart_home.so" as Boolean
+    return smart_home_trigger_alarm(controller["handle"], zone, alarm_type)
+end
+
+# Smart Scenes and Routines
+define function create_smart_scene(controller as SmartHomeController, scene_name as String, actions as List) as String:
+    """Create smart scene with multiple actions"""
+    external function smart_home_create_scene(handle as pointer, name as String, actions as pointer) from "iot_smart_home.so" as String
+    create scene_id as String
+    set scene_id to smart_home_create_scene(controller["handle"], scene_name, actions)
+
+    if scene_id != "":
+        create scene as Object
+        set scene["id"] to scene_id
+        set scene["name"] to scene_name
+        set scene["actions"] to actions
+        add scene to controller["scenes"]
+    end
+
+    return scene_id
+end
+
+define function activate_smart_scene(controller as SmartHomeController, scene_id as String) as Boolean:
+    """Activate smart scene"""
+    external function smart_home_activate_scene(handle as pointer, scene_id as String) from "iot_smart_home.so" as Boolean
+    return smart_home_activate_scene(controller["handle"], scene_id)
+end
+
+define function create_automation_routine(controller as SmartHomeController, routine_name as String, triggers as List, actions as List) as String:
+    """Create automation routine with triggers and actions"""
+    external function smart_home_create_routine(handle as pointer, name as String, triggers as pointer, actions as pointer) from "iot_smart_home.so" as String
+    create routine_id as String
+    set routine_id to smart_home_create_routine(controller["handle"], routine_name, triggers, actions)
+
+    if routine_id != "":
+        create routine as Object
+        set routine["id"] to routine_id
+        set routine["name"] to routine_name
+        set routine["triggers"] to triggers
+        set routine["actions"] to actions
+        set routine["enabled"] to false
+        add routine to controller["routines"]
+    end
+
+    return routine_id
+end
+
+define function enable_automation_routine(controller as SmartHomeController, routine_id as String) as Boolean:
+    """Enable automation routine"""
+    external function smart_home_enable_routine(handle as pointer, routine_id as String) from "iot_smart_home.so" as Boolean
+    create success as Boolean
+    set success to smart_home_enable_routine(controller["handle"], routine_id)
+
+    if success:
+        create i as Integer
+        set i to 0
+        while i < list.length(controller["routines"]):
+            create routine as Object
+            set routine to controller["routines"][i]
+            if routine["id"] == routine_id:
+                set routine["enabled"] to true
+                break
+            end
+            set i to i + 1
+        end
+    end
+
+    return success
+end
+
+define function disable_automation_routine(controller as SmartHomeController, routine_id as String) as Boolean:
+    """Disable automation routine"""
+    external function smart_home_disable_routine(handle as pointer, routine_id as String) from "iot_smart_home.so" as Boolean
+    create success as Boolean
+    set success to smart_home_disable_routine(controller["handle"], routine_id)
+
+    if success:
+        create i as Integer
+        set i to 0
+        while i < list.length(controller["routines"]):
+            create routine as Object
+            set routine to controller["routines"][i]
+            if routine["id"] == routine_id:
+                set routine["enabled"] to false
+                break
+            end
+            set i to i + 1
+        end
+    end
+
+    return success
+end
+
+# Voice Control Integration
+define function setup_voice_control(controller as SmartHomeController, voice_config as Object) as Boolean:
+    """Setup voice control integration"""
+    external function smart_home_setup_voice_control(handle as pointer, config as pointer) from "iot_smart_home.so" as Boolean
+    return smart_home_setup_voice_control(controller["handle"], voice_config)
+end
+
+define function process_voice_command(controller as SmartHomeController, voice_command as String) as Object:
+    """Process voice command and return actions"""
+    external function smart_home_process_voice_command(handle as pointer, command as String) from "iot_smart_home.so" as pointer
+    return smart_home_process_voice_command(controller["handle"], voice_command)
+end
+
+# Energy Management
+define function get_home_energy_usage(controller as SmartHomeController, time_range as String) as Object:
+    """Get home energy usage statistics"""
+    external function smart_home_get_energy_usage(handle as pointer, time_range as String) from "iot_smart_home.so" as pointer
+    return smart_home_get_energy_usage(controller["handle"], time_range)
+end
+
+define function optimize_energy_usage(controller as SmartHomeController, preferences as Object) as Boolean:
+    """Optimize home energy usage"""
+    external function smart_home_optimize_energy(handle as pointer, preferences as pointer) from "iot_smart_home.so" as Boolean
+    return smart_home_optimize_energy(controller["handle"], preferences)
+end
+
+define function set_energy_budget(controller as SmartHomeController, daily_budget_wh as Float) as Boolean:
+    """Set daily energy budget"""
+    external function smart_home_set_energy_budget(handle as pointer, budget as Float) from "iot_smart_home.so" as Boolean
+    return smart_home_set_energy_budget(controller["handle"], daily_budget_wh)
+end
+
+# Sensor Integration
+define function add_home_sensor(controller as SmartHomeController, sensor_info as Object) as String:
+    """Add sensor to smart home system"""
+    external function smart_home_add_sensor(handle as pointer, info as pointer) from "iot_smart_home.so" as String
+    create sensor_id as String
+    set sensor_id to smart_home_add_sensor(controller["handle"], sensor_info)
+
+    if sensor_id != "":
+        create sensor as Object
+        set sensor["id"] to sensor_id
+        set sensor["info"] to sensor_info
+        set sensor["zone"] to sensor_info["zone"]
+        add sensor to controller["sensors"]
+    end
+
+    return sensor_id
+end
+
+define function get_sensor_data(controller as SmartHomeController, sensor_id as String) as Object:
+    """Get sensor data"""
+    external function smart_home_get_sensor_data(handle as pointer, sensor_id as String) from "iot_smart_home.so" as pointer
+    return smart_home_get_sensor_data(controller["handle"], sensor_id)
+end
+
+# Notification System
+define function setup_notification_system(controller as SmartHomeController, notification_config as Object) as Boolean:
+    """Setup notification system"""
+    external function smart_home_setup_notifications(handle as pointer, config as pointer) from "iot_smart_home.so" as Boolean
+    return smart_home_setup_notifications(controller["handle"], notification_config)
+end
+
+define function send_home_notification(controller as SmartHomeController, message as String, priority as String, recipients as List) as Boolean:
+    """Send home notification"""
+    external function smart_home_send_notification(handle as pointer, message as String, priority as String, recipients as pointer) from "iot_smart_home.so" as Boolean
+    return smart_home_send_notification(controller["handle"], message, priority, recipients)
+end
+
+# Home Monitoring
+define function setup_home_monitoring(controller as SmartHomeController, monitoring_config as Object) as Boolean:
+    """Setup home monitoring system"""
+    external function smart_home_setup_monitoring(handle as pointer, config as pointer) from "iot_smart_home.so" as Boolean
+    return smart_home_setup_monitoring(controller["handle"], monitoring_config)
+end
+
+define function get_home_status(controller as SmartHomeController) as Object:
+    """Get overall home status"""
+    external function smart_home_get_status(handle as pointer) from "iot_smart_home.so" as pointer
+    return smart_home_get_status(controller["handle"])
+end
+
+# Error Handling
+define function get_smart_home_error(controller as SmartHomeController) as String:
+    """Get last smart home error"""
+    external function smart_home_get_error(handle as pointer) from "iot_smart_home.so" as String
+    return smart_home_get_error(controller["handle"])
+end
+
+define function clear_smart_home_error(controller as SmartHomeController) as void:
+    """Clear smart home error"""
+    external function smart_home_clear_error(handle as pointer) from "iot_smart_home.so" as void
+    smart_home_clear_error(controller["handle"])
+end
+
+# Example Usage
+define function basic_home_automation_example:
+    """Basic home automation example"""
+    # Create smart home controller
+    create controller as SmartHomeController
+    set controller to create_smart_home_controller()
+
+    # Initialize home network
+    create network_config as Object
+    set network_config["network_name"] to "MySmartHome"
+    set network_config["security_type"] to "wpa3"
+    set network_config["password"] to "secure_password_123"
+
+    initialize_home_network(controller, network_config)
+
+    # Add smart light
+    create light_info as Object
+    set light_info["type"] to DEVICE_LIGHT
+    set light_info["name"] to "Living Room Light"
+    set light_info["category"] to CATEGORY_LIGHTING
+    set light_info["zone"] to ZONE_LIVING_ROOM
+    set light_info["capabilities"] to ["brightness", "color", "color_temperature"]
+
+    create light_id as String
+    set light_id to add_home_device(controller, light_info)
+
+    io.print("Smart light added with ID: " + light_id)
+
+    # Control the light
+    turn_on_device(controller, light_id)
+    set_device_brightness(controller, light_id, 80)
+    set_device_color(controller, light_id, "#FF6B35")  # Warm orange color
+
+    io.print("Light turned on and configured")
+
+    # Create a lighting scene
+    create scene_lighting as List
+
+    create light_setting as Object
+    set light_setting["device_id"] to light_id
+    set light_setting["brightness"] to 60
+    set light_setting["color"] to "#FFD700"  # Gold color
+    add light_setting to scene_lighting
+
+    create scene_id as String
+    set scene_id to create_lighting_scene(controller, "Evening Relax", scene_lighting)
+
+    io.print("Lighting scene created: " + scene_id)
+
+define function climate_control_example:
+    """Climate control example"""
+    create controller as SmartHomeController
+    set controller to create_smart_home_controller()
+
+    # Add thermostat
+    create thermostat_info as Object
+    set thermostat_info["type"] to DEVICE_THERMOSTAT
+    set thermostat_info["name"] to "Living Room Thermostat"
+    set thermostat_info["category"] to CATEGORY_CLIMATE
+    set thermostat_info["zone"] to ZONE_LIVING_ROOM
+    set thermostat_info["capabilities"] to ["temperature", "humidity", "heating", "cooling"]
+
+    create thermostat_id as String
+    set thermostat_id to add_home_device(controller, thermostat_info)
+
+    # Set climate control
+    set_climate_mode(controller, ZONE_LIVING_ROOM, "auto", 22.0)  # 22°C
+
+    # Create climate schedule
+    create schedule_config as List
+
+    create morning_setting as Object
+    set morning_setting["time"] to "07:00"
+    set morning_setting["temperature"] to 21.0
+    set morning_setting["days"] to ["monday", "tuesday", "wednesday", "thursday", "friday"]
+    add morning_setting to schedule_config
+
+    create evening_setting as Object
+    set evening_setting["time"] to "22:00"
+    set evening_setting["temperature"] to 19.0
+    set evening_setting["days"] to ["monday", "tuesday", "wednesday", "thursday", "friday"]
+    add evening_setting to schedule_config
+
+    create schedule_id as String
+    set schedule_id to create_climate_schedule(controller, ZONE_LIVING_ROOM, schedule_config)
+
+    io.print("Climate control schedule created: " + schedule_id)
+
+    # Get climate status
+    create climate_status as Object
+    set climate_status to get_climate_status(controller, ZONE_LIVING_ROOM)
+
+    io.print("Current temperature: " + string.format(climate_status["current_temperature"]) + "°C")
+    io.print("Target temperature: " + string.format(climate_status["target_temperature"]) + "°C")
+
+define function smart_scene_example:
+    """Smart scene example"""
+    create controller as SmartHomeController
+    set controller to create_smart_home_controller()
+
+    # Add multiple devices
+    create devices as List
+
+    create light1_info as Object
+    set light1_info["type"] to DEVICE_LIGHT
+    set light1_info["name"] to "Living Room Main Light"
+    set light1_info["zone"] to ZONE_LIVING_ROOM
+    set light1_info["category"] to CATEGORY_LIGHTING
+    add light1_info to devices
+
+    create light2_info as Object
+    set light2_info["type"] to DEVICE_LIGHT
+    set light2_info["name"] to "Living Room Accent Light"
+    set light2_info["zone"] to ZONE_LIVING_ROOM
+    set light2_info["category"] to CATEGORY_LIGHTING
+    add light2_info to devices
+
+    create speaker_info as Object
+    set speaker_info["type"] to DEVICE_SPEAKER
+    set speaker_info["name"] to "Living Room Speaker"
+    set speaker_info["zone"] to ZONE_LIVING_ROOM
+    set speaker_info["category"] to CATEGORY_ENTERTAINMENT
+    add speaker_info to devices
+
+    # Bulk add devices
+    create i as Integer
+    set i to 0
+    while i < list.length(devices):
+        create device_info as Object
+        set device_info to devices[i]
+        create device_id as String
+        set device_id to add_home_device(controller, device_info)
+        io.print("Device added: " + device_id)
+        set i to i + 1
+    end
+
+    # Create smart scene
+    create scene_actions as List
+
+    create light1_action as Object
+    set light1_action["device_id"] to "living_room_main_light"
+    set light1_action["action"] to ACTION_TURN_ON
+    set light1_action["parameters"] to {"brightness": 70, "color": "#FFD700"}
+    add light1_action to scene_actions
+
+    create light2_action as Object
+    set light2_action["device_id"] to "living_room_accent_light"
+    set light2_action["action"] to ACTION_TURN_ON
+    set light2_action["parameters"] to {"brightness": 40, "color": "#FF6B9D"}
+    add light2_action to scene_actions
+
+    create speaker_action as Object
+    set speaker_action["device_id"] to "living_room_speaker"
+    set speaker_action["action"] to "play_playlist"
+    set speaker_action["parameters"] to {"playlist": "Evening Relaxation"}
+    add speaker_action to scene_actions
+
+    create scene_id as String
+    set scene_id to create_smart_scene(controller, "Movie Night", scene_actions)
+
+    io.print("Smart scene created: " + scene_id)
+
+    # Activate scene
+    activate_smart_scene(controller, scene_id)
+    io.print("Movie night scene activated")
+
+define function automation_routine_example:
+    """Automation routine example"""
+    create controller as SmartHomeController
+    set controller to create_smart_home_controller()
+
+    # Add motion sensor
+    create motion_sensor_info as Object
+    set motion_sensor_info["type"] to "motion_sensor"
+    set motion_sensor_info["name"] to "Entrance Motion Sensor"
+    set motion_sensor_info["zone"] to ZONE_ENTRANCE
+    set motion_sensor_info["category"] to CATEGORY_SECURITY
+
+    create sensor_id as String
+    set sensor_id to add_home_sensor(controller, motion_sensor_info)
+
+    # Create automation routine
+    create routine_triggers as List
+
+    create motion_trigger as Object
+    set motion_trigger["type"] to TRIGGER_MOTION
+    set motion_trigger["sensor_id"] to sensor_id
+    set motion_trigger["condition"] to "detected"
+    set motion_trigger["zone"] to ZONE_ENTRANCE
+    add motion_trigger to routine_triggers
+
+    create time_trigger as Object
+    set time_trigger["type"] to TRIGGER_TIME
+    set time_trigger["time"] to "18:00"
+    set time_trigger["days"] to ["monday", "tuesday", "wednesday", "thursday", "friday"]
+    add time_trigger to routine_triggers
+
+    create routine_actions as List
+
+    create light_action as Object
+    set light_action["device_id"] to "entrance_light"
+    set light_action["action"] to ACTION_TURN_ON
+    set light_action["parameters"] to {"brightness": 100}
+    add light_action to routine_actions
+
+    create notification_action as Object
+    set notification_action["type"] to "notification"
+    set notification_action["message"] to "Motion detected at entrance"
+    set notification_action["recipients"] to ["owner_phone", "security_system"]
+    add notification_action to routine_actions
+
+    create routine_id as String
+    set routine_id to create_automation_routine(controller, "Entrance Security", routine_triggers, routine_actions)
+
+    io.print("Automation routine created: " + routine_id)
+
+    # Enable the routine
+    enable_automation_routine(controller, routine_id)
+    io.print("Automation routine enabled")
+
+define function voice_control_example:
+    """Voice control example"""
+    create controller as SmartHomeController
+    set controller to create_smart_home_controller()
+
+    # Setup voice control
+    create voice_config as Object
+    set voice_config["voice_assistant"] to "alexa"
+    set voice_config["wake_word"] to "hey home"
+    set voice_config["language"] to "en-US"
+    set voice_config["voice_responses"] to true
+
+    setup_voice_control(controller, voice_config)
+
+    # Process voice commands
+    create voice_commands as List
+    add "turn on living room lights" to voice_commands
+    add "set temperature to 72 degrees" to voice_commands
+    add "activate movie night scene" to voice_commands
+    add "what's the current energy usage" to voice_commands
+    add "lock all doors" to voice_commands
+
+    create i as Integer
+    set i to 0
+    while i < list.length(voice_commands):
+        create command as String
+        set command to voice_commands[i]
+
+        create response as Object
+        set response to process_voice_command(controller, command)
+
+        io.print("Voice command: " + command)
+        io.print("Response: " + response["message"])
+
+        if response["success"]:
+            io.print("Command executed successfully")
+        else:
+            io.print("Command execution failed")
+        end
+
+        set i to i + 1
+    end
+
+define function energy_management_example:
+    """Energy management example"""
+    create controller as SmartHomeController
+    set controller to create_smart_home_controller()
+
+    # Set energy budget
+    set_energy_budget(controller, 15000.0)  # 15 kWh daily
+
+    # Get energy usage
+    create energy_usage as Object
+    set energy_usage to get_home_energy_usage(controller, "daily")
+
+    io.print("Today's energy usage: " + string.format(energy_usage["total_wh"]) + " Wh")
+    io.print("Energy cost: $" + string.format(energy_usage["estimated_cost"]))
+
+    # Check if over budget
+    if energy_usage["over_budget"]:
+        io.print("Energy budget exceeded!")
+
+        # Optimize energy usage
+        create optimization_prefs as Object
+        set optimization_prefs["reduce_non_essential"] to true
+        set optimization_prefs["optimize_thermostat"] to true
+        set optimization_prefs["dim_lights"] to true
+
+        optimize_energy_usage(controller, optimization_prefs)
+        io.print("Energy optimization initiated")
+    end
+
+    # Setup energy monitoring
+    create monitoring_config as Object
+    set monitoring_config["monitor_appliances"] to true
+    set monitoring_config["alert_on_high_usage"] to true
+    set monitoring_config["track_historical_data"] to true
+
+    setup_home_monitoring(controller, monitoring_config)
+
+    # Get detailed energy breakdown
+    create energy_breakdown as Object
+    set energy_breakdown to get_home_energy_usage(controller, "weekly")
+
+    io.print("Weekly energy breakdown:")
+    create categories as List
+    set categories to object.keys(energy_breakdown["by_category"])
+
+    create j as Integer
+    set j to 0
+    while j < list.length(categories):
+        create category as String
+        set category to categories[j]
+        create usage as Float
+        set usage to energy_breakdown["by_category"][category]
+        io.print("  " + category + ": " + string.format(usage) + " Wh")
+        set j to j + 1
+    end
+
+define function security_system_example:
+    """Security system example"""
+    create controller as SmartHomeController
+    set controller to create_smart_home_controller()
+
+    # Add security devices
+    create security_devices as List
+
+    create camera_info as Object
+    set camera_info["type"] to DEVICE_CAMERA
+    set camera_info["name"] to "Front Door Camera"
+    set camera_info["zone"] to ZONE_ENTRANCE
+    set camera_info["category"] to CATEGORY_SECURITY
+    set camera_info["capabilities"] to ["video_recording", "motion_detection", "night_vision"]
+    add camera_info to security_devices
+
+    create lock_info as Object
+    set lock_info["type"] to DEVICE_DOOR_LOCK
+    set lock_info["name"] to "Front Door Lock"
+    set lock_info["zone"] to ZONE_ENTRANCE
+    set lock_info["category"] to CATEGORY_SECURITY
+    set lock_info["capabilities"] to ["remote_lock", "keypad_entry", "access_logs"]
+    add lock_info to security_devices
+
+    create alarm_info as Object
+    set alarm_info["type"] to DEVICE_ALARM
+    set alarm_info["name"] to "Home Alarm System"
+    set alarm_info["zone"] to ZONE_LIVING_ROOM
+    set alarm_info["category"] to CATEGORY_SECURITY
+    set alarm_info["capabilities"] to ["intrusion_detection", "fire_detection", "emergency_alert"]
+    add alarm_info to security_devices
+
+    # Add security devices
+    create i as Integer
+    set i to 0
+    while i < list.length(security_devices):
+        create device_info as Object
+        set device_info to security_devices[i]
+        create device_id as String
+        set device_id to add_home_device(controller, device_info)
+        io.print("Security device added: " + device_id)
+        set i to i + 1
+    end
+
+    # Enable security system
+    enable_security_system(controller, "away_mode")
+
+    io.print("Security system enabled in away mode")
+
+    # Get security status
+    create security_status as Object
+    set security_status to get_security_status(controller)
+
+    io.print("Security system status: " + security_status["mode"])
+    io.print("All doors locked: " + string.format(security_status["doors_locked"]))
+    io.print("Cameras active: " + string.format(security_status["cameras_active"]))
+
+    # Simulate security event
+    trigger_security_alarm(controller, ZONE_ENTRANCE, "intrusion_detected")
+
+    io.print("Security alarm triggered for intrusion detection")
+
+    # Setup security notifications
+    create notification_config as Object
+    set notification_config["push_notifications"] to true
+    set notification_config["email_alerts"] to true
+    set notification_config["sms_alerts"] to true
+    set notification_config["emergency_contacts"] to ["police", "neighbor"]
+
+    setup_notification_system(controller, notification_config)
+
+    send_home_notification(controller, "Security alert: Intrusion detected at front entrance", "high", ["owner", "security_service"])

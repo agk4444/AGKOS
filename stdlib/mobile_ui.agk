@@ -1,0 +1,330 @@
+# AGK Mobile UI and Gesture Framework
+# Provides touch-based UI components and gesture recognition
+
+import graphics
+import string
+import math
+
+# Touch and Gesture Constants
+create constant GESTURE_TAP as String = "tap"
+create constant GESTURE_DOUBLE_TAP as String = "double_tap"
+create constant GESTURE_LONG_PRESS as String = "long_press"
+create constant GESTURE_SWIPE_LEFT as String = "swipe_left"
+create constant GESTURE_SWIPE_RIGHT as String = "swipe_right"
+create constant GESTURE_SWIPE_UP as String = "swipe_up"
+create constant GESTURE_SWIPE_DOWN as String = "swipe_down"
+create constant GESTURE_PINCH_IN as String = "pinch_in"
+create constant GESTURE_PINCH_OUT as String = "pinch_out"
+create constant GESTURE_ROTATE as String = "rotate"
+
+# UI Component States
+create constant UI_STATE_NORMAL as String = "normal"
+create constant UI_STATE_PRESSED as String = "pressed"
+create constant UI_STATE_HOVERED as String = "hovered"
+create constant UI_STATE_DISABLED as String = "disabled"
+
+# Touch State
+create touch_state as Object
+create touch_points as List
+create gesture_recognizers as List
+
+# UI Components
+define function create_button that takes x as Integer, y as Integer, width as Integer, height as Integer, text as String and returns Object:
+    create button as Object
+    set button["x"] to x
+    set button["y"] to y
+    set button["width"] to width
+    set button["height"] to height
+    set button["text"] to text
+    set button["state"] to UI_STATE_NORMAL
+    set button["visible"] to true
+    set button["enabled"] to true
+    set button["background_color"] to graphics.color_blue()
+    set button["text_color"] to graphics.color_white()
+    set button["border_color"] to graphics.color_black()
+    set button["corner_radius"] to 8
+    return button
+
+define function draw_button that takes canvas as Canvas, button as Object:
+    if button["visible"]:
+        create bg_color as String
+        if button["enabled"]:
+            if button["state"] is equal to UI_STATE_PRESSED:
+                set bg_color to graphics.darken_color(button["background_color"], 0.3)
+            else:
+                if button["state"] is equal to UI_STATE_HOVERED:
+                    set bg_color to graphics.lighten_color(button["background_color"], 0.2)
+                else:
+                    set bg_color to button["background_color"]
+        else:
+            set bg_color to graphics.color_gray()
+
+        # Draw button background with rounded corners
+        if button["corner_radius"] > 0:
+            graphics.draw_rounded_rectangle(canvas, button["x"], button["y"], button["width"], button["height"], button["corner_radius"], bg_color, true)
+            graphics.draw_rounded_rectangle(canvas, button["x"], button["y"], button["width"], button["height"], button["corner_radius"], button["border_color"], false)
+        else:
+            graphics.draw_rectangle(canvas, button["x"], button["y"], button["width"], button["height"], bg_color, true)
+            graphics.draw_rectangle(canvas, button["x"], button["y"], button["width"], button["height"], button["border_color"], false)
+
+        # Draw button text
+        create text_x as Integer
+        set text_x to button["x"] + button["width"] / 2
+        create text_y as Integer
+        set text_y to button["y"] + button["height"] / 2 - 8
+        graphics.draw_text(canvas, text_x, text_y, button["text"], button["text_color"], 16)
+
+define function is_button_touched that takes button as Object, touch_x as Integer, touch_y as Integer and returns Boolean:
+    if button["enabled"] and button["visible"]:
+        return touch_x >= button["x"] and touch_x <= button["x"] + button["width"] and touch_y >= button["y"] and touch_y <= button["y"] + button["height"]
+    else:
+        return false
+
+define function update_button_state that takes button as Object, touch_x as Integer, touch_y as Integer, is_touched as Boolean:
+    if button["enabled"] and button["visible"]:
+        if is_button_touched(button, touch_x, touch_y):
+            if is_touched:
+                set button["state"] to UI_STATE_PRESSED
+            else:
+                set button["state"] to UI_STATE_HOVERED
+        else:
+            set button["state"] to UI_STATE_NORMAL
+
+# Text Input Component
+define function create_text_input that takes x as Integer, y as Integer, width as Integer, height as Integer, placeholder as String and returns Object:
+    create input as Object
+    set input["x"] to x
+    set input["y"] to y
+    set input["width"] to width
+    set input["height"] to height
+    set input["text"] to ""
+    set input["placeholder"] to placeholder
+    set input["state"] to UI_STATE_NORMAL
+    set input["visible"] to true
+    set input["enabled"] to true
+    set input["focused"] to false
+    set input["background_color"] to graphics.color_white()
+    set input["text_color"] to graphics.color_black()
+    set input["border_color"] to graphics.color_gray()
+    set input["cursor_position"] to 0
+    return input
+
+define function draw_text_input that takes canvas as Canvas, input as Object:
+    if input["visible"]:
+        create bg_color as String
+        if input["enabled"]:
+            if input["focused"]:
+                set bg_color to graphics.lighten_color(input["background_color"], 0.1)
+            else:
+                set bg_color to input["background_color"]
+        else:
+            set bg_color to graphics.color_light_gray()
+
+        # Draw input background
+        graphics.draw_rectangle(canvas, input["x"], input["y"], input["width"], input["height"], bg_color, true)
+        graphics.draw_rectangle(canvas, input["x"], input["y"], input["width"], input["height"], input["border_color"], false)
+
+        # Draw text or placeholder
+        create display_text as String
+        if string.length(input["text"]) > 0:
+            set display_text to input["text"]
+        else:
+            set display_text to input["placeholder"]
+
+        graphics.draw_text(canvas, input["x"] + 8, input["y"] + input["height"]/2 - 8, display_text, input["text_color"], 14)
+
+        # Draw cursor if focused
+        if input["focused"]:
+            create cursor_x as Integer
+            set cursor_x to input["x"] + 8 + graphics.measure_text(display_text, 14) + 2
+            graphics.draw_line(canvas, cursor_x, input["y"] + 4, cursor_x, input["y"] + input["height"] - 4, graphics.color_black())
+
+# Slider Component
+define function create_slider that takes x as Integer, y as Integer, width as Integer, min_value as Float, max_value as Float, initial_value as Float and returns Object:
+    create slider as Object
+    set slider["x"] to x
+    set slider["y"] to y
+    set slider["width"] to width
+    set slider["height"] to 40
+    set slider["min_value"] to min_value
+    set slider["max_value"] to max_value
+    set slider["value"] to initial_value
+    set slider["state"] to UI_STATE_NORMAL
+    set slider["visible"] to true
+    set slider["enabled"] to true
+    set slider["dragging"] to false
+    set slider["track_color"] to graphics.color_light_gray()
+    set slider["fill_color"] to graphics.color_blue()
+    set slider["thumb_color"] to graphics.color_white()
+    return slider
+
+define function draw_slider that takes canvas as Canvas, slider as Object:
+    if slider["visible"]:
+        # Draw track
+        graphics.draw_rounded_rectangle(canvas, slider["x"], slider["y"] + 15, slider["width"], 10, 5, slider["track_color"], true)
+
+        # Calculate fill width
+        create value_ratio as Float
+        set value_ratio to (slider["value"] - slider["min_value"]) / (slider["max_value"] - slider["min_value"])
+        create fill_width as Integer
+        set fill_width to value_ratio * slider["width"]
+
+        # Draw fill
+        graphics.draw_rounded_rectangle(canvas, slider["x"], slider["y"] + 15, fill_width, 10, 5, slider["fill_color"], true)
+
+        # Draw thumb
+        create thumb_x as Integer
+        set thumb_x to slider["x"] + fill_width - 15
+        if thumb_x < slider["x"]:
+            set thumb_x to slider["x"]
+        if thumb_x > slider["x"] + slider["width"] - 30:
+            set thumb_x to slider["x"] + slider["width"] - 30
+
+        graphics.draw_circle(canvas, thumb_x + 15, slider["y"] + 20, 15, slider["thumb_color"], true)
+        graphics.draw_circle(canvas, thumb_x + 15, slider["y"] + 20, 15, graphics.color_gray(), false)
+
+        # Draw value text
+        create value_text as String
+        set value_text to string.format(slider["value"])
+        graphics.draw_text(canvas, slider["x"] + slider["width"] + 20, slider["y"] + 12, value_text, graphics.color_black(), 12)
+
+# Gesture Recognition
+define function initialize_touch_system():
+    set touch_state["touch_points"] to []
+    set touch_state["gesture_start_time"] to 0
+    set touch_state["last_tap_time"] to 0
+    set touch_state["tap_count"] to 0
+    set touch_state["gesture_detected"] to false
+    set touch_state["current_gesture"] to ""
+
+define function add_touch_point that takes x as Integer, y as Integer, pressure as Float:
+    create touch_point as Object
+    set touch_point["x"] to x
+    set touch_point["y"] to y
+    set touch_point["pressure"] to pressure
+    set touch_point["timestamp"] to get_current_time_ms()
+    touch_state["touch_points"].append(touch_point)
+
+define function clear_touch_points():
+    touch_state["touch_points"].clear()
+
+define function detect_gesture() as String:
+    create points as List
+    set points to touch_state["touch_points"]
+
+    if points.length() < 2:
+        return ""
+
+    # Get first and last points
+    create start_point as Object
+    set start_point to points[0]
+    create end_point as Object
+    set end_point to points[points.length() - 1]
+
+    create delta_x as Integer
+    set delta_x to end_point["x"] - start_point["x"]
+    create delta_y as Integer
+    set delta_y to end_point["y"] - start_point["y"]
+
+    create distance as Float
+    set distance to math.sqrt(delta_x * delta_x + delta_y * delta_y)
+
+    create duration as Integer
+    set duration to end_point["timestamp"] - start_point["timestamp"]
+
+    # Tap detection
+    if distance < 10 and duration < 200:
+        create current_time as Integer
+        set current_time to get_current_time_ms()
+        if current_time - touch_state["last_tap_time"] < 300:
+            set touch_state["tap_count"] to touch_state["tap_count"] + 1
+            if touch_state["tap_count"] == 2:
+                set touch_state["tap_count"] to 0
+                return GESTURE_DOUBLE_TAP
+        else:
+            set touch_state["tap_count"] to 1
+        set touch_state["last_tap_time"] to current_time
+        return GESTURE_TAP
+
+    # Long press detection
+    if distance < 20 and duration > 500:
+        return GESTURE_LONG_PRESS
+
+    # Swipe detection
+    if distance > 50:
+        create angle as Float
+        set angle to math.atan2(delta_y, delta_x) * 180 / math.PI
+
+        if angle >= -45 and angle <= 45:
+            return GESTURE_SWIPE_RIGHT
+        else:
+            if angle >= 45 and angle <= 135:
+                return GESTURE_SWIPE_DOWN
+            else:
+                if angle >= -135 and angle <= -45:
+                    return GESTURE_SWIPE_UP
+                else:
+                    return GESTURE_SWIPE_LEFT
+
+    return ""
+
+# Pinch and Rotate Gestures (multi-touch)
+define function detect_multi_touch_gesture() as String:
+    create points as List
+    set points to touch_state["touch_points"]
+
+    if points.length() < 2:
+        return ""
+
+    create point1 as Object
+    create point2 as Object
+    set point1 to points[points.length() - 2]
+    set point2 to points[points.length() - 1]
+
+    create distance1 as Float
+    set distance1 to math.sqrt((point2["x"] - point1["x"]) * (point2["x"] - point1["x"]) + (point2["y"] - point1["y"]) * (point2["y"] - point1["y"]))
+
+    if points.length() >= 4:
+        create point3 as Object
+        create point4 as Object
+        set point3 to points[points.length() - 4]
+        set point4 to points[points.length() - 3]
+
+        create distance2 as Float
+        set distance2 to math.sqrt((point4["x"] - point3["x"]) * (point4["x"] - point3["x"]) + (point4["y"] - point3["y"]) * (point4["y"] - point3["y"]))
+
+        if distance2 > 0:
+            create scale as Float
+            set scale to distance1 / distance2
+            if scale > 1.2:
+                return GESTURE_PINCH_OUT
+            else:
+                if scale < 0.8:
+                    return GESTURE_PINCH_IN
+
+    return ""
+
+# Utility Functions
+define function get_current_time_ms() as Integer:
+    """Get current time in milliseconds"""
+    external function mobile_get_current_time_ms() from "mobile.so" as Integer
+    return mobile_get_current_time_ms()
+
+define function is_point_in_rect that takes px as Integer, py as Integer, rx as Integer, ry as Integer, rw as Integer, rh as Integer and returns Boolean:
+    return px >= rx and px <= rx + rw and py >= ry and py <= py + rh
+
+define function distance_between_points that takes x1 as Integer, y1 as Integer, x2 as Integer, y2 as Integer and returns Float:
+    create dx as Integer
+    set dx to x2 - x1
+    create dy as Integer
+    set dy to y2 - y1
+    return math.sqrt(dx * dx + dy * dy)
+
+# Animation Support
+define function animate_touch_feedback that takes x as Integer, y as Integer, duration as Integer:
+    """Create visual feedback for touch events"""
+    # This would create a ripple effect or similar feedback
+    pass
+
+# Initialize the system
+initialize_touch_system()

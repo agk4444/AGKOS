@@ -16,7 +16,8 @@ from agk_codegen import CodeGenerator
 class AGKCompiler:
     """Main AGK compiler class"""
 
-    def __init__(self):
+    def __init__(self, target_platform: str = "python"):
+        self.target_platform = target_platform
         self.lexer = None
         self.parser = None
         self.analyzer = None
@@ -61,7 +62,8 @@ class AGKCompiler:
 
             # Phase 4: Code Generation
             print("Phase 4: Code Generation...")
-            self.generator = CodeGenerator()
+            print(f"Target platform: {self.target_platform}")
+            self.generator = CodeGenerator(self.target_platform)
             generated_code = self.generator.generate(ast)
 
             # Output results
@@ -106,16 +108,36 @@ class AGKCompiler:
 def main():
     """Main function for command-line usage"""
     if len(sys.argv) < 2:
-        print("Usage: python agk_compiler.py <source_file> [output_file]")
-        print("       python agk_compiler.py --repl")
+        print("Usage: python agk_compiler.py <source_file> [output_file] [--platform <platform>]")
+        print("       python agk_compiler.py --repl [--platform <platform>]")
+        print("Platforms: python, javascript, kotlin, swift, cpp, csharp")
+        print("          wearable, tv, automotive")
         sys.exit(1)
 
-    if sys.argv[1] == "--repl":
-        run_repl()
+    # Parse platform argument
+    target_platform = "python"  # default
+    args = sys.argv[1:]
+
+    if "--platform" in args:
+        platform_index = args.index("--platform")
+        if platform_index + 1 < len(args):
+            target_platform = args[platform_index + 1]
+            # Remove platform args from list
+            args = args[:platform_index] + args[platform_index + 2:]
+        else:
+            print("ERROR: --platform requires a value")
+            sys.exit(1)
+
+    if len(args) == 0:
+        print("ERROR: No source file specified")
+        sys.exit(1)
+
+    if args[0] == "--repl":
+        run_repl(target_platform)
         return
 
-    source_file = sys.argv[1]
-    output_file = sys.argv[2] if len(sys.argv) > 2 else None
+    source_file = args[0]
+    output_file = args[1] if len(args) > 1 else None
 
     try:
         with open(source_file, 'r') as f:
@@ -125,9 +147,10 @@ def main():
         sys.exit(1)
 
     print(f"Compiling AGK source file: {source_file}")
+    print(f"Target platform: {target_platform}")
     print("=" * 50)
 
-    compiler = AGKCompiler()
+    compiler = AGKCompiler(target_platform)
     success = compiler.compile(source_code, output_file)
 
     if success:
@@ -137,13 +160,14 @@ def main():
         sys.exit(1)
 
 
-def run_repl():
+def run_repl(target_platform: str = "python"):
     """Run interactive REPL mode"""
     print("AGK Language REPL")
+    print(f"Target platform: {target_platform}")
     print("Type 'quit' or 'exit' to exit")
     print("=" * 30)
 
-    compiler = AGKCompiler()
+    compiler = AGKCompiler(target_platform)
 
     while True:
         try:
