@@ -111,6 +111,7 @@ The AGK Language Compiler has comprehensive documentation organized in the `docs
 
 ### 📊 **Specialized Documentation**
 - **[Templates Summary](docs/AGK_TEMPLATES_SUMMARY.md)** - Overview of all available templates
+- **[IoT Development Guide](docs/IOT_DEVELOPMENT_GUIDE.md)** - Comprehensive IoT development guide
 
 ## Standard Library System
 
