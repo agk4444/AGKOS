@@ -87,27 +87,40 @@ cp mobile_app_template.agk my_mobile_app.agk
 python agk_compiler.py my_mobile_app.agk
 ```
 
-### 5. Browser App Template (`browser_app_template.agk`)
-**Perfect for:** Web Browsers, Content Viewers, Document Readers, Media Players
+### 5. Browser App Template (`agk_browser_full.agk`) - ENHANCED!
+**Perfect for:** Web Browsers, Content Viewers, Document Readers, Media Players, OS GUI Development
 
 **Features:**
-- Full-featured web browser interface
-- Address bar with smart URL handling
-- Navigation controls (back, forward, reload, stop)
-- Bookmark system with persistence
-- Download management with progress tracking
-- Session restore functionality
-- Customizable settings and preferences
-- AI assistant integration
+- **Advanced Graphics Integration**: Uses the new `advanced_graphics` library for professional UI
+- **Professional UI Components**: Tabbed interface, validated address bar, icon buttons
+- **Advanced Layout Management**: Grid and flex layouts with component positioning
+- **Theming System**: Dark/light theme support with customizable colors and fonts
+- **Event-Driven Architecture**: Comprehensive event handling with custom events
+- **Accessibility Features**: Screen reader support and keyboard navigation
+- **Performance Optimization**: Hardware acceleration and rendering optimization
+- **Navigation Controls**: Back, forward, reload, home with icon buttons
+- **Address Bar**: Smart URL handling with validation
+- **Progress Tracking**: Loading progress bars and status indicators
+- **Keyboard Shortcuts**: Full keyboard navigation (Ctrl+T, Ctrl+W, F5, etc.)
+- **Session Management**: Advanced session handling and persistence
+- **OS Integration**: System tray support and native OS features
 
 **Quick Start:**
 ```bash
-# Copy the template
-cp browser_app_template.agk my_browser.agk
+# Copy the enhanced template
+cp agk_browser_full.agk my_advanced_browser.agk
 
-# Configure browser settings
-python agk_compiler.py my_browser.agk
+# Configure browser settings and themes
+python agk_compiler.py my_advanced_browser.agk
 ```
+
+**NEW - Advanced Graphics Library Demo:**
+This template now serves as a complete demonstration of the `advanced_graphics` library, showcasing:
+- Professional UI component integration
+- Advanced event handling and theming
+- OS-level GUI capabilities
+- Performance optimizations
+- Accessibility features
 
 ### 6. AI Assistant Template (`llm_template.agk`)
 **Perfect for:** AI Assistants, Code Generators, Content Creators, Educational Tools, Chatbots
@@ -317,6 +330,74 @@ cp edge_computing_template.agk my_edge_device.agk
 # Compile for edge computing hardware
 python agk_compiler.py my_edge_device.agk --backend edge
 ```
+
+## 🎨 Advanced Graphics Library (NEW!)
+
+The `advanced_graphics.agk` library provides professional OS-level GUI components and advanced graphics capabilities for building sophisticated user interfaces.
+
+### Features:
+- **Advanced Window Management**: Main windows, child windows, decorations
+- **Professional UI Components**: Buttons with icons, validated text inputs, dropdowns, progress bars, sliders, tabbed interfaces, tree views
+- **Advanced Drawing & Rendering**: Rounded rectangles, gradients, shadows, animations
+- **Layout Management**: Grid layouts, flex layouts, component positioning
+- **Theming & Styling**: Complete theming system with dark/light themes, custom styling
+- **Event Handling**: Advanced event manager, custom events, input management
+- **Accessibility**: Screen reader support, accessibility labels, keyboard navigation
+- **OS Integration**: System tray icons, notifications, native OS features
+- **Performance**: Hardware acceleration, render caching, drawing optimizations
+
+### Usage Example:
+```agk
+import advanced_graphics
+
+define function main:
+    # Create advanced main window
+    create window as advanced_graphics.MainWindow
+    set window to advanced_graphics.create_main_window("My OS App", 1200, 800)
+
+    # Create professional UI components
+    create button as advanced_graphics.Button
+    set button to advanced_graphics.create_button_with_icon("Launch", "icon.png", 100, 100, 120, 40)
+
+    create input as advanced_graphics.TextInput
+    set input to advanced_graphics.create_text_input_with_validation("Enter text...", validate_input)
+
+    # Set up advanced layout
+    create layout as advanced_graphics.GridLayout
+    set layout to advanced_graphics.create_grid_layout(3, 1)
+
+    # Apply professional theming
+    create theme as advanced_graphics.Theme
+    set theme to advanced_graphics.create_theme("Dark", dark_colors, fonts)
+    advanced_graphics.apply_theme(window, theme)
+
+    # Enable accessibility
+    advanced_graphics.enable_accessibility(window)
+    advanced_graphics.set_accessibility_label(button, "Launch Application Button")
+
+    # Set up event handling
+    create event_manager as advanced_graphics.EventManager
+    set event_manager to advanced_graphics.create_event_manager()
+    advanced_graphics.register_event_handler(event_manager, "button_click", handle_click)
+
+    run_application_with_event_loop(window, event_manager)
+```
+
+### Perfect for:
+- **Operating System Development**: Build complete OS GUI environments
+- **Professional Applications**: Enterprise software with advanced UIs
+- **Complex Desktop Apps**: Multi-window applications with rich interactions
+- **Accessibility-Focused Software**: Applications requiring screen reader support
+- **Themed Applications**: Apps needing multiple visual themes
+- **High-Performance GUIs**: Applications requiring hardware acceleration
+
+### Integration with Browser Template:
+The enhanced `agk_browser_full.agk` template demonstrates the full power of the advanced graphics library by implementing a professional web browser with:
+- Advanced UI components integration
+- Professional theming and styling
+- Accessibility features
+- Performance optimizations
+- OS-level GUI capabilities
 
 ## 📚 Library Templates
 

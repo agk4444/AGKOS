@@ -243,13 +243,26 @@ AGK includes a comprehensive standard library system with **38 powerful librarie
   - Performance monitoring
 
 - **`graphics`**: 2D and 3D graphics capabilities
-  - Window and canvas management
-  - Drawing primitives (lines, shapes, text)
-  - Image loading, manipulation, and saving
-  - Sprite animation system
-  - 3D scene rendering
-  - Color management and predefined colors
-  - Input handling (mouse, keyboard)
+   - Window and canvas management
+   - Drawing primitives (lines, shapes, text)
+   - Image loading, manipulation, and saving
+   - Sprite animation system
+   - 3D scene rendering
+   - Color management and predefined colors
+   - Input handling (mouse, keyboard)
+
+- **`advanced_graphics`**: Professional OS-level GUI framework (NEW!)
+   - Advanced window management with decorations
+   - Professional UI components (buttons, text inputs, dropdowns)
+   - Layout management (grid, flex, custom positioning)
+   - Theming and styling system with dark/light themes
+   - Event handling with custom events and callbacks
+   - Accessibility support with screen readers
+   - Hardware acceleration for performance
+   - Input management with keyboard shortcuts
+   - OS integration (system tray, notifications)
+   - Animation and rendering optimization
+   - Performance monitoring and caching
 
 ## 🖥️ Operating System Development (NEW!)
 
