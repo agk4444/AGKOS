@@ -691,6 +691,307 @@ cp game_template.agk game_demo.agk
 agk_compiler.exe game_demo.agk
 ```
 
+### Math Library Template (`math_template.agk`)
+**Learn:** Mathematical operations, trigonometry, calculus, statistics
+
+**Features:**
+- Basic arithmetic and advanced calculations
+- Trigonometric functions (sin, cos, tan, etc.)
+- Exponential and logarithmic functions
+- Statistical operations (mean, median, standard deviation)
+- Geometry calculations (area, volume, distance)
+- Number theory (prime numbers, factors)
+- Complex number operations
+- Calculus (derivatives, integrals)
+- Mathematical constants (pi, e, golden ratio)
+
+**Quick Start:**
+```bash
+cp math_template.agk math_demo.agk
+# Compile and run (using standalone executable)
+./agk_compiler math_demo.agk
+
+# On Windows
+agk_compiler.exe math_demo.agk
+```
+
+### String Library Template (`string_template.agk`)
+**Learn:** Text processing, string manipulation, encoding
+
+**Features:**
+- Basic string operations (concatenation, length, substring)
+- Analysis and statistics (word count, character frequency)
+- Search and pattern matching
+- Transformation (uppercase, lowercase, title case)
+- Formatting and alignment
+- Parsing and extraction (split, join, replace)
+- Encoding/decoding (UTF-8, ASCII, Base64)
+- Validation (email, phone, URL)
+- Text processing (word wrapping, trimming)
+- Regular expressions integration
+
+**Quick Start:**
+```bash
+cp string_template.agk string_demo.agk
+# Compile and run (using standalone executable)
+./agk_compiler string_demo.agk
+
+# On Windows
+agk_compiler.exe string_demo.agk
+```
+
+### Crypto Library Template (`crypto_template.agk`)
+**Learn:** Cryptography, security, encryption, hashing
+
+**Features:**
+- Hashing functions (SHA256, MD5, bcrypt)
+- Password security (salting, verification)
+- Symmetric encryption (AES-256, DES, 3DES)
+- Asymmetric encryption (RSA, ECC)
+- Digital signatures (signing, verification)
+- Random number generation (secure, pseudo-random)
+- Key derivation (PBKDF2, scrypt)
+- HMAC operations
+- Encoding/decoding (Base64, Hex)
+- Certificate operations
+- Cryptographic utilities
+
+**Quick Start:**
+```bash
+cp crypto_template.agk crypto_demo.agk
+# Compile and run (using standalone executable)
+./agk_compiler crypto_demo.agk
+
+# On Windows
+agk_compiler.exe crypto_demo.agk
+```
+
+### Hardware Library Template (`hardware_template.agk`)
+**Learn:** Low-level hardware access, CPU operations, I/O
+
+**Features:**
+- CPU register operations (read, write, modify)
+- Port I/O operations (inb, outb, inw, outw)
+- PCI configuration space access
+- CPU feature detection and information
+- Atomic operations and memory barriers
+- Model-specific registers (MSRs)
+- Interrupt control and handling
+- Cache management (flush, invalidate)
+- Performance monitoring counters
+- Assembly code execution
+- Hardware constants and definitions
+
+**Quick Start:**
+```bash
+cp hardware_template.agk hardware_demo.agk
+# Compile and run (using standalone executable)
+./agk_compiler hardware_demo.agk
+
+# On Windows
+agk_compiler.exe hardware_demo.agk
+```
+
+### OS Library Template (`os_template.agk`)
+**Learn:** Operating system development, system programming
+
+**Features:**
+- Process management (creation, termination, waiting)
+- File system operations (open, read, write, close)
+- Memory management (allocation, deallocation, copying)
+- Thread management (creation, joining, synchronization)
+- Network programming (sockets, TCP/UDP)
+- System information queries
+- Synchronization primitives (mutexes, semaphores)
+- System calls and API functions
+- Hardware I/O operations
+- System constants and error codes
+
+**Quick Start:**
+```bash
+cp os_template.agk os_demo.agk
+# Compile and run (using standalone executable)
+./agk_compiler os_demo.agk
+
+# On Windows
+agk_compiler.exe os_demo.agk
+```
+
+### IO Library Template (`io_template.agk`)
+**Learn:** Input/output operations, console management, file I/O
+
+**Features:**
+- Console input/output operations
+- Formatted output (printf-style formatting)
+- Text rendering and display
+- File I/O with reading/writing
+- Input validation and sanitization
+- Interactive console applications
+- Logging integration
+- Stream operations
+- Buffer management
+- Character encoding
+
+**Quick Start:**
+```bash
+cp io_template.agk io_demo.agk
+# Compile and run (using standalone executable)
+./agk_compiler io_demo.agk
+
+# On Windows
+agk_compiler.exe io_demo.agk
+```
+
+### List Library Template (`list_template.agk`)
+**Learn:** List data structures, algorithms, operations
+
+**Features:**
+- Basic list operations (create, append, prepend, remove)
+- Searching and finding elements
+- Sorting algorithms (bubble sort, quicksort, mergesort)
+- Advanced operations (slice, filter, map, reduce)
+- Performance testing and benchmarking
+- Memory management and optimization
+- List manipulation utilities
+- Statistical operations on lists
+- List comparison and merging
+- Iterator and enumeration support
+
+**Quick Start:**
+```bash
+cp list_template.agk list_demo.agk
+# Compile and run (using standalone executable)
+./agk_compiler list_demo.agk
+
+# On Windows
+agk_compiler.exe list_demo.agk
+```
+
+### Date Library Template (`date_template.agk`)
+**Learn:** Date and time manipulation, calendar operations
+
+**Features:**
+- Current date/time information
+- Date creation and parsing
+- Date arithmetic (add/subtract days, months, years)
+- Date formatting with multiple formats
+- Date comparisons and calculations
+- Calendar operations (weekdays, month names)
+- Business days calculations
+- Timezone operations and conversions
+- Date validation and range checking
+- Leap year calculations
+
+**Quick Start:**
+```bash
+cp date_template.agk date_demo.agk
+# Compile and run (using standalone executable)
+./agk_compiler date_demo.agk
+
+# On Windows
+agk_compiler.exe date_demo.agk
+```
+
+### Power Library Template (`power_template.agk`)
+**Learn:** Power management, battery optimization, energy efficiency
+
+**Features:**
+- Battery monitoring and health assessment
+- Performance profile control
+- CPU and GPU power management
+- Thermal monitoring and throttling
+- Memory power optimization
+- Wake lock management
+- Network power optimization
+- Smart charging features
+- Power state transitions
+- Energy consumption analytics
+
+**Quick Start:**
+```bash
+cp power_template.agk power_demo.agk
+# Compile and run (using standalone executable)
+./agk_compiler power_demo.agk
+
+# On Windows
+agk_compiler.exe power_demo.agk
+```
+
+### Graphics Library Template (`graphics_template.agk`)
+**Learn:** 2D/3D graphics, rendering, visual programming
+
+**Features:**
+- 2D drawing primitives (lines, shapes, circles, rectangles)
+- Color management and RGB operations
+- Text rendering and font management
+- Image manipulation (resize, rotate, filter)
+- Sprite animation and management
+- Interactive graphics and event handling
+- Basic 3D graphics operations
+- Window management and properties
+- Visual effects and animations
+- Coordinate system transformations
+
+**Quick Start:**
+```bash
+cp graphics_template.agk graphics_demo.agk
+# Compile and run (using standalone executable)
+./agk_compiler graphics_demo.agk
+
+# On Windows
+agk_compiler.exe graphics_demo.agk
+```
+
+### Security Library Template (`security_template.agk`)
+**Learn:** Security operations, package signing, trust management
+
+**Features:**
+- Keypair generation and management
+- Package signing and signature verification
+- Vulnerability scanning and assessment
+- Trust management for publishers
+- Data encryption and decryption
+- Hashing operations (SHA256, MD5)
+- Security scanning and reporting
+- Certificate validation
+- Secure random number generation
+- Security policy enforcement
+
+**Quick Start:**
+```bash
+cp security_template.agk security_demo.agk
+# Compile and run (using standalone executable)
+./agk_compiler security_demo.agk
+
+# On Windows
+agk_compiler.exe security_demo.agk
+```
+
+### System AST Library Template (`system_ast_template.agk`)
+**Learn:** System programming, AST operations, low-level system access
+
+**Features:**
+- Memory management (allocate, free, copy, set)
+- File I/O operations (open, close, read, write, seek)
+- Process and thread management
+- Network socket operations
+- System information queries
+- Atomic operations and memory barriers
+- Hardware access (GPIO, PCI, DMA, port I/O)
+- Interrupt handling and device registers
+- Memory-mapped I/O operations
+- Device register access and control
+
+**Quick Start:**
+```bash
+cp system_ast_template.agk system_demo.agk
+# Compile and run (using standalone executable)
+./agk_compiler system_demo.agk
+
+# On Windows
+agk_compiler.exe system_demo.agk
+```
+
 ## 🛠 Template Structure
 
 ### Common Pattern:
@@ -864,8 +1165,8 @@ These templates are designed to:
 **Remember:** These are comprehensive starting points, not finished products. The AGK ecosystem now provides:
 
 - **14 Application Templates**: Desktop, Web, Mobile, Browser, AI, Server, General Business, Bootloader, Kernel, Device Driver, Smart Home, Industrial IoT, Microcontroller, Edge Computing
-- **11 Library Templates**: Complete coverage of all 38 standard libraries
-- **Production-Ready Code**: 35,000+ lines of professional examples
+- **23 Library Templates**: Complete coverage of all 38 standard libraries including Math, String, Crypto, Hardware, OS, IO, List, Date, Power, Graphics, Security, and System AST
+- **Production-Ready Code**: 15,000+ lines of professional examples
 - **OS Development Support**: Complete operating system development capabilities
 - **IoT Development Support**: Comprehensive Internet of Things capabilities
 - **Complete Documentation**: Comprehensive guides and usage examples
