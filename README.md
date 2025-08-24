@@ -107,11 +107,10 @@ The AGK Language Compiler has comprehensive documentation organized in the `docs
 - **[Operating System Development](docs/C_BACKEND_README.md)** - Complete OS development with C backend
 - **[Mobile Development](docs/MOBILE_OS_DEVELOPMENT_GUIDE.md)** - Android and iOS app development
 - **[Multi-Platform Development](docs/PLATFORM_DEVELOPMENT_GUIDE.md)** - Wearables, TV, automotive platforms
-- **[IoT Development](docs/PLATFORM_DEVELOPMENT_GUIDE.md#iot-development)** - Internet of Things development
+- **[IoT Development](docs/IOT_DEVELOPMENT_GUIDE.md)** - Comprehensive IoT development guide
 
 ### 📊 **Specialized Documentation**
 - **[Templates Summary](docs/AGK_TEMPLATES_SUMMARY.md)** - Overview of all available templates
-- **[IoT Development Guide](docs/IOT_DEVELOPMENT_GUIDE.md)** - Comprehensive IoT development guide
 
 ## Standard Library System
 
