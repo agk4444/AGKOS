@@ -19,8 +19,11 @@ This comprehensive guide provides ready-to-use templates for different types of 
 # Copy the template
 cp desktop_app_template.agk my_desktop_app.agk
 
-# Compile and run
-python agk_compiler.py my_desktop_app.agk
+# Compile and run (using standalone executable)
+./agk_compiler my_desktop_app.agk
+
+# On Windows
+agk_compiler.exe my_desktop_app.agk
 ```
 
 ### 2. Web Application Template (`web_app_template.agk`)
@@ -40,8 +43,11 @@ python agk_compiler.py my_desktop_app.agk
 cp web_app_template.agk my_web_app.agk
 
 # Edit configuration (port, routes, etc.)
-# Compile and run
-python agk_compiler.py my_web_app.agk
+# Compile and run (using standalone executable)
+./agk_compiler my_web_app.agk
+
+# On Windows
+agk_compiler.exe my_web_app.agk
 ```
 
 ### 3. Server/API Template (`server_api_template.agk`)
@@ -63,7 +69,11 @@ cp server_api_template.agk my_api_server.agk
 
 # Configure server settings
 # Add your API endpoints
-python agk_compiler.py my_api_server.agk
+# Compile and run (using standalone executable)
+./agk_compiler my_api_server.agk
+
+# On Windows
+agk_compiler.exe my_api_server.agk
 ```
 
 ### 4. Mobile App Template (`mobile_app_template.agk`)
@@ -84,7 +94,11 @@ python agk_compiler.py my_api_server.agk
 cp mobile_app_template.agk my_mobile_app.agk
 
 # Customize screens and interactions
-python agk_compiler.py my_mobile_app.agk
+# Compile and run (using standalone executable)
+./agk_compiler my_mobile_app.agk
+
+# On Windows
+agk_compiler.exe my_mobile_app.agk
 ```
 
 ### 5. Browser App Template (`agk_browser_full.agk`) - ENHANCED!
@@ -111,7 +125,11 @@ python agk_compiler.py my_mobile_app.agk
 cp agk_browser_full.agk my_advanced_browser.agk
 
 # Configure browser settings and themes
-python agk_compiler.py my_advanced_browser.agk
+# Compile and run (using standalone executable)
+./agk_compiler my_advanced_browser.agk
+
+# On Windows
+agk_compiler.exe my_advanced_browser.agk
 ```
 
 **NEW - Advanced Graphics Library Demo:**
@@ -144,7 +162,11 @@ This template now serves as a complete demonstration of the `advanced_graphics` 
 cp llm_template.agk my_ai_assistant.agk
 
 # Configure API settings
-python agk_compiler.py my_ai_assistant.agk
+# Compile and run (using standalone executable)
+./agk_compiler my_ai_assistant.agk
+
+# On Windows
+agk_compiler.exe my_ai_assistant.agk
 ```
 
 ### 7. General Application Template (`general_template.agk`)
@@ -167,7 +189,11 @@ python agk_compiler.py my_ai_assistant.agk
 cp general_template.agk my_business_app.agk
 
 # Configure application settings
-python agk_compiler.py my_business_app.agk
+# Compile and run (using standalone executable)
+./agk_compiler my_business_app.agk
+
+# On Windows
+agk_compiler.exe my_business_app.agk
 ```
 
 ### 8. Bootloader Template (`bootloader_template.agk`) - NEW!
@@ -189,7 +215,11 @@ python agk_compiler.py my_business_app.agk
 cp bootloader_template.agk my_bootloader.agk
 
 # Compile with C backend for system programming
-python agk_compiler.py my_bootloader.agk --backend c
+# Using standalone executable with C backend
+./agk_compiler my_bootloader.agk --backend c
+
+# On Windows
+agk_compiler.exe my_bootloader.agk --backend c
 
 # Build for your target system (BIOS, UEFI, etc.)
 ```
@@ -214,7 +244,11 @@ python agk_compiler.py my_bootloader.agk --backend c
 cp kernel_template.agk my_kernel.agk
 
 # Compile with C backend for system programming
-python agk_compiler.py my_kernel.agk --backend c
+# Using standalone executable with C backend
+./agk_compiler my_kernel.agk --backend c
+
+# On Windows
+agk_compiler.exe my_kernel.agk --backend c
 
 # Build kernel image for your OS
 ```
@@ -238,7 +272,11 @@ python agk_compiler.py my_kernel.agk --backend c
 cp driver_template.agk my_device_driver.agk
 
 # Compile with C backend for hardware access
-python agk_compiler.py my_device_driver.agk --backend c
+# Using standalone executable with C backend
+./agk_compiler my_device_driver.agk --backend c
+
+# On Windows
+agk_compiler.exe my_device_driver.agk --backend c
 
 # Build kernel module or integrated driver
 ```
@@ -262,7 +300,11 @@ cp smart_home_template.agk my_smart_device.agk
 
 # Configure device settings and sensors
 # Compile for your target microcontroller
-python agk_compiler.py my_smart_device.agk --backend microcontroller
+# Using standalone executable with microcontroller backend
+./agk_compiler my_smart_device.agk --backend microcontroller
+
+# On Windows
+agk_compiler.exe my_smart_device.agk --backend microcontroller
 ```
 
 ### 12. Industrial IoT Template (`industrial_iot_template.agk`) - NEW!
@@ -284,7 +326,11 @@ cp industrial_iot_template.agk my_industrial_monitor.agk
 
 # Configure industrial protocols and sensors
 # Compile for industrial hardware platform
-python agk_compiler.py my_industrial_monitor.agk --backend industrial
+# Using standalone executable with industrial backend
+./agk_compiler my_industrial_monitor.agk --backend industrial
+
+# On Windows
+agk_compiler.exe my_industrial_monitor.agk --backend industrial
 ```
 
 ### 13. Microcontroller Template (`microcontroller_template.agk`) - NEW!
@@ -306,7 +352,11 @@ cp microcontroller_template.agk my_embedded_device.agk
 
 # Configure pin mappings and peripherals
 # Compile for your specific microcontroller
-python agk_compiler.py my_embedded_device.agk --backend microcontroller --target esp32
+# Using standalone executable with microcontroller backend
+./agk_compiler my_embedded_device.agk --backend microcontroller --target esp32
+
+# On Windows
+agk_compiler.exe my_embedded_device.agk --backend microcontroller --target esp32
 ```
 
 ### 14. Edge Computing Template (`edge_computing_template.agk`) - NEW!
@@ -328,7 +378,11 @@ cp edge_computing_template.agk my_edge_device.agk
 
 # Configure AI models and processing pipelines
 # Compile for edge computing hardware
-python agk_compiler.py my_edge_device.agk --backend edge
+# Using standalone executable with edge backend
+./agk_compiler my_edge_device.agk --backend edge
+
+# On Windows
+agk_compiler.exe my_edge_device.agk --backend edge
 ```
 
 ## 🎨 Advanced Graphics Library (NEW!)
@@ -416,7 +470,11 @@ In addition to application templates, AGK provides comprehensive templates for l
 **Quick Start:**
 ```bash
 cp database_template.agk database_demo.agk
-python agk_compiler.py database_demo.agk
+# Compile and run (using standalone executable)
+./agk_compiler database_demo.agk
+
+# On Windows
+agk_compiler.exe database_demo.agk
 ```
 
 ### HTTP Client Template (`http_template.agk`)
@@ -433,7 +491,11 @@ python agk_compiler.py database_demo.agk
 **Quick Start:**
 ```bash
 cp http_template.agk http_demo.agk
-python agk_compiler.py http_demo.agk
+# Compile and run (using standalone executable)
+./agk_compiler http_demo.agk
+
+# On Windows
+agk_compiler.exe http_demo.agk
 ```
 
 ### File System Template (`fs_template.agk`)
@@ -450,7 +512,11 @@ python agk_compiler.py http_demo.agk
 **Quick Start:**
 ```bash
 cp fs_template.agk filesystem_demo.agk
-python agk_compiler.py filesystem_demo.agk
+# Compile and run (using standalone executable)
+./agk_compiler filesystem_demo.agk
+
+# On Windows
+agk_compiler.exe filesystem_demo.agk
 ```
 
 ### UI Components Template (`ui_template.agk`)
@@ -468,7 +534,11 @@ python agk_compiler.py filesystem_demo.agk
 **Quick Start:**
 ```bash
 cp ui_template.agk ui_demo.agk
-python agk_compiler.py ui_demo.agk
+# Compile and run (using standalone executable)
+./agk_compiler ui_demo.agk
+
+# On Windows
+agk_compiler.exe ui_demo.agk
 ```
 
 ### Testing Framework Template (`test_template.agk`)
@@ -485,7 +555,11 @@ python agk_compiler.py ui_demo.agk
 **Quick Start:**
 ```bash
 cp test_template.agk testing_demo.agk
-python agk_compiler.py testing_demo.agk
+# Compile and run (using standalone executable)
+./agk_compiler testing_demo.agk
+
+# On Windows
+agk_compiler.exe testing_demo.agk
 ```
 
 ### Logging System Template (`logging_template.agk`)
@@ -502,7 +576,11 @@ python agk_compiler.py testing_demo.agk
 **Quick Start:**
 ```bash
 cp logging_template.agk logging_demo.agk
-python agk_compiler.py logging_demo.agk
+# Compile and run (using standalone executable)
+./agk_compiler logging_demo.agk
+
+# On Windows
+agk_compiler.exe logging_demo.agk
 ```
 
 ### JSON Processing Template (`json_template.agk`)
@@ -519,7 +597,11 @@ python agk_compiler.py logging_demo.agk
 **Quick Start:**
 ```bash
 cp json_template.agk json_demo.agk
-python agk_compiler.py json_demo.agk
+# Compile and run (using standalone executable)
+./agk_compiler json_demo.agk
+
+# On Windows
+agk_compiler.exe json_demo.agk
 ```
 
 ### Network Programming Template (`network_template.agk`)
@@ -536,7 +618,11 @@ python agk_compiler.py json_demo.agk
 **Quick Start:**
 ```bash
 cp network_template.agk network_demo.agk
-python agk_compiler.py network_demo.agk
+# Compile and run (using standalone executable)
+./agk_compiler network_demo.agk
+
+# On Windows
+agk_compiler.exe network_demo.agk
 ```
 
 ### Regular Expressions Template (`regex_template.agk`)
@@ -554,7 +640,11 @@ python agk_compiler.py network_demo.agk
 **Quick Start:**
 ```bash
 cp regex_template.agk regex_demo.agk
-python agk_compiler.py regex_demo.agk
+# Compile and run (using standalone executable)
+./agk_compiler regex_demo.agk
+
+# On Windows
+agk_compiler.exe regex_demo.agk
 ```
 
 ### Statistics Template (`stats_template.agk`)
@@ -572,7 +662,11 @@ python agk_compiler.py regex_demo.agk
 **Quick Start:**
 ```bash
 cp stats_template.agk stats_demo.agk
-python agk_compiler.py stats_demo.agk
+# Compile and run (using standalone executable)
+./agk_compiler stats_demo.agk
+
+# On Windows
+agk_compiler.exe stats_demo.agk
 ```
 
 ### Game Development Template (`game_template.agk`)
@@ -590,7 +684,11 @@ python agk_compiler.py stats_demo.agk
 **Quick Start:**
 ```bash
 cp game_template.agk game_demo.agk
-python agk_compiler.py game_demo.agk
+# Compile and run (using standalone executable)
+./agk_compiler game_demo.agk
+
+# On Windows
+agk_compiler.exe game_demo.agk
 ```
 
 ## 🛠 Template Structure
@@ -751,8 +849,8 @@ The 11 library templates are specifically designed for learning and mastering ea
 For questions about these templates:
 1. Check the AGK Language documentation
 2. Review the standard library documentation
-3. Test with the AGK REPL: `python agk_compiler.py --repl`
-4. Compile with debug output: `python agk_compiler.py your_app.agk`
+3. Test with the AGK REPL: `./agk_compiler --repl` (Linux/macOS) or `agk_compiler.exe --repl` (Windows)
+4. Compile with debug output: `./agk_compiler your_app.agk` (Linux/macOS) or `agk_compiler.exe your_app.agk` (Windows)
 
 ## 🎨 Template Philosophy
 
