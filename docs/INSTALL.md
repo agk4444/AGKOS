@@ -499,44 +499,37 @@ AGK_language/
 ├── make_standalone.bat   # Windows batch build script
 ├── make_standalone.cmd   # Windows CMD build script
 ├── make_standalone.ps1   # Windows PowerShell build script
-├── make_standalone.sh    # Linux/macOS build script
-├── make_standalone.bat   # Windows build script
 ├── simple_test.agk      # Simple example program
 ├── test_program.agk     # More complex example
 ├── debug_lexer.py       # Debugging utilities
-├── stdlib/              # Standard library modules (22 libraries)
-│   ├── database.agk     # SQLite database integration
-│   ├── http.agk         # HTTP client for REST APIs
-│   ├── fs.agk           # Advanced file system operations
-│   ├── json.agk         # Enhanced JSON processing
-│   ├── ui.agk           # User interface components
-│   ├── network.agk      # Socket programming
-│   ├── logging.agk      # Structured logging framework
-│   ├── test.agk         # Unit testing framework
-│   ├── stats.agk        # Statistics and data analysis
-│   ├── regex.agk        # Regular expressions
-│   ├── game.agk         # Game development framework
-│   └── ...              # 11 more libraries
-├── templates/           # Application templates
-│   ├── desktop_app_template.agk      # Desktop applications
-│   ├── web_app_template.agk          # Web applications
-│   ├── server_api_template.agk       # REST API servers
-│   ├── mobile_app_template.agk       # Mobile applications
-│   ├── browser_app_template.agk      # Web browsers
-│   ├── llm_template.agk              # AI applications
-│   ├── general_template.agk          # Business applications
-│   ├── database_template.agk         # Database demos
-│   ├── http_template.agk             # HTTP client demos
-│   ├── fs_template.agk               # File system demos
-│   ├── ui_template.agk               # UI component demos
-│   ├── test_template.agk             # Testing demos
-│   ├── logging_template.agk          # Logging demos
-│   ├── json_template.agk             # JSON processing demos
-│   ├── network_template.agk          # Network demos
-│   ├── regex_template.agk            # Regex demos
-│   ├── stats_template.agk            # Statistics demos
-│   └── game_template.agk             # Game demos
-└── APP_TEMPLATES_README.md           # Templates usage guide
+├── lib/                 # 📚 Centralized Library Hub
+│   ├── stdlib/         # 📚 23 Core Standard Libraries
+│   │   ├── __init__.agk    # Module initialization
+│   │   ├── crypto.agk      # Cryptography & security
+│   │   ├── database.agk    # SQLite database integration
+│   │   ├── graphics.agk    # 2D/3D rendering
+│   │   ├── http.agk        # HTTP client for REST APIs
+│   │   ├── json.agk        # Enhanced JSON processing
+│   │   ├── math.agk        # Mathematical operations
+│   │   ├── network.agk     # Socket programming
+│   │   ├── os.agk          # Operating system interface
+│   │   ├── string.agk      # Text processing
+│   │   ├── ui.agk          # User interface components
+│   │   └── [13 more core libraries]
+│   └── advanced/          # 🚀 20 Advanced Libraries
+│       ├── __init__.agk    # Module initialization
+│       ├── iot/           # 📡 10 IoT Libraries
+│       ├── mobile/        # 📱 4 Mobile Libraries
+│       ├── specialized/   # 🎯 4 Specialized Libraries
+│       └── system/        # ⚙️ 2 System Libraries
+├── templates/           # 📋 39 Professional Templates
+│   ├── [16 application templates]  # Desktop, Web, Mobile, AI, OS, IoT
+│   ├── [23 library templates]      # Complete stdlib coverage
+│   └── index.html        # 📋 Template index with categories
+└── docs/                # 📖 Comprehensive Documentation
+    ├── AGK_TEMPLATES_SUMMARY.md     # Template ecosystem overview
+    ├── APP_TEMPLATES_README.md      # Detailed template usage guide
+    └── [7 other specialized guides]
 ```
 
 ## 🐛 Troubleshooting
@@ -601,48 +594,44 @@ After installation, you can:
 
 1. **Try the examples**: Compile and run the provided example files
 2. **Experiment in REPL**: Use `--repl` mode for quick testing
-3. **Explore templates**: Use 19 professional templates to learn AGK features
-4. **Learn libraries**: Study 11 library templates for each standard library
-5. **Use package management**: Install and publish AGK packages with `agk-pkg`
-5. **Build applications**: Start with application templates for common use cases
-6. **Create standalone**: Build distributable executables with the standalone system
-7. **Write your own programs**: Use the syntax examples above
-8. **Contribute**: Help improve the compiler or add new features
+3. **Explore templates**: Use 39 professional templates in `templates/` directory
+4. **Learn libraries**: Study 23 library templates for complete stdlib coverage
+5. **Use advanced libraries**: Explore 20 specialized libraries in `lib/advanced/`
+6. **Use package management**: Install and publish AGK packages with `agk-pkg`
+7. **Build applications**: Start with 16 application templates for common use cases
+8. **Create standalone**: Build distributable executables with the standalone system
+9. **Write your own programs**: Use the syntax examples above
+10. **Contribute**: Help improve the compiler or add new features
 
 ## 📚 Template Ecosystem
 
-The AGK Language now includes a comprehensive template ecosystem:
+The AGK Language now includes a comprehensive template ecosystem with **39 professional templates**:
 
-### Application Templates (10)
-- **Desktop Apps**: Interactive GUI applications
-- **Web Apps**: Full-stack web applications
-- **API Servers**: REST API backend services
-- **Mobile Apps**: Touch-based mobile applications
-- **Browser Apps**: Custom web browser applications
+### Application Templates (16)
+- **Desktop Apps**: Interactive GUI applications with graphics
+- **Web Apps**: Full-stack web applications with REST APIs
+- **Mobile Apps**: Touch-based mobile applications with navigation
+- **Browser Apps**: Professional web browsers with advanced GUI
 - **AI Apps**: LLM-powered intelligent applications
 - **Business Apps**: General-purpose business applications
-- **OS Bootloader**: Complete x86 bootloader implementation
-- **OS Kernel**: Full kernel framework with memory management
-- **Device Drivers**: Hardware device driver templates
+- **OS Development**: Bootloaders, kernels, device drivers
+- **IoT Apps**: Smart home, industrial IoT, microcontrollers, edge computing
+- **Server Apps**: REST API servers with authentication
 
-### Library Templates (11)
-- **Database**: SQLite integration and CRUD operations
-- **HTTP Client**: REST API operations and JSON handling
-- **File System**: Advanced file operations and path management
-- **UI Components**: Form creation and validation
-- **Testing**: Unit testing and assertion frameworks
-- **Logging**: Structured logging and performance monitoring
-- **JSON**: Parsing, validation, and transformation
-- **Network**: Socket programming and client-server apps
-- **Regex**: Pattern matching and text processing
-- **Statistics**: Data analysis and visualization
-- **Game Development**: Entity-component system and game mechanics
+### Library Templates (23)
+- **Core Libraries (5)**: math, string, io, list, date
+- **System Libraries (5)**: hardware, os, power, security, system_ast
+- **Advanced Libraries (4)**: crypto, graphics, database, network
+- **Utility Libraries (4)**: json, regex, stats, logging
+- **Development Libraries (4)**: test, ui, fs, http
+- **Specialized Libraries (1)**: game development framework
 
 ### Learning Path
 1. **Start with examples**: Use `simple_test.agk` and `test_program.agk`
-2. **Learn libraries**: Study each `*_template.agk` file
-3. **Build applications**: Use application templates for real projects
-4. **Create distributables**: Use standalone build system for deployment
+2. **Learn libraries**: Study 23 library templates in `templates/`
+3. **Build applications**: Use 16 application templates for real projects
+4. **Explore advanced libraries**: Use `lib/advanced/` for specialized functionality
+5. **Create distributables**: Use standalone build system for deployment
 
 ## 📞 Support
 
