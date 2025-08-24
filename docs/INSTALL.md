@@ -145,13 +145,13 @@ pip install -r requirements.txt
 ### Building OS Components
 ```bash
 # Compile bootloader with C backend
-python agk_compiler.py bootloader_template.agk --backend c
+python agk_compiler.py templates/bootloader_template.agk --backend c
 
 # Compile kernel with C backend
-python agk_compiler.py kernel_template.agk --backend c
+python agk_compiler.py templates/kernel_template.agk --backend c
 
 # Compile device driver with C backend
-python agk_compiler.py driver_template.agk --backend c
+python agk_compiler.py templates/driver_template.agk --backend c
 ```
 
 ### OS Development Features
