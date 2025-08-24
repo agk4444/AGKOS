@@ -162,6 +162,74 @@ python agk_compiler.py driver_template.agk --backend c
 - **Device driver framework** (interrupt handling, I/O operations)
 - **Build system integration** (Makefile, CMake, kernel module builds)
 
+## 📦 Package Management System (NEW!)
+
+The AGK compiler includes a comprehensive **package management system** for sharing, distributing, and managing libraries with professional-grade security and distribution features.
+
+### Package Management Installation
+
+The package management system is included in the standard AGK installation:
+
+```bash
+# Install AGK with all components including package management
+pip install -r requirements.txt
+
+# The package management tools are now available
+agk-pkg --help
+```
+
+### Package Management Features
+
+- **🔒 Security First**: RSA-based package signing with integrity verification
+- **📋 Semantic Versioning**: Full support for version ranges (^1.0.0, ~1.2.0, etc.)
+- **🔄 Dependency Resolution**: Automatic resolution of complex dependency trees
+- **🌐 Registry System**: Local and remote package repositories
+- **🛡️ Integrity Checks**: SHA256 verification and manifest validation
+- **📊 Publishing Workflow**: Complete CI/CD-style package publishing
+- **🧪 Validation Tools**: Pre-publish validation and testing
+- **🔍 Discovery**: Package search and information tools
+
+### Quick Package Management Start
+
+```bash
+# Initialize a new package
+agk-pkg init my-awesome-package
+
+# Install packages with dependencies
+agk-pkg install web json@1.5.0 crypto
+
+# Search for packages
+agk-pkg search web-framework
+
+# Build and publish
+agk-pkg build
+agk-pkg publish
+
+# Security features
+agk-pkg security keygen
+agk-pkg security sign my-package-1.0.0.agk-pkg
+```
+
+### Package Management Commands
+
+- **`agk-pkg init <name>`**: Initialize a new package
+- **`agk-pkg install <packages>`**: Install packages with dependencies
+- **`agk-pkg search <query>`**: Search for available packages
+- **`agk-pkg build`**: Build your package for distribution
+- **`agk-pkg publish`**: Publish package to registry
+- **`agk-pkg security keygen`**: Generate RSA keys for signing
+- **`agk-pkg security sign <package>`**: Sign a package with your key
+- **`agk-pkg security verify <package>`**: Verify package signature
+
+### Package Registry
+
+The system supports both local and remote package registries:
+
+- **Local Registry**: SQLite-based registry for development
+- **Remote Registry**: REST API-based registry for distribution
+- **Package Discovery**: Search and browse available packages
+- **Version Management**: Semantic versioning with compatibility checking
+
 ### Standalone Installation Benefits
 
 - ✅ **No Python Required**: Works on any system
@@ -419,6 +487,12 @@ AGK_language/
 ├── agk_ast.py           # Abstract Syntax Tree definitions
 ├── agk_semantic.py      # Semantic analyzer
 ├── agk_codegen.py       # Code generator
+├── agk_package.py       # Package management system (NEW!)
+├── agk_registry.py      # Package registry (NEW!)
+├── agk_pkg.py           # Package management CLI (NEW!)
+├── agk_dependency_resolver.py # Dependency resolution (NEW!)
+├── agk_publisher.py     # Package publishing (NEW!)
+├── agk_security.py      # Package security (NEW!)
 ├── build_standalone.py   # Standalone executable build system
 ├── requirements.txt      # Build dependencies
 ├── make_standalone.sh    # Linux/macOS build script
@@ -497,7 +571,7 @@ AGK_language/
 
 1. **REPL Help**: Type `help` in REPL mode
 2. **Example Files**: Study `simple_test.agk` and `test_program.agk`
-3. **Template Library**: Explore 16 professional templates for learning
+3. **Template Library**: Explore 19 professional templates for learning
 4. **Library Demos**: Use `*_template.agk` files to learn each library
 5. **Error Messages**: Read compiler error messages carefully
 6. **Template Guide**: See `APP_TEMPLATES_README.md` for detailed template usage
@@ -527,8 +601,9 @@ After installation, you can:
 
 1. **Try the examples**: Compile and run the provided example files
 2. **Experiment in REPL**: Use `--repl` mode for quick testing
-3. **Explore templates**: Use 16 professional templates to learn AGK features
+3. **Explore templates**: Use 19 professional templates to learn AGK features
 4. **Learn libraries**: Study 11 library templates for each standard library
+5. **Use package management**: Install and publish AGK packages with `agk-pkg`
 5. **Build applications**: Start with application templates for common use cases
 6. **Create standalone**: Build distributable executables with the standalone system
 7. **Write your own programs**: Use the syntax examples above
@@ -538,7 +613,7 @@ After installation, you can:
 
 The AGK Language now includes a comprehensive template ecosystem:
 
-### Application Templates (7)
+### Application Templates (10)
 - **Desktop Apps**: Interactive GUI applications
 - **Web Apps**: Full-stack web applications
 - **API Servers**: REST API backend services
@@ -546,6 +621,9 @@ The AGK Language now includes a comprehensive template ecosystem:
 - **Browser Apps**: Custom web browser applications
 - **AI Apps**: LLM-powered intelligent applications
 - **Business Apps**: General-purpose business applications
+- **OS Bootloader**: Complete x86 bootloader implementation
+- **OS Kernel**: Full kernel framework with memory management
+- **Device Drivers**: Hardware device driver templates
 
 ### Library Templates (11)
 - **Database**: SQLite integration and CRUD operations
