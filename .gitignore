@@ -11,6 +11,7 @@ __pycache__/
 
 # AGKCompiler files
 agk_*
+!agk_compiler.py
 
 # IDE files
 .vscode/
