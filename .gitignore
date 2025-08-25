@@ -9,6 +9,9 @@ __pycache__/
 .agk_api_keys.salt
 *.agk.salt
 
+# AGKCompiler files
+agk_*
+
 # IDE files
 .vscode/
 .idea/

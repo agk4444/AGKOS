@@ -1,9 +1,0 @@
-import io
-
-external function test_func(x as int) from "testlib.so" as int
-
-define function main:
-    create result as int
-    set result to test_func(42)
-    io.print("Result: " + result)
-    return result
