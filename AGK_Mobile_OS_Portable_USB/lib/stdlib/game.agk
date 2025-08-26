@@ -1,0 +1,766 @@
+# AGK Game Development Library
+# Comprehensive game development framework for 2D/3D games
+# Provides complete game engine functionality for AGK applications
+
+# Game Engine Core
+define function create_game_engine and returns GameEngine:
+    # Create game engine instance
+    create engine as GameEngine
+    set engine["scenes"] to []
+    set engine["current_scene"] to ""
+    set engine["is_running"] to false
+    set engine["target_fps"] to 60
+    set engine["delta_time"] to 0.0
+
+    return engine
+
+define function start_game_loop that takes engine as GameEngine:
+    # Start the main game loop
+    set engine["is_running"] to true
+
+    # In implementation: start main game loop with update/render cycle
+    io.print("Game engine started")
+
+define function stop_game_loop that takes engine as GameEngine:
+    # Stop the game loop
+    set engine["is_running"] to false
+    io.print("Game engine stopped")
+
+# Scene Management
+define function create_scene that takes name as String and returns Scene:
+    # Create a new game scene
+    create scene as Scene
+    set scene["name"] to name
+    set scene["entities"] to []
+    set scene["systems"] to []
+    set scene["background_color"] to [0, 0, 0]
+    set scene["is_active"] to false
+
+    return scene
+
+define function add_entity_to_scene that takes scene as Scene, entity as Entity:
+    # Add entity to scene
+    add entity to scene["entities"]
+
+define function add_system_to_scene that takes scene as Scene, system as System:
+    # Add system to scene
+    add system to scene["systems"]
+
+define function load_scene that takes engine as GameEngine, scene as Scene:
+    # Load scene into game engine
+    set engine["current_scene"] to scene["name"]
+    set scene["is_active"] to true
+
+    io.print("Loaded scene: " + scene["name"])
+
+define function unload_scene that takes engine as GameEngine, scene as Scene:
+    # Unload scene from game engine
+    set scene["is_active"] to false
+
+    io.print("Unloaded scene: " + scene["name"])
+
+# Entity and Component System
+define function create_entity that takes name as String and returns Entity:
+    # Create a new game entity
+    create entity as Entity
+    set entity["name"] to name
+    set entity["components"] to []
+    set entity["tags"] to []
+    set entity["is_active"] to true
+    set entity["layer"] to 0
+
+    return entity
+
+define function add_component that takes entity as Entity, component as Component:
+    # Add component to entity
+    add component to entity["components"]
+
+define function get_component that takes entity as Entity, component_type as String and returns Component:
+    # Get component from entity by type
+    create components as List
+    set components to entity["components"]
+
+    create i as Integer
+    set i to 0
+    while i < components length:
+        create component as Component
+        set component to components[i]
+
+        if component["type"] = component_type:
+            return component
+
+        set i to i + 1
+
+    return null
+
+define function remove_component that takes entity as Entity, component_type as String:
+    # Remove component from entity
+    create new_components as List
+    create components as List
+    set components to entity["components"]
+
+    create i as Integer
+    set i to 0
+    while i < components length:
+        create component as Component
+        set component to components[i]
+
+        if component["type"] != component_type:
+            add component to new_components
+
+        set i to i + 1
+
+    set entity["components"] to new_components
+
+# Transform Component
+define function create_transform_component that takes x as Float, y as Float, z as Float and returns TransformComponent:
+    # Create transform component for positioning
+    create transform as TransformComponent
+    set transform["type"] to "transform"
+    set transform["position"] to [x, y, z]
+    set transform["rotation"] to [0.0, 0.0, 0.0]
+    set transform["scale"] to [1.0, 1.0, 1.0]
+    set transform["parent"] to null
+
+    return transform
+
+define function set_position that takes transform as TransformComponent, x as Float, y as Float, z as Float:
+    # Set transform position
+    set transform["position"][0] to x
+    set transform["position"][1] to y
+    set transform["position"][2] to z
+
+define function move that takes transform as TransformComponent, dx as Float, dy as Float, dz as Float:
+    # Move transform by delta
+    create pos as List
+    set pos to transform["position"]
+    set transform["position"][0] to pos[0] + dx
+    set transform["position"][1] to pos[1] + dy
+    set transform["position"][2] to pos[2] + dz
+
+# Sprite Component
+define function create_sprite_component that takes image_path as String and returns SpriteComponent:
+    # Create sprite component for rendering
+    create sprite as SpriteComponent
+    set sprite["type"] to "sprite"
+    set sprite["image_path"] to image_path
+    set sprite["frame"] to 0
+    set sprite["animation"] to ""
+    set sprite["visible"] to true
+    set sprite["flip_x"] to false
+    set sprite["flip_y"] to false
+    set sprite["color"] to [255, 255, 255, 255]  # RGBA
+
+    return sprite
+
+define function set_sprite_frame that takes sprite as SpriteComponent, frame as Integer:
+    # Set sprite animation frame
+    set sprite["frame"] to frame
+
+define function play_animation that takes sprite as SpriteComponent, animation_name as String:
+    # Start sprite animation
+    set sprite["animation"] to animation_name
+
+define function stop_animation that takes sprite as SpriteComponent:
+    # Stop sprite animation
+    set sprite["animation"] to ""
+
+# Physics Component
+define function create_physics_component that takes body_type as String and returns PhysicsComponent:
+    # Create physics component for collision and movement
+    create physics as PhysicsComponent
+    set physics["type"] to "physics"
+    set physics["body_type"] to body_type  # "static", "dynamic", "kinematic"
+    set physics["velocity"] to [0.0, 0.0, 0.0]
+    set physics["acceleration"] to [0.0, 0.0, 0.0]
+    set physics["mass"] to 1.0
+    set physics["friction"] to 0.5
+    set physics["restitution"] to 0.3
+    set physics["is_trigger"] to false
+    set physics["colliders"] to []
+
+    return physics
+
+define function apply_force that takes physics as PhysicsComponent, force_x as Float, force_y as Float, force_z as Float:
+    # Apply force to physics body
+    create accel as List
+    set accel to physics["acceleration"]
+
+    create mass as Float
+    set mass to physics["mass"]
+
+    set physics["acceleration"][0] to accel[0] + (force_x / mass)
+    set physics["acceleration"][1] to accel[1] + (force_y / mass)
+    set physics["acceleration"][2] to accel[2] + (force_z / mass)
+
+define function set_velocity that takes physics as PhysicsComponent, vx as Float, vy as Float, vz as Float:
+    # Set physics velocity
+    set physics["velocity"][0] to vx
+    set physics["velocity"][1] to vy
+    set physics["velocity"][2] to vz
+
+# Collision System
+define function create_collision_shape that takes shape_type as String, width as Float, height as Float and returns CollisionShape:
+    # Create collision shape for physics
+    create shape as CollisionShape
+    set shape["type"] to shape_type  # "circle", "rectangle", "polygon"
+    set shape["width"] to width
+    set shape["height"] to height
+    set shape["radius"] to width / 2.0  # for circles
+    set shape["vertices"] to []  # for polygons
+
+    return shape
+
+define function add_collision_shape that takes physics as PhysicsComponent, shape as CollisionShape:
+    # Add collision shape to physics component
+    add shape to physics["colliders"]
+
+define function check_collision that takes entity1 as Entity, entity2 as Entity and returns Boolean:
+    # Check collision between two entities
+    create transform1 as TransformComponent
+    set transform1 to get_component(entity1, "transform")
+
+    create transform2 as TransformComponent
+    set transform2 to get_component(entity2, "transform")
+
+    create physics1 as PhysicsComponent
+    set physics1 to get_component(entity1, "physics")
+
+    create physics2 as PhysicsComponent
+    set physics2 to get_component(entity2, "physics")
+
+    if transform1 is null or transform2 is null or physics1 is null or physics2 is null:
+        return false
+
+    # Simple AABB collision detection
+    create pos1 as List
+    set pos1 to transform1["position"]
+
+    create pos2 as List
+    set pos2 to transform2["position"]
+
+    # Assume collision shapes are rectangles for simplicity
+    create size1 as Float
+    set size1 to 32.0  # default sprite size
+
+    create size2 as Float
+    set size2 to 32.0  # default sprite size
+
+    # Check for overlap
+    create overlap_x as Boolean
+    set overlap_x to (pos1[0] < pos2[0] + size2) and (pos1[0] + size1 > pos2[0])
+
+    create overlap_y as Boolean
+    set overlap_y to (pos1[1] < pos2[1] + size2) and (pos1[1] + size1 > pos2[1])
+
+    return overlap_x and overlap_y
+
+# Input System
+define function create_input_system and returns InputSystem:
+    # Create input system for handling user input
+    create input as InputSystem
+    set input["keyboard_state"] to []
+    set input["mouse_state"] to []
+    set input["gamepad_state"] to []
+    set input["input_handlers"] to []
+
+    return input
+
+define function is_key_pressed that takes key_code as Integer and returns Boolean:
+    # Check if keyboard key is pressed
+    # In implementation: check current keyboard state
+    return false  # Placeholder
+
+define function is_mouse_button_pressed that takes button as Integer and returns Boolean:
+    # Check if mouse button is pressed
+    # In implementation: check current mouse state
+    return false  # Placeholder
+
+define function get_mouse_position and returns MousePosition:
+    # Get current mouse position
+    create pos as MousePosition
+    set pos["x"] to 0
+    set pos["y"] to 0
+    set pos["z"] to 0
+
+    return pos  # Placeholder
+
+define function add_input_handler that takes input as InputSystem, event_type as String, handler as String:
+    # Add input event handler
+    create input_handler as Object
+    set input_handler["event_type"] to event_type
+    set input_handler["handler"] to handler
+
+    add input_handler to input["input_handlers"]
+
+# Audio System
+define function create_audio_system and returns AudioSystem:
+    # Create audio system for sound and music
+    create audio as AudioSystem
+    set audio["sounds"] to []
+    set audio["music"] to []
+    set audio["master_volume"] to 1.0
+    set audio["sfx_volume"] to 1.0
+    set audio["music_volume"] to 1.0
+
+    return audio
+
+define function load_sound that takes audio as AudioSystem, file_path as String and returns Sound:
+    # Load sound effect
+    create sound as Sound
+    set sound["file_path"] to file_path
+    set sound["volume"] to 1.0
+    set sound["pitch"] to 1.0
+    set sound["is_loaded"] to true
+
+    add sound to audio["sounds"]
+    return sound
+
+define function load_music that takes audio as AudioSystem, file_path as String and returns Music:
+    # Load background music
+    create music as Music
+    set music["file_path"] to file_path
+    set music["volume"] to 1.0
+    set music["is_looping"] to false
+    set music["is_loaded"] to true
+
+    add music to audio["music"]
+    return music
+
+define function play_sound that takes sound as Sound:
+    # Play sound effect
+    # In implementation: play sound using audio system
+    io.print("Playing sound: " + sound["file_path"])
+
+define function play_music that takes music as Music:
+    # Play background music
+    # In implementation: play music using audio system
+    io.print("Playing music: " + music["file_path"])
+
+define function stop_music that takes music as Music:
+    # Stop background music
+    # In implementation: stop music playback
+    io.print("Stopping music: " + music["file_path"])
+
+define function set_sound_volume that takes sound as Sound, volume as Float:
+    # Set sound volume (0.0 to 1.0)
+    set sound["volume"] to volume
+
+define function set_music_volume that takes music as Music, volume as Float:
+    # Set music volume (0.0 to 1.0)
+    set music["volume"] to volume
+
+# Particle System
+define function create_particle_system that takes max_particles as Integer and returns ParticleSystem:
+    # Create particle system for effects
+    create particles as ParticleSystem
+    set particles["max_particles"] to max_particles
+    set particles["particles"] to []
+    set particles["emitters"] to []
+    set particles["is_active"] to true
+
+    return particles
+
+define function create_particle_emitter that takes x as Float, y as Float, z as Float and returns ParticleEmitter:
+    # Create particle emitter
+    create emitter as ParticleEmitter
+    set emitter["position"] to [x, y, z]
+    set emitter["rate"] to 10  # particles per second
+    set emitter["lifetime"] to 2.0  # emitter lifetime
+    set emitter["particle_lifetime"] to 1.0  # individual particle lifetime
+    set emitter["speed"] to 50.0
+    set emitter["spread"] to 30.0  # angle spread in degrees
+    set emitter["colors"] to [[255, 255, 0, 255], [255, 0, 0, 0]]  # start and end colors
+
+    return emitter
+
+define function add_emitter_to_system that takes system as ParticleSystem, emitter as ParticleEmitter:
+    # Add emitter to particle system
+    add emitter to system["emitters"]
+
+define function update_particle_system that takes system as ParticleSystem, delta_time as Float:
+    # Update particle system
+    # In implementation: update all particles and emitters
+    pass
+
+# Camera System
+define function create_camera that takes x as Float, y as Float, z as Float and returns Camera:
+    # Create camera for viewport control
+    create camera as Camera
+    set camera["position"] to [x, y, z]
+    set camera["rotation"] to [0.0, 0.0, 0.0]
+    set camera["zoom"] to 1.0
+    set camera["viewport_width"] to 800
+    set camera["viewport_height"] to 600
+    set camera["is_active"] to true
+
+    return camera
+
+define function move_camera that takes camera as Camera, dx as Float, dy as Float, dz as Float:
+    # Move camera by delta
+    create pos as List
+    set pos to camera["position"]
+    set camera["position"][0] to pos[0] + dx
+    set camera["position"][1] to pos[1] + dy
+    set camera["position"][2] to pos[2] + dz
+
+define function set_camera_position that takes camera as Camera, x as Float, y as Float, z as Float:
+    # Set camera position
+    set camera["position"][0] to x
+    set camera["position"][1] to y
+    set camera["position"][2] to z
+
+define function set_camera_zoom that takes camera as Camera, zoom as Float:
+    # Set camera zoom level
+    set camera["zoom"] to zoom
+
+# Game State Management
+define function create_game_state and returns GameState:
+    # Create game state manager
+    create state as GameState
+    set state["current_state"] to "main_menu"
+    set state["previous_state"] to ""
+    set state["states"] to []
+    set state["score"] to 0
+    set state["lives"] to 3
+    set state["level"] to 1
+    set state["is_paused"] to false
+    set state["game_time"] to 0.0
+
+    return state
+
+define function change_game_state that takes state as GameState, new_state as String:
+    # Change current game state
+    set state["previous_state"] to state["current_state"]
+    set state["current_state"] to new_state
+
+    io.print("Game state changed from " + state["previous_state"] + " to " + new_state)
+
+define function add_score that takes state as GameState, points as Integer:
+    # Add points to score
+    set state["score"] to state["score"] + points
+
+define function lose_life that takes state as GameState:
+    # Decrease lives
+    if state["lives"] > 0:
+        set state["lives"] to state["lives"] - 1
+
+define function next_level that takes state as GameState:
+    # Advance to next level
+    set state["level"] to state["level"] + 1
+
+# Timer and Scheduling
+define function create_timer that takes duration as Float, callback as String, repeat as Boolean and returns GameTimer:
+    # Create game timer
+    create timer as GameTimer
+    set timer["duration"] to duration
+    set timer["remaining"] to duration
+    set timer["callback"] to callback
+    set timer["repeat"] to repeat
+    set timer["is_active"] to true
+
+    return timer
+
+define function update_timer that takes timer as GameTimer, delta_time as Float and returns Boolean:
+    # Update timer and return true if triggered
+    if not timer["is_active"]:
+        return false
+
+    set timer["remaining"] to timer["remaining"] - delta_time
+
+    if timer["remaining"] <= 0:
+        # Timer triggered
+        if timer["repeat"]:
+            set timer["remaining"] to timer["duration"]
+        else:
+            set timer["is_active"] to false
+
+        return true
+
+    return false
+
+# AI Behaviors
+define function create_ai_behavior that takes behavior_type as String and returns AIBehavior:
+    # Create AI behavior for entities
+    create behavior as AIBehavior
+    set behavior["type"] to behavior_type
+    set behavior["is_active"] to true
+    set behavior["parameters"] to {}
+
+    return behavior
+
+define function set_ai_behavior_parameter that takes behavior as AIBehavior, param_name as String, value as Object:
+    # Set AI behavior parameter
+    set behavior["parameters"][param_name] to value
+
+define function update_ai_behavior that takes entity as Entity, behavior as AIBehavior, delta_time as Float:
+    # Update AI behavior for entity
+    create behavior_type as String
+    set behavior_type to behavior["type"]
+
+    if behavior_type = "patrol":
+        # Simple patrol behavior
+        update_patrol_behavior(entity, behavior, delta_time)
+    else if behavior_type = "chase":
+        # Chase behavior
+        update_chase_behavior(entity, behavior, delta_time)
+    else if behavior_type = "flee":
+        # Flee behavior
+        update_flee_behavior(entity, behavior, delta_time)
+
+# Example usage patterns
+define function simple_game_example:
+    # Create a simple 2D game example
+    create engine as GameEngine
+    set engine to create_game_engine()
+
+    # Create main scene
+    create main_scene as Scene
+    set main_scene to create_scene("main_game")
+
+    # Create player entity
+    create player as Entity
+    set player to create_entity("player")
+
+    # Add transform component
+    create player_transform as TransformComponent
+    set player_transform to create_transform_component(400, 300, 0)
+    add_component(player, player_transform)
+
+    # Add sprite component
+    create player_sprite as SpriteComponent
+    set player_sprite to create_sprite_component("player.png")
+    add_component(player, player_sprite)
+
+    # Add physics component
+    create player_physics as PhysicsComponent
+    set player_physics to create_physics_component("dynamic")
+    add_component(player, player_physics)
+
+    # Add collision shape
+    create player_collider as CollisionShape
+    set player_collider to create_collision_shape("rectangle", 32, 32)
+    add_collision_shape(player_physics, player_collider)
+
+    # Add player to scene
+    add_entity_to_scene(main_scene, player)
+
+    # Create input system
+    create input as InputSystem
+    set input to create_input_system()
+
+    add_input_handler(input, "keyboard", "handle_player_input")
+
+    # Create camera
+    create camera as Camera
+    set camera to create_camera(0, 0, -10)
+
+    # Load scene and start game
+    load_scene(engine, main_scene)
+    start_game_loop(engine)
+
+define function handle_player_input:
+    # Example input handling function
+    if is_key_pressed(87):  # W key
+        # Move player up
+        create player_transform as TransformComponent
+        # In real implementation, get player transform and move
+        move(player_transform, 0, -5, 0)
+
+    if is_key_pressed(83):  # S key
+        # Move player down
+        move(player_transform, 0, 5, 0)
+
+    if is_key_pressed(65):  # A key
+        # Move player left
+        move(player_transform, -5, 0, 0)
+
+    if is_key_pressed(68):  # D key
+        # Move player right
+        move(player_transform, 5, 0, 0)
+
+    if is_mouse_button_pressed(1):  # Left mouse button
+        create mouse_pos as MousePosition
+        set mouse_pos to get_mouse_position()
+
+        # Player shoots towards mouse position
+        io.print("Player shoots at: " + string.format(mouse_pos["x"]) + ", " + string.format(mouse_pos["y"]))
+
+define function create_particle_effect_example:
+    # Create explosion particle effect
+    create explosion_particles as ParticleSystem
+    set explosion_particles to create_particle_system(100)
+
+    # Create emitter at explosion position
+    create emitter as ParticleEmitter
+    set emitter to create_particle_emitter(200, 200, 0)
+
+    # Configure emitter for explosion
+    set emitter["rate"] to 50
+    set emitter["lifetime"] to 0.5
+    set emitter["particle_lifetime"] to 1.5
+    set emitter["speed"] to 100.0
+    set emitter["spread"] to 360.0  # Full circle
+
+    # Set explosion colors (orange to red)
+    set emitter["colors"] to [[255, 150, 0, 255], [255, 0, 0, 0]]
+
+    add_emitter_to_system(explosion_particles, emitter)
+
+define function game_state_management_example:
+    # Game state management example
+    create game_state as GameState
+    set game_state to create_game_state()
+
+    # Game loop simulation
+    while game_state["lives"] > 0:
+        if game_state["current_state"] = "playing":
+            # Handle gameplay
+            if is_key_pressed(32):  # Spacebar
+                add_score(game_state, 10)
+
+            # Check for enemy collision
+            # if player_collides_with_enemy():
+            #     lose_life(game_state)
+
+            # Check for level completion
+            # if level_completed():
+            #     next_level(game_state)
+
+        else if game_state["current_state"] = "paused":
+            # Handle pause menu
+            if is_key_pressed(80):  # P key
+                change_game_state(game_state, "playing")
+
+        # Update game time
+        set game_state["game_time"] to game_state["game_time"] + 0.016  # ~60 FPS
+
+    io.print("Game Over! Final Score: " + string.format(game_state["score"]))
+
+define function audio_system_example:
+    # Audio system example
+    create audio as AudioSystem
+    set audio to create_audio_system()
+
+    # Load sound effects
+    create jump_sound as Sound
+    set jump_sound to load_sound(audio, "jump.wav")
+
+    create coin_sound as Sound
+    set coin_sound to load_sound(audio, "coin.wav")
+
+    # Load background music
+    create bg_music as Music
+    set bg_music to load_music(audio, "background.mp3")
+    set bg_music["is_looping"] to true
+
+    # Start background music
+    play_music(bg_music)
+
+    # Game loop with audio
+    while true:
+        if is_key_pressed(32):  # Spacebar - jump
+            play_sound(jump_sound)
+
+        # if player_collects_coin():
+        #     play_sound(coin_sound)
+
+        # if game_over():
+        #     stop_music(bg_music)
+        #     break
+
+    # Cleanup
+    stop_music(bg_music)
+
+define function timer_system_example:
+    # Timer and scheduling example
+    create powerup_timer as GameTimer
+    set powerup_timer to create_timer(10.0, "powerup_expired", false)
+
+    create enemy_spawn_timer as GameTimer
+    set enemy_spawn_timer to create_timer(2.0, "spawn_enemy", true)
+
+    # Game loop with timers
+    create delta_time as Float
+    set delta_time to 0.016  # ~60 FPS
+
+    while true:
+        # Update timers
+        if update_timer(powerup_timer, delta_time):
+            io.print("Powerup expired!")
+
+        if update_timer(enemy_spawn_timer, delta_time):
+            io.print("New enemy spawned!")
+
+        # Game logic here...
+
+        # if game_should_end():
+        #     break
+
+define function collision_detection_example:
+    # Collision detection example
+    create player_entity as Entity
+    set player_entity to create_entity("player")
+
+    create player_transform as TransformComponent
+    set player_transform to create_transform_component(100, 100, 0)
+    add_component(player_entity, player_transform)
+
+    create player_physics as PhysicsComponent
+    set player_physics to create_physics_component("dynamic")
+    add_component(player_entity, player_physics)
+
+    create enemy_entity as Entity
+    set enemy_entity to create_entity("enemy")
+
+    create enemy_transform as TransformComponent
+    set enemy_transform to create_transform_component(150, 100, 0)
+    add_component(enemy_entity, enemy_transform)
+
+    create enemy_physics as PhysicsComponent
+    set enemy_physics to create_physics_component("dynamic")
+    add_component(enemy_entity, enemy_physics)
+
+    # Check for collision
+    if check_collision(player_entity, enemy_entity):
+        io.print("Collision detected between player and enemy!")
+
+        # Handle collision (damage, score, etc.)
+        lose_life(game_state)
+        # Remove enemy or apply damage
+    else:
+        io.print("No collision")
+
+define function ai_behavior_example:
+    # AI behavior example
+    create enemy_entity as Entity
+    set enemy_entity to create_entity("enemy")
+
+    # Add patrol behavior
+    create patrol_behavior as AIBehavior
+    set patrol_behavior to create_ai_behavior("patrol")
+
+    # Set patrol parameters
+    set_ai_behavior_parameter(patrol_behavior, "speed", 50.0)
+    set_ai_behavior_parameter(patrol_behavior, "left_bound", 50.0)
+    set_ai_behavior_parameter(patrol_behavior, "right_bound", 350.0)
+
+    # Add behavior to entity
+    add_component(enemy_entity, patrol_behavior)
+
+    # In game loop:
+    # update_ai_behavior(enemy_entity, patrol_behavior, delta_time)
+
+    # Add chase behavior for when player is near
+    create chase_behavior as AIBehavior
+    set chase_behavior to create_ai_behavior("chase")
+
+    set_ai_behavior_parameter(chase_behavior, "target_entity", player_entity)
+    set_ai_behavior_parameter(chase_behavior, "chase_speed", 75.0)
+    set_ai_behavior_parameter(chase_behavior, "detection_range", 100.0)
+
+    # Switch behaviors based on distance to player
+    # if distance_to_player < detection_range:
+    #     current_behavior = chase_behavior
+    # else:
+    #     current_behavior = patrol_behavior

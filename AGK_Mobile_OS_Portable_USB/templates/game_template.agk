@@ -1,0 +1,499 @@
+# AGK Game Template - Game Development Framework
+# This template demonstrates comprehensive game development capabilities
+# Perfect for: 2D games, arcade games, puzzle games, platformers, educational games
+
+import game
+import io
+import logging
+import json
+
+# Global configuration
+define constant SCREEN_WIDTH as Integer = 800
+define constant SCREEN_HEIGHT as Integer = 600
+define constant GAME_TITLE as String = "AGK Game Template"
+define constant TARGET_FPS as Integer = 60
+
+# Game state management
+define constant STATE_MENU as Integer = 0
+define constant STATE_PLAYING as Integer = 1
+define constant STATE_PAUSED as Integer = 2
+define constant STATE_GAME_OVER as Integer = 3
+
+# Main application entry point
+define function main:
+    # Initialize logging for the game application
+    create logger as Logger
+    set logger to logging.get_logger("Game_Engine")
+    logging.set_level(logger, logging.INFO)
+    logging.add_console_handler(logger)
+
+    logging.info(logger, "Starting Game Development Template")
+
+    # Initialize the game
+    initialize_game(logger)
+
+# Initialize game engine and systems
+define function initialize_game that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "game_initialization")
+
+    # Create game engine
+    create game_engine as GameEngine
+    set game_engine to game.create_game_engine()
+
+    # Configure engine settings
+    game.set_target_fps(game_engine, TARGET_FPS)
+    game.set_window_title(game_engine, GAME_TITLE)
+    game.set_window_size(game_engine, SCREEN_WIDTH, SCREEN_HEIGHT)
+
+    # Create main scene
+    create main_scene as Scene
+    set main_scene to game.create_scene(game_engine, "main_scene")
+
+    # Initialize game systems
+    initialize_game_systems(game_engine, main_scene, logger)
+
+    logging.end_timer(timer)
+    logging.info(logger, "Game initialization completed")
+
+    # Start game loop
+    run_game_loop(game_engine, main_scene, logger)
+
+# Initialize game systems
+define function initialize_game_systems that takes game_engine as GameEngine, main_scene as Scene, logger as Logger:
+    io.println("\n🎮 Initializing Game Systems:")
+    io.println("─" * 40)
+
+    # Create player entity
+    create player as Entity
+    set player to game.create_entity(main_scene, "player")
+
+    # Add components to player
+    game.add_component(player, game.create_sprite_component("player.png"))
+    game.add_component(player, game.create_physics_component())
+    game.add_component(player, game.create_input_component())
+    game.add_component(player, game.create_animation_component())
+
+    # Set player properties
+    game.set_position(player, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+    game.set_velocity(player, 0, 0)
+    game.set_sprite_scale(player, 2.0, 2.0)
+
+    io.println("✅ Player entity created")
+    io.println("  Components: Sprite, Physics, Input, Animation")
+    io.println("  Position: Center of screen")
+    io.println("  Scale: 2x")
+
+    # Create enemy entities
+    create enemy1 as Entity
+    set enemy1 to game.create_entity(main_scene, "enemy1")
+    game.add_component(enemy1, game.create_sprite_component("enemy.png"))
+    game.add_component(enemy1, game.create_physics_component())
+    game.add_component(enemy1, game.create_ai_component())
+    game.set_position(enemy1, 100, 100)
+    game.set_ai_behavior(enemy1, "patrol", 3.0)
+
+    create enemy2 as Entity
+    set enemy2 to game.create_entity(main_scene, "enemy2")
+    game.add_component(enemy2, game.create_sprite_component("enemy.png"))
+    game.add_component(enemy2, game.create_physics_component())
+    game.add_component(enemy2, game.create_ai_component())
+    game.set_position(enemy2, SCREEN_WIDTH - 100, 100)
+    game.set_ai_behavior(enemy2, "chase_player", 5.0)
+
+    io.println("✅ Enemy entities created")
+    io.println("  Enemy 1: Patrol behavior")
+    io.println("  Enemy 2: Chase player behavior")
+
+    # Create UI elements
+    create score_display as Entity
+    set score_display to game.create_entity(main_scene, "score_display")
+    game.add_component(score_display, game.create_text_component("Score: 0"))
+    game.set_position(score_display, 10, 10)
+
+    create lives_display as Entity
+    set lives_display to game.create_entity(main_scene, "lives_display")
+    game.add_component(lives_display, game.create_text_component("Lives: 3"))
+    game.set_position(lives_display, SCREEN_WIDTH - 100, 10)
+
+    create health_bar as Entity
+    set health_bar to game.create_entity(main_scene, "health_bar")
+    game.add_component(health_bar, game.create_progress_bar_component(100))
+    game.set_position(health_bar, 10, SCREEN_HEIGHT - 30)
+    game.set_progress_bar_value(health_bar, 85)
+
+    io.println("✅ UI elements created")
+    io.println("  Score display")
+    io.println("  Lives display")
+    io.println("  Health bar")
+
+    # Create game world
+    create background as Entity
+    set background to game.create_entity(main_scene, "background")
+    game.add_component(background, game.create_sprite_component("background.png"))
+    game.set_position(background, 0, 0)
+
+    create platform1 as Entity
+    set platform1 to game.create_entity(main_scene, "platform1")
+    game.add_component(platform1, game.create_sprite_component("platform.png"))
+    game.add_component(platform1, game.create_physics_component())
+    game.set_position(platform1, 200, 400)
+    game.set_static_body(platform1, true)
+
+    create platform2 as Entity
+    set platform2 to game.create_entity(main_scene, "platform2")
+    game.add_component(platform2, game.create_sprite_component("platform.png"))
+    game.add_component(platform2, game.create_physics_component())
+    game.set_position(platform2, 500, 300)
+    game.set_static_body(platform2, true)
+
+    io.println("✅ Game world created")
+    io.println("  Background layer")
+    io.println("  Platform collision objects")
+
+    # Initialize game state
+    create game_state as Object
+    set game_state["score"] to 0
+    set game_state["lives"] to 3
+    set game_state["level"] to 1
+    set game_state["game_state"] to STATE_MENU
+
+    # Set up camera
+    create camera as Entity
+    set camera to game.create_entity(main_scene, "camera")
+    game.add_component(camera, game.create_camera_component())
+    game.set_camera_target(camera, player)
+
+    io.println("✅ Camera system initialized")
+    io.println("  Follows player movement")
+
+    logging.info(logger, "Game systems initialization completed")
+
+# Main game loop
+define function run_game_loop that takes game_engine as GameEngine, main_scene as Scene, logger as Logger:
+    create running as Boolean
+    set running to true
+
+    create frame_count as Integer
+    set frame_count to 0
+
+    create last_time as Float
+    # set last_time to get_current_time()
+
+    while running:
+        # Update game systems
+        game.update_physics(game_engine)
+        game.update_animations(game_engine)
+        game.update_ai(game_engine)
+        game.update_particles(game_engine)
+        game.update_camera(game_engine)
+
+        # Handle input
+        handle_input(game_engine, main_scene, logger)
+
+        # Update game logic
+        update_game_logic(game_engine, main_scene, logger)
+
+        # Render frame
+        game.render_frame(game_engine)
+
+        # Performance monitoring
+        set frame_count to frame_count + 1
+        if frame_count % 300 == 0:  # Every 5 seconds at 60 FPS
+            create fps as Float
+            # set fps to game.get_current_fps(game_engine)
+            io.println("🎮 Game running - Frame: " + frame_count + " FPS: " + fps)
+
+        # Check for quit condition
+        if frame_count > 1800:  # Demo: quit after 30 seconds
+            set running to false
+
+    logging.info(logger, "Game loop ended after " + frame_count + " frames")
+
+# Handle player input
+define function handle_input that takes game_engine as GameEngine, main_scene as Scene, logger as Logger:
+    # Get player entity
+    create player as Entity
+    set player to game.get_entity_by_name(main_scene, "player")
+
+    # Movement controls
+    if game.is_key_pressed("W") or game.is_key_pressed("UP"):
+        game.apply_force(player, 0, -10)
+    if game.is_key_pressed("S") or game.is_key_pressed("DOWN"):
+        game.apply_force(player, 0, 10)
+    if game.is_key_pressed("A") or game.is_key_pressed("LEFT"):
+        game.apply_force(player, -10, 0)
+    if game.is_key_pressed("D") or game.is_key_pressed("RIGHT"):
+        game.apply_force(player, 10, 0)
+
+    # Jump
+    if game.is_key_pressed("SPACE") and game.is_on_ground(player):
+        game.apply_impulse(player, 0, -15)
+
+    # Attack/Shoot
+    if game.is_key_pressed("MOUSE_LEFT"):
+        create attack_position as Object
+        # set attack_position to game.get_mouse_position()
+        create attack_x as Float
+        set attack_x to attack_position["x"]
+        create attack_y as Float
+        set attack_y to attack_position["y"]
+
+        create projectile as Entity
+        set projectile to game.create_entity(main_scene, "projectile")
+        game.add_component(projectile, game.create_sprite_component("bullet.png"))
+        game.add_component(projectile, game.create_physics_component())
+        game.set_position(projectile, attack_x, attack_y)
+        game.set_velocity(projectile, 20, 0)  # Move right
+
+        # Auto-destroy after 2 seconds
+        game.set_lifetime(projectile, 2.0)
+
+    # Pause game
+    if game.is_key_pressed("ESCAPE"):
+        game.pause_game(game_engine)
+        io.println("⏸️ Game paused")
+
+# Update game logic
+define function update_game_logic that takes game_engine as GameEngine, main_scene as Scene, logger as Logger:
+    # Collision detection
+    handle_collisions(main_scene, logger)
+
+    # Update score and UI
+    update_ui_elements(main_scene)
+
+    # Spawn enemies periodically
+    # In real implementation: if random() < 0.01: spawn_enemy(main_scene)
+
+    # Check win/lose conditions
+    check_game_conditions(main_scene, logger)
+
+# Handle collision detection
+define function handle_collisions that takes main_scene as Scene, logger as Logger:
+    # Player vs collectibles
+    create player as Entity
+    set player to game.get_entity_by_name(main_scene, "player")
+
+    # Enemy vs projectile collisions
+    create projectiles as List
+    # set projectiles to game.get_entities_by_tag(main_scene, "projectile")
+
+    create enemies as List
+    # set enemies to game.get_entities_by_tag(main_scene, "enemy")
+
+    # Check for collisions and handle them
+    # In real implementation: complex collision detection logic
+
+# Update UI elements
+define function update_ui_elements that takes main_scene as Scene:
+    # Update score display
+    create score_display as Entity
+    set score_display to game.get_entity_by_name(main_scene, "score_display")
+    # In real implementation: update score based on game events
+
+    # Update health bar
+    create health_bar as Entity
+    set health_bar to game.get_entity_by_name(main_scene, "health_bar")
+    # In real implementation: update based on damage taken
+
+    # Update lives display
+    create lives_display as Entity
+    set lives_display to game.get_entity_by_name(main_scene, "lives_display")
+
+# Check win/lose conditions
+define function check_game_conditions that takes main_scene as Scene, logger as Logger:
+    # Check if player is out of bounds
+    create player as Entity
+    set player to game.get_entity_by_name(main_scene, "player")
+
+    create player_pos as Object
+    # set player_pos to game.get_position(player)
+
+    # In real implementation: check boundaries and health
+    # if player_pos["y"] > SCREEN_HEIGHT: game_over()
+
+# Spawn enemy function
+define function spawn_enemy that takes main_scene as Scene:
+    create enemy as Entity
+    set enemy to game.create_entity(main_scene, "enemy")
+    game.add_component(enemy, game.create_sprite_component("enemy.png"))
+    game.add_component(enemy, game.create_physics_component())
+    game.add_component(enemy, game.create_ai_component())
+
+    # Random position
+    create spawn_x as Float
+    # set spawn_x to random() * SCREEN_WIDTH
+    create spawn_y as Float
+    set spawn_y to -50  # Above screen
+
+    game.set_position(enemy, spawn_x, spawn_y)
+    game.set_ai_behavior(enemy, "move_down", 2.0)
+
+# Game mechanics demonstration
+define function demonstrate_game_mechanics that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "game_mechanics_demo")
+
+    io.println("\n🎯 Game Mechanics Demonstration:")
+    io.println("─" * 40)
+
+    io.println("Core Game Systems:")
+    io.println("─" * 20)
+    io.println("  ✓ Entity Component System")
+    io.println("  ✓ Physics Engine")
+    io.println("  ✓ Collision Detection")
+    io.println("  ✓ Animation System")
+    io.println("  ✓ Particle Effects")
+    io.println("  ✓ AI Behaviors")
+    io.println("  ✓ Input Handling")
+    io.println("  ✓ Camera System")
+    io.println("  ✓ Audio System")
+    io.println("  ✓ Save/Load System")
+
+    io.println("\nGame Genres Supported:")
+    io.println("─" * 25)
+    io.println("  🏃 Platformers")
+    io.println("  👾 Shooters")
+    io.println("  🧩 Puzzle Games")
+    io.println("  🏎️ Racing Games")
+    io.println("  ⚔️ RPG Elements")
+    io.println("  🎯 Arcade Games")
+    io.println("  🏗️ Strategy Games")
+    io.println("  🎲 Simulation Games")
+
+    io.println("\nGame Development Workflow:")
+    io.println("─" * 30)
+    io.println("  1. Design game concept")
+    io.println("  2. Create game assets")
+    io.println("  3. Set up game scenes")
+    io.println("  4. Implement game mechanics")
+    io.println("  5. Add UI elements")
+    io.println("  6. Test and balance")
+    io.println("  7. Optimize performance")
+    io.println("  8. Deploy and distribute")
+
+    logging.end_timer(timer)
+    logging.info(logger, "Game mechanics demonstration completed")
+
+# Physics system demonstration
+define function demonstrate_physics_system that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "physics_demo")
+
+    io.println("\n⚗️ Physics System Demonstration:")
+    io.println("─" * 40)
+
+    io.println("Physics Components:")
+    io.println("─" * 20)
+    io.println("  ✓ Rigid Body Physics")
+    io.println("  ✓ Collision Detection")
+    io.println("  ✓ Gravity Simulation")
+    io.println("  ✓ Friction and Damping")
+    io.println("  ✓ Joint Constraints")
+    io.println("  ✓ Force and Impulse")
+    io.println("  ✓ Ray Casting")
+    io.println("  ✓ Physics Materials")
+    io.println("  ✓ Multi-body Simulation")
+
+    io.println("\nPhysics Properties:")
+    io.println("─" * 20)
+    io.println("  Mass: 1.0 kg")
+    io.println("  Friction: 0.5")
+    io.println("  Restitution: 0.8")
+    io.println("  Linear Damping: 0.1")
+    io.println("  Angular Damping: 0.05")
+    io.println("  Gravity: -9.81 m/s²")
+
+    io.println("\nCollision Shapes:")
+    io.println("─" * 20)
+    io.println("  □ Box Colliders")
+    io.println("  ○ Circle Colliders")
+    io.println("  ◇ Polygon Colliders")
+    io.println("  ▲ Triangle Colliders")
+    io.println("  ◯ Capsule Colliders")
+
+    logging.end_timer(timer)
+    logging.info(logger, "Physics system demonstration completed")
+
+# AI system demonstration
+define function demonstrate_ai_system that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "ai_demo")
+
+    io.println("\n🤖 AI System Demonstration:")
+    io.println("─" * 40)
+
+    io.println("AI Behavior Types:")
+    io.println("─" * 20)
+    io.println("  🏃 Patrol Behavior")
+    io.println("  🏹 Chase Behavior")
+    io.println("  🛡️ Flee Behavior")
+    io.println("  🎯 Attack Behavior")
+    io.println("  🔍 Search Behavior")
+    io.println("  🏠 Return Home Behavior")
+    io.println("  👥 Formation Behavior")
+    io.println("  🎲 Random Movement")
+
+    io.println("\nAI Decision Making:")
+    io.println("─" * 20)
+    io.println("  ✓ Finite State Machines")
+    io.println("  ✓ Behavior Trees")
+    io.println("  ✓ Utility AI")
+    io.println("  ✓ Goal-Oriented Action Planning")
+    io.println("  ✓ Neural Networks")
+    io.println("  ✓ Pathfinding (A*)")
+
+    io.println("\nAI Perception:")
+    io.println("─" * 20)
+    io.println("  👁️ Line of Sight")
+    io.println("  👂 Sound Detection")
+    io.println("  🕵️ Proximity Detection")
+    io.println("  🎯 Target Tracking")
+    io.println("  🧠 Memory System")
+
+    logging.end_timer(timer)
+    logging.info(logger, "AI system demonstration completed")
+
+# Animation system demonstration
+define function demonstrate_animation_system that takes logger as Logger:
+    create timer as Timer
+    set timer to logging.start_timer(logger, "animation_demo")
+
+    io.println("\n🎬 Animation System Demonstration:")
+    io.println("─" * 40)
+
+    io.println("Animation Types:")
+    io.println("─" * 20)
+    io.println("  🎯 Sprite Sheet Animations")
+    io.println("  🏃 Character Movement")
+    io.println("  ⚔️ Attack Animations")
+    io.println("  💥 Effect Animations")
+    io.println("  🎨 UI Animations")
+    io.println("  🌊 Particle Animations")
+    io.println("  🔄 Transform Animations")
+
+    io.println("\nAnimation Features:")
+    io.println("─" * 20)
+    io.println("  ✓ Frame-based Animation")
+    io.println("  ✓ Keyframe Animation")
+    io.println("  ✓ Skeletal Animation")
+    io.println("  ✓ Morph Target Animation")
+    io.println("  ✓ Animation Blending")
+    io.println("  ✓ Animation Events")
+    io.println("  ✓ Animation State Machines")
+
+    io.println("\nAnimation Controls:")
+    io.println("─" * 20)
+    io.println("  ▶️ Play Animation")
+    io.println("  ⏸️ Pause Animation")
+    io.println("  ⏹️ Stop Animation")
+    io.println("  🔄 Loop Animation")
+    io.println("  🔀 Transition Animation")
+    io.println("  ⚡ Speed Control")
+    io.println("  🔁 Reverse Animation")
+
+    logging.end_timer(timer)
+    logging.info(logger, "Animation system demonstration completed")
+
+# Initialize the application
+main()

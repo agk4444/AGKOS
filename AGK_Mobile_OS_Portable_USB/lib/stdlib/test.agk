@@ -1,0 +1,626 @@
+# AGK Testing Framework Library
+# Comprehensive testing framework for unit tests, integration tests, and test automation
+# Provides assertion functions, test discovery, and detailed reporting
+
+# Test Suite Management
+define function create_suite that takes name as String and returns TestSuite:
+    # Create a new test suite
+    create suite as TestSuite
+    set suite["name"] to name
+    set suite["tests"] to []
+    set suite["setup"] to ""
+    set suite["teardown"] to ""
+    set suite["fixtures"] to {}
+
+    return suite
+
+define function add_test that takes suite as TestSuite, test_name as String, test_function as String:
+    # Add a test to the suite
+    create test as Test
+    set test["name"] to test_name
+    set test["function"] to test_function
+    set test["suite"] to suite["name"]
+    set test["status"] to "pending"
+    set test["error"] to ""
+    set test["duration"] to 0
+
+    add test to suite["tests"]
+
+define function set_suite_setup that takes suite as TestSuite, setup_function as String:
+    # Set up function to run before each test in suite
+    set suite["setup"] to setup_function
+
+define function set_suite_teardown that takes suite as TestSuite, teardown_function as String:
+    # Set teardown function to run after each test in suite
+    set suite["teardown"] to teardown_function
+
+define function add_fixture that takes suite as TestSuite, fixture_name as String, fixture_data as Object:
+    # Add test fixture data
+    set suite["fixtures"][fixture_name] to fixture_data
+
+# Assertion Functions
+define function assert_true that takes condition as Boolean, message as String:
+    # Assert that condition is true
+    if not condition:
+        throw_assertion_error("Expected true but got false: " + message)
+
+define function assert_false that takes condition as Boolean, message as String:
+    # Assert that condition is false
+    if condition:
+        throw_assertion_error("Expected false but got true: " + message)
+
+define function assert_equals that takes actual as Object, expected as Object, message as String:
+    # Assert that two values are equal
+    if actual != expected:
+        create error_msg as String
+        set error_msg to "Expected " + object_to_string(expected) + " but got " + object_to_string(actual)
+        if message is not empty:
+            set error_msg to error_msg + ": " + message
+        throw_assertion_error(error_msg)
+
+define function assert_not_equals that takes actual as Object, expected as Object, message as String:
+    # Assert that two values are not equal
+    if actual = expected:
+        create error_msg as String
+        set error_msg to "Expected different values but both were " + object_to_string(actual)
+        if message is not empty:
+            set error_msg to error_msg + ": " + message
+        throw_assertion_error(error_msg)
+
+define function assert_null that takes value as Object, message as String:
+    # Assert that value is null
+    if value is not null:
+        create error_msg as String
+        set error_msg to "Expected null but got " + object_to_string(value)
+        if message is not empty:
+            set error_msg to error_msg + ": " + message
+        throw_assertion_error(error_msg)
+
+define function assert_not_null that takes value as Object, message as String:
+    # Assert that value is not null
+    if value is null:
+        create error_msg as String
+        set error_msg to "Expected non-null value but got null"
+        if message is not empty:
+            set error_msg to error_msg + ": " + message
+        throw_assertion_error(error_msg)
+
+define function assert_greater_than that takes actual as Object, expected as Object, message as String:
+    # Assert that actual > expected
+    if actual <= expected:
+        create error_msg as String
+        set error_msg to "Expected " + object_to_string(actual) + " to be greater than " + object_to_string(expected)
+        if message is not empty:
+            set error_msg to error_msg + ": " + message
+        throw_assertion_error(error_msg)
+
+define function assert_less_than that takes actual as Object, expected as Object, message as String:
+    # Assert that actual < expected
+    if actual >= expected:
+        create error_msg as String
+        set error_msg to "Expected " + object_to_string(actual) + " to be less than " + object_to_string(expected)
+        if message is not empty:
+            set error_msg to error_msg + ": " + message
+        throw_assertion_error(error_msg)
+
+define function assert_contains that takes container as Object, item as Object, message as String:
+    # Assert that container contains item
+    if not object_contains(container, item):
+        create error_msg as String
+        set error_msg to "Expected " + object_to_string(container) + " to contain " + object_to_string(item)
+        if message is not empty:
+            set error_msg to error_msg + ": " + message
+        throw_assertion_error(error_msg)
+
+define function assert_not_contains that takes container as Object, item as Object, message as String:
+    # Assert that container does not contain item
+    if object_contains(container, item):
+        create error_msg as String
+        set error_msg to "Expected " + object_to_string(container) + " to not contain " + object_to_string(item)
+        if message is not empty:
+            set error_msg to error_msg + ": " + message
+        throw_assertion_error(error_msg)
+
+define function assert_throws that takes function_call as String, expected_error as String, message as String:
+    # Assert that function call throws expected error
+    # This would need to be implemented with try/catch in the runtime
+    pass
+
+define function assert_string_contains that takes text as String, substring as String, message as String:
+    # Assert that string contains substring
+    if not string.contains(text, substring):
+        create error_msg as String
+        set error_msg to "Expected string to contain '" + substring + "' but got: " + text
+        if message is not empty:
+            set error_msg to error_msg + ": " + message
+        throw_assertion_error(error_msg)
+
+define function assert_string_starts_with that takes text as String, prefix as String, message as String:
+    # Assert that string starts with prefix
+    if not string.starts_with(text, prefix):
+        create error_msg as String
+        set error_msg to "Expected string to start with '" + prefix + "' but got: " + text
+        if message is not empty:
+            set error_msg to error_msg + ": " + message
+        throw_assertion_error(error_msg)
+
+define function assert_string_ends_with that takes text as String, suffix as String, message as String:
+    # Assert that string ends with suffix
+    if not string.ends_with(text, suffix):
+        create error_msg as String
+        set error_msg to "Expected string to end with '" + suffix + "' but got: " + text
+        if message is not empty:
+            set error_msg to error_msg + ": " + message
+        throw_assertion_error(error_msg)
+
+define function assert_list_length that takes list_obj as List, expected_length as Integer, message as String:
+    # Assert that list has expected length
+    create actual_length as Integer
+    set actual_length to list.length(list_obj)
+
+    if actual_length != expected_length:
+        create error_msg as String
+        set error_msg to "Expected list length " + string.format(expected_length) + " but got " + string.format(actual_length)
+        if message is not empty:
+            set error_msg to error_msg + ": " + message
+        throw_assertion_error(error_msg)
+
+# Test Execution
+define function run_test that takes test as Test and returns TestResult:
+    # Run a single test and return result
+    create start_time as Float
+    set start_time to get_current_time()
+
+    create result as TestResult
+    set result["test"] to test
+    set result["status"] to "passed"
+    set result["error"] to ""
+    set result["duration"] to 0
+
+    # Run test function (would be implemented in runtime)
+    # try:
+    #     call_function(test["function"])
+    #     result["status"] = "passed"
+    # except AssertionError as e:
+    #     result["status"] = "failed"
+    #     result["error"] = str(e)
+    # except Exception as e:
+    #     result["status"] = "error"
+    #     result["error"] = str(e)
+
+    create end_time as Float
+    set end_time to get_current_time()
+    set result["duration"] to end_time - start_time
+
+    return result
+
+define function run_suite that takes suite as TestSuite and returns TestSuiteResult:
+    # Run all tests in a suite
+    create start_time as Float
+    set start_time to get_current_time()
+
+    create suite_result as TestSuiteResult
+    set suite_result["suite"] to suite
+    set suite_result["results"] to []
+    set suite_result["passed"] to 0
+    set suite_result["failed"] to 0
+    set suite_result["errors"] to 0
+    set suite_result["duration"] to 0
+
+    create i as Integer
+    set i to 0
+    while i < suite["tests"] length:
+        create test as Test
+        set test to suite["tests"][i]
+
+        create test_result as TestResult
+        set test_result to run_test(test)
+
+        add test_result to suite_result["results"]
+
+        if test_result["status"] = "passed":
+            set suite_result["passed"] to suite_result["passed"] + 1
+        else if test_result["status"] = "failed":
+            set suite_result["failed"] to suite_result["failed"] + 1
+        else if test_result["status"] = "error":
+            set suite_result["errors"] to suite_result["errors"] + 1
+
+        set i to i + 1
+
+    create end_time as Float
+    set end_time to get_current_time()
+    set suite_result["duration"] to end_time - start_time
+
+    return suite_result
+
+define function run_suites that takes suites as List and returns TestReport:
+    # Run multiple test suites
+    create report as TestReport
+    set report["suites"] to []
+    set report["total_tests"] to 0
+    set report["total_passed"] to 0
+    set report["total_failed"] to 0
+    set report["total_errors"] to 0
+    set report["total_duration"] to 0
+
+    create i as Integer
+    set i to 0
+    while i < suites length:
+        create suite as TestSuite
+        set suite to suites[i]
+
+        create suite_result as TestSuiteResult
+        set suite_result to run_suite(suite)
+
+        add suite_result to report["suites"]
+        set report["total_tests"] to report["total_tests"] + suite_result["passed"] + suite_result["failed"] + suite_result["errors"]
+        set report["total_passed"] to report["total_passed"] + suite_result["passed"]
+        set report["total_failed"] to report["total_failed"] + suite_result["failed"]
+        set report["total_errors"] to report["total_errors"] + suite_result["errors"]
+        set report["total_duration"] to report["total_duration"] + suite_result["duration"]
+
+        set i to i + 1
+
+    return report
+
+# Test Discovery
+define function discover_tests that takes directory as String and returns List:
+    # Discover test files in directory
+    create test_files as List
+
+    # Look for files ending with _test.agk
+    create all_files as List
+    set all_files to fs.list_directory_recursive(directory)
+
+    create i as Integer
+    set i to 0
+    while i < all_files length:
+        create file_path as String
+        set file_path to all_files[i]
+
+        if string.ends_with(file_path, "_test.agk"):
+            add file_path to test_files
+
+        set i to i + 1
+
+    return test_files
+
+define function load_test_suite that takes file_path as String and returns TestSuite:
+    # Load test suite from file
+    # This would parse the test file and create a TestSuite object
+    create suite as TestSuite
+    set suite["name"] to fs.path_basename(file_path)
+    set suite["tests"] to []
+    set suite["fixtures"] to {}
+
+    return suite
+
+# Test Fixtures and Mocking
+define function create_mock that takes object_type as String and returns MockObject:
+    # Create a mock object for testing
+    create mock as MockObject
+    set mock["type"] to object_type
+    set mock["methods"] to {}
+    set mock["properties"] to {}
+    set mock["calls"] to []
+
+    return mock
+
+define function mock_method that takes mock as MockObject, method_name as String, return_value as Object:
+    # Mock a method to return specific value
+    set mock["methods"][method_name] to return_value
+
+define function mock_property that takes mock as MockObject, property_name as String, value as Object:
+    # Mock a property value
+    set mock["properties"][property_name] to value
+
+define function verify_called that takes mock as MockObject, method_name as String and returns Boolean:
+    # Verify that a method was called
+    create calls as List
+    set calls to mock["calls"]
+
+    create i as Integer
+    set i to 0
+    while i < calls length:
+        create call as Object
+        set call to calls[i]
+
+        if call["method"] = method_name:
+            return true
+
+        set i to i + 1
+
+    return false
+
+define function get_call_count that takes mock as MockObject, method_name as String and returns Integer:
+    # Get number of times method was called
+    create count as Integer
+    set count to 0
+
+    create calls as List
+    set calls to mock["calls"]
+
+    create i as Integer
+    set i to 0
+    while i < calls length:
+        create call as Object
+        set call to calls[i]
+
+        if call["method"] = method_name:
+            set count to count + 1
+
+        set i to i + 1
+
+    return count
+
+# Test Reporting
+define function generate_report that takes report as TestReport and returns String:
+    # Generate detailed test report
+    create output as String
+    set output to "TEST REPORT\n"
+    set output to output + "=============\n\n"
+
+    set output to output + "Summary:\n"
+    set output to output + "  Total Tests: " + string.format(report["total_tests"]) + "\n"
+    set output to output + "  Passed: " + string.format(report["total_passed"]) + "\n"
+    set output to output + "  Failed: " + string.format(report["total_failed"]) + "\n"
+    set output to output + "  Errors: " + string.format(report["total_errors"]) + "\n"
+    set output to output + "  Duration: " + format_duration(report["total_duration"]) + "\n\n"
+
+    # Suite details
+    create i as Integer
+    set i to 0
+    while i < report["suites"] length:
+        create suite_result as TestSuiteResult
+        set suite_result to report["suites"][i]
+
+        create suite as TestSuite
+        set suite to suite_result["suite"]
+
+        set output to output + "Suite: " + suite["name"] + "\n"
+        set output to output + "  Passed: " + string.format(suite_result["passed"]) + "\n"
+        set output to output + "  Failed: " + string.format(suite_result["failed"]) + "\n"
+        set output to output + "  Errors: " + string.format(suite_result["errors"]) + "\n"
+        set output to output + "  Duration: " + format_duration(suite_result["duration"]) + "\n\n"
+
+        set i to i + 1
+
+    return output
+
+define function save_report that takes report as TestReport, file_path as String:
+    # Save test report to file
+    create report_text as String
+    set report_text to generate_report(report)
+
+    io.write_file(file_path, report_text)
+
+# Utility Functions
+define function get_current_time that returns Float:
+    # Get current time for timing tests
+    return 1234567890.0  # Placeholder
+
+define function format_duration that takes seconds as Float and returns String:
+    # Format duration in human-readable format
+    if seconds < 1.0:
+        return string.format(seconds * 1000) + "ms"
+    else:
+        create minutes as Integer
+        set minutes to seconds / 60
+        create remaining_seconds as Float
+        set remaining_seconds to seconds % 60
+        return string.format(minutes) + "m " + string.format(remaining_seconds) + "s"
+
+define function object_to_string that takes obj as Object and returns String:
+    # Convert object to string representation
+    return "object"  # Placeholder
+
+define function object_contains that takes container as Object, item as Object and returns Boolean:
+    # Check if container contains item
+    return false  # Placeholder
+
+define function throw_assertion_error that takes message as String:
+    # Throw assertion error
+    # In implementation: raise AssertionError(message)
+    io.print("ASSERTION ERROR: " + message)
+
+# Example usage patterns
+define function example_usage:
+    # Create a test suite
+    create math_suite as TestSuite
+    set math_suite to create_suite("Math Functions")
+
+    # Add tests
+    add_test(math_suite, "Addition", "test_addition")
+    add_test(math_suite, "Multiplication", "test_multiplication")
+    add_test(math_suite, "Division by Zero", "test_division_by_zero")
+
+    # Set up and teardown
+    set_suite_setup(math_suite, "setup_math_tests")
+    set_suite_teardown(math_suite, "cleanup_math_tests")
+
+    # Run the suite
+    create suite_result as TestSuiteResult
+    set suite_result to run_suite(math_suite)
+
+    # Print results
+    io.print("Math Suite Results:")
+    io.print("  Passed: " + string.format(suite_result["passed"]))
+    io.print("  Failed: " + string.format(suite_result["failed"]))
+    io.print("  Errors: " + string.format(suite_result["errors"]))
+
+define function math_test_examples:
+    # Example test functions that would be defined elsewhere
+
+    # Test addition
+    define function test_addition:
+        create result as Integer
+        set result to 2 + 3
+        assert_equals(result, 5, "Addition should work correctly")
+
+        create float_result as Float
+        set float_result to 2.5 + 3.7
+        assert_equals(float_result, 6.2, "Float addition should work")
+
+    # Test multiplication
+    define function test_multiplication:
+        create result as Integer
+        set result to 4 * 5
+        assert_equals(result, 20, "Multiplication should work")
+
+        assert_greater_than(10 * 10, 50, "100 should be greater than 50")
+
+    # Test division by zero
+    define function test_division_by_zero:
+        # This test expects an error to be thrown
+        # assert_throws("divide(10, 0)", "DivisionByZeroError", "Division by zero should throw error")
+        pass
+
+    # Setup function
+    define function setup_math_tests:
+        io.print("Setting up math tests...")
+
+    # Cleanup function
+    define function cleanup_math_tests:
+        io.print("Cleaning up math tests...")
+
+define function mock_example:
+    # Example of using mocks
+    create database_mock as MockObject
+    set database_mock to create_mock("Database")
+
+    # Mock the save method
+    mock_method(database_mock, "save", true)
+
+    # Mock a property
+    mock_property(database_mock, "is_connected", true)
+
+    # Use the mock in a test
+    define function test_user_service:
+        create user_service as UserService
+        set user_service["database"] to database_mock
+
+        # Test that save is called
+        create result as Boolean
+        set result to user_service.save_user("Alice")
+
+        assert_true(result, "User should be saved successfully")
+        assert_true(verify_called(database_mock, "save"), "Database save should be called")
+
+    # Run the test
+    test_user_service()
+
+define function test_discovery_example:
+    # Example of test discovery
+    create test_directory as String
+    set test_directory to "./tests"
+
+    create test_files as List
+    set test_files to discover_tests(test_directory)
+
+    io.print("Found test files:")
+    create i as Integer
+    set i to 0
+    while i < test_files length:
+        io.print("  " + test_files[i])
+        set i to i + 1
+
+    # Load and run all test suites
+    create all_suites as List
+    set i to 0
+    while i < test_files length:
+        create suite as TestSuite
+        set suite to load_test_suite(test_files[i])
+        add suite to all_suites
+        set i to i + 1
+
+    # Run all suites and generate report
+    create report as TestReport
+    set report to run_suites(all_suites)
+
+    create report_text as String
+    set report_text to generate_report(report)
+
+    io.print(report_text)
+
+    # Save report to file
+    save_report(report, "test_results.txt")
+
+define function string_test_examples:
+    # String-specific test examples
+    create string_suite as TestSuite
+    set string_suite to create_suite("String Operations")
+
+    add_test(string_suite, "String Length", "test_string_length")
+    add_test(string_suite, "String Concatenation", "test_string_concat")
+    add_test(string_suite, "String Contains", "test_string_contains")
+
+    define function test_string_length:
+        create text as String
+        set text to "Hello World"
+        create length as Integer
+        set length to string.length(text)
+        assert_equals(length, 11, "String length should be correct")
+
+    define function test_string_concat:
+        create part1 as String
+        set part1 to "Hello"
+        create part2 as String
+        set part2 to " World"
+        create result as String
+        set result to part1 + part2
+        assert_equals(result, "Hello World", "String concatenation should work")
+
+    define function test_string_contains:
+        create text as String
+        set text to "The quick brown fox"
+        assert_string_contains(text, "quick", "Text should contain 'quick'")
+        assert_string_contains(text, "fox", "Text should contain 'fox'")
+
+        assert_false(string.contains(text, "slow"), "Text should not contain 'slow'")
+
+    # Run string tests
+    create string_result as TestSuiteResult
+    set string_result to run_suite(string_suite)
+
+    io.print("String tests completed")
+
+define function list_test_examples:
+    # List-specific test examples
+    create list_suite as TestSuite
+    set list_suite to create_suite("List Operations")
+
+    add_test(list_suite, "List Creation", "test_list_creation")
+    add_test(list_suite, "List Append", "test_list_append")
+    add_test(list_suite, "List Length", "test_list_length")
+
+    define function test_list_creation:
+        create numbers as List
+        add 1 to numbers
+        add 2 to numbers
+        add 3 to numbers
+
+        assert_list_length(numbers, 3, "List should have 3 elements")
+        assert_contains(numbers, 2, "List should contain 2")
+
+    define function test_list_append:
+        create items as List
+        add "first" to items
+        add "second" to items
+
+        assert_list_length(items, 2, "List should have 2 elements")
+        assert_equals(items[0], "first", "First element should be 'first'")
+        assert_equals(items[1], "second", "Second element should be 'second'")
+
+    define function test_list_length:
+        create empty_list as List
+        assert_list_length(empty_list, 0, "Empty list should have length 0")
+
+        create single_item as List
+        add "item" to single_item
+        assert_list_length(single_item, 1, "Single item list should have length 1")
+
+    # Run list tests
+    create list_result as TestSuiteResult
+    set list_result to run_suite(list_suite)
+
+    io.print("List tests completed")

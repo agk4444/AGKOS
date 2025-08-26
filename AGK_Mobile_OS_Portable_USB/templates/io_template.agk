@@ -1,0 +1,487 @@
+# AGK IO Template - Input/Output Operations
+# This template demonstrates comprehensive I/O operations including
+# console input/output, file operations, formatted output, and error handling
+# Perfect for: Console applications, data processing, user interaction systems
+
+import io
+import logging
+import fs
+import string
+
+# Global configuration
+define constant TEST_FILE as String = "io_demo.txt"
+define constant LOG_FILE as String = "io_operations.log"
+
+# Main application entry point
+define function main:
+    # Initialize logging for the IO application
+    create logger as Logger
+    set logger to logging.get_logger("IO_App")
+    logging.set_level(logger, logging.INFO)
+    logging.add_console_handler(logger)
+    logging.add_file_handler(logger, LOG_FILE)
+
+    logging.info(logger, "Starting AGK IO Application")
+
+    # Run the main application loop
+    run_io_application_loop(logger)
+
+# Main application loop with menu-driven interface
+define function run_io_application_loop that takes logger as Logger:
+    create running as Boolean
+    set running to true
+
+    while running:
+        io.println("\n📝 AGK I/O Operations Demo")
+        io.println("1. Basic Console I/O")
+        io.println("2. Formatted Output")
+        io.println("3. File I/O Operations")
+        io.println("4. Input Validation")
+        io.println("5. Interactive Input Demo")
+        io.println("6. Error Handling Demo")
+        io.println("7. Logging Operations")
+        io.println("8. Batch Processing")
+        io.println("9. Exit")
+        io.print("Enter your choice (1-9): ")
+
+        create choice as String
+        set choice to io.read_line()
+
+        if choice == "1":
+            basic_console_demo(logger)
+        else if choice == "2":
+            formatted_output_demo(logger)
+        else if choice == "3":
+            file_operations_demo(logger)
+        else if choice == "4":
+            input_validation_demo(logger)
+        else if choice == "5":
+            interactive_input_demo(logger)
+        else if choice == "6":
+            error_handling_demo(logger)
+        else if choice == "7":
+            logging_demo(logger)
+        else if choice == "8":
+            batch_processing_demo(logger)
+        else if choice == "9":
+            set running to false
+            logging.info(logger, "IO application shutting down")
+        else:
+            io.println("❌ Invalid choice. Please try again.")
+
+# Basic console I/O demonstration
+define function basic_console_demo that takes logger as Logger:
+    io.println("\n📺 Basic Console I/O Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "console_operations")
+
+    io.println("=== Basic Output Operations ===")
+    io.print("This is a print without newline")
+    io.println(" - This is a println with newline")
+
+    io.println("=== Special Characters ===")
+    io.println("Tab:\tIndented text")
+    io.println("Newline:\nLine 1\nLine 2")
+    io.println("Quote: \"Hello World\"")
+
+    io.println("\n=== Basic Input ===")
+    io.print("Enter your name: ")
+    create name as String
+    set name to io.read_line()
+
+    io.print("Enter your age: ")
+    create age_input as String
+    set age_input to io.read_line()
+
+    io.println("Hello, " + name + "! You entered age: " + age_input)
+
+    logging.end_timer(timer)
+    logging.info(logger, "Basic console operations completed")
+
+# Formatted output demonstration
+define function formatted_output_demo that takes logger as Logger:
+    io.println("\n🎨 Formatted Output Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "formatted_output")
+
+    io.println("=== Number Formatting ===")
+    create pi as Float
+    set pi to 3.14159
+    io.println("Pi: " + string(pi))
+    io.println("Pi (2 decimals): " + string(pi, 2))
+    io.println("Pi (4 decimals): " + string(pi, 4))
+
+    create large_number as Integer
+    set large_number to 1234567
+    io.println("Large number: " + string(large_number))
+
+    io.println("\n=== String Formatting ===")
+    create message as String
+    set message to "Hello World"
+    io.println("Original: '" + message + "'")
+    io.println("Uppercase: '" + string.to_upper(message) + "'")
+    io.println("Lowercase: '" + string.to_lower(message) + "'")
+    io.println("Length: " + string(length(message)))
+
+    io.println("\n=== Table Formatting ===")
+    io.println("┌────────────┬─────────────┬────────────┐")
+    io.println("│ Name       │ Age         │ City        │")
+    io.println("├────────────┼─────────────┼────────────┤")
+    io.println("│ John       │ 25          │ New York    │")
+    io.println("│ Jane       │ 30          │ London      │")
+    io.println("│ Bob        │ 35          │ Tokyo       │")
+    io.println("└────────────┴─────────────┴────────────┘")
+
+    logging.end_timer(timer)
+    logging.info(logger, "Formatted output demonstration completed")
+
+# File I/O operations demo
+define function file_operations_demo that takes logger as Logger:
+    io.println("\n📁 File I/O Operations Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "file_operations")
+
+    io.println("=== Writing to File ===")
+    create content as String
+    set content to "This is a demo file created by AGK IO Template.\n"
+    set content to content + "Created on: " + string(now()) + "\n"
+    set content to content + "This demonstrates file writing capabilities.\n"
+
+    create success as Boolean
+    set success to fs.write_file(TEST_FILE, content)
+
+    if success:
+        io.println("✅ File written successfully: " + TEST_FILE)
+        io.println("Content preview:")
+        io.println("---")
+        io.println(content)
+        io.println("---")
+    else:
+        io.println("❌ Failed to write file")
+
+    io.println("\n=== Reading from File ===")
+    if fs.file_exists(TEST_FILE):
+        create file_content as String
+        set file_content to fs.read_file(TEST_FILE)
+        io.println("File content:")
+        io.println("---")
+        io.println(file_content)
+        io.println("---")
+        io.println("File size: " + string(length(file_content)) + " characters")
+    else:
+        io.println("❌ File not found: " + TEST_FILE)
+
+    io.println("\n=== File Information ===")
+    create file_info as Object
+    set file_info to fs.get_file_info(TEST_FILE)
+
+    if file_info != null:
+        io.println("File: " + TEST_FILE)
+        io.println("Size: " + string(file_info["size"]) + " bytes")
+        io.println("Created: " + string(file_info["created"]))
+        io.println("Modified: " + string(file_info["modified"]))
+    else:
+        io.println("Could not retrieve file information")
+
+    logging.end_timer(timer)
+    logging.info(logger, "File I/O operations completed")
+
+# Input validation demonstration
+define function input_validation_demo that takes logger as Logger:
+    io.println("\n✅ Input Validation Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "input_validation")
+
+    io.println("=== Email Validation ===")
+    io.print("Enter an email address: ")
+    create email as String
+    set email to io.read_line()
+
+    if validate_email(email):
+        io.println("✅ Valid email format")
+    else:
+        io.println("❌ Invalid email format")
+
+    io.println("\n=== Number Validation ===")
+    io.print("Enter a number: ")
+    create number_input as String
+    set number_input to io.read_line()
+
+    if validate_number(number_input):
+        create number as Float
+        set number to string_to_float(number_input)
+        io.println("✅ Valid number: " + string(number))
+    else:
+        io.println("❌ Invalid number format")
+
+    io.println("\n=== Password Validation ===")
+    io.print("Enter a password (min 8 chars): ")
+    create password as String
+    set password to io.read_line()
+
+    if validate_password(password):
+        io.println("✅ Password meets requirements")
+    else:
+        io.println("❌ Password too short (minimum 8 characters)")
+
+    logging.end_timer(timer)
+    logging.info(logger, "Input validation completed")
+
+# Interactive input demonstration
+define function interactive_input_demo that takes logger as Logger:
+    io.println("\n💬 Interactive Input Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "interactive_input")
+
+    io.println("=== Survey ===")
+
+    # Name
+    create name as String
+    set name to get_validated_input("What is your name? ", "name")
+
+    # Age
+    create age as String
+    set age to get_validated_input("How old are you? ", "number")
+
+    # Favorite color
+    create color as String
+    set color to get_validated_input("What is your favorite color? ", "text")
+
+    io.println("\n📊 Survey Results:")
+    io.println("Name: " + name)
+    io.println("Age: " + age)
+    io.println("Favorite Color: " + color)
+
+    io.println("\n=== Multiple Choice ===")
+    io.println("What is your preferred programming language?")
+    io.println("1. Python")
+    io.println("2. JavaScript")
+    io.println("3. Java")
+    io.println("4. C++")
+    io.println("5. Other")
+
+    create choice as String
+    set choice to get_validated_input("Enter your choice (1-5): ", "choice", ["1", "2", "3", "4", "5"])
+
+    create languages as List
+    add "Python" to languages
+    add "JavaScript" to languages
+    add "Java" to languages
+    add "C++" to languages
+    add "Other" to languages
+
+    create language_index as Integer
+    set language_index to string_to_int(choice) - 1
+    io.println("You chose: " + get_item(languages, language_index))
+
+    logging.end_timer(timer)
+    logging.info(logger, "Interactive input demonstration completed")
+
+# Error handling demonstration
+define function error_handling_demo that takes logger as Logger:
+    io.println("\n🚨 Error Handling Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "error_handling")
+
+    io.println("=== Division by Zero Handling ===")
+    io.print("Enter numerator: ")
+    create numerator_str as String
+    set numerator_str to io.read_line()
+
+    io.print("Enter denominator: ")
+    create denominator_str as String
+    set denominator_str to io.read_line()
+
+    create numerator as Float
+    create denominator as Float
+
+    if validate_number(numerator_str) and validate_number(denominator_str):
+        set numerator to string_to_float(numerator_str)
+        set denominator to string_to_float(denominator_str)
+
+        if denominator == 0:
+            io.println("❌ Error: Division by zero!")
+        else:
+            create result as Float
+            set result to numerator / denominator
+            io.println("Result: " + string(numerator) + " ÷ " + string(denominator) + " = " + string(result, 2))
+    else:
+        io.println("❌ Error: Invalid number format")
+
+    io.println("\n=== File Access Error Handling ===")
+    io.print("Enter filename to read: ")
+    create filename as String
+    set filename to io.read_line()
+
+    if filename == "":
+        set filename to "nonexistent_file.txt"
+
+    if fs.file_exists(filename):
+        create content as String
+        set content to fs.read_file(filename)
+        io.println("✅ File read successfully")
+        io.println("Content length: " + string(length(content)) + " characters")
+    else:
+        io.println("❌ Error: File not found - " + filename)
+
+    logging.end_timer(timer)
+    logging.info(logger, "Error handling demonstration completed")
+
+# Logging operations demo
+define function logging_demo that takes logger as Logger:
+    io.println("\n📋 Logging Operations Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "logging_demo")
+
+    io.println("=== Different Log Levels ===")
+
+    logging.debug(logger, "This is a DEBUG message")
+    logging.info(logger, "This is an INFO message")
+    logging.warning(logger, "This is a WARNING message")
+    logging.error(logger, "This is an ERROR message")
+
+    io.println("✅ Log messages written to: " + LOG_FILE)
+
+    io.println("\n=== Log File Contents ===")
+    if fs.file_exists(LOG_FILE):
+        create log_content as String
+        set log_content to fs.read_file(LOG_FILE)
+        io.println("--- Recent Log Entries ---")
+        io.println(log_content)
+        io.println("--- End of Log ---")
+    else:
+        io.println("❌ Log file not found")
+
+    logging.end_timer(timer)
+    logging.info(logger, "Logging demonstration completed")
+
+# Batch processing demonstration
+define function batch_processing_demo that takes logger as Logger:
+    io.println("\n⚡ Batch Processing Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "batch_processing")
+
+    io.println("=== Processing Multiple Items ===")
+
+    create items as List
+    add "apple" to items
+    add "banana" to items
+    add "cherry" to items
+    add "date" to items
+    add "elderberry" to items
+
+    io.println("Processing " + string(length(items)) + " items...")
+
+    create processed_count as Integer
+    set processed_count to 0
+
+    for each item in items:
+        io.print("Processing: " + item + "... ")
+        # Simulate processing time
+        create uppercase_item as String
+        set uppercase_item to string.to_upper(item)
+        io.println("✅ -> " + uppercase_item)
+        set processed_count to processed_count + 1
+
+    io.println("\n✅ Batch processing completed!")
+    io.println("Items processed: " + string(processed_count))
+
+    io.println("\n=== Batch File Creation ===")
+    create batch_files as List
+    add "batch_file_1.txt" to batch_files
+    add "batch_file_2.txt" to batch_files
+    add "batch_file_3.txt" to batch_files
+
+    create file_count as Integer
+    set file_count to 0
+
+    for each filename in batch_files:
+        create file_content as String
+        set file_content to "Batch file: " + filename + "\nCreated at: " + string(now()) + "\n"
+        fs.write_file(filename, file_content)
+        set file_count to file_count + 1
+        io.println("✅ Created: " + filename)
+
+    io.println("Created " + string(file_count) + " files")
+
+    logging.end_timer(timer)
+    logging.info(logger, "Batch processing demonstration completed")
+
+# Helper functions
+define function validate_email that takes email as String and returns Boolean:
+    if length(email) < 5:
+        return false
+    if not string.contains(email, "@"):
+        return false
+    if not string.contains(email, "."):
+        return false
+    return true
+
+define function validate_number that takes input as String and returns Boolean:
+    # Simple validation - check if it contains only digits and decimal point
+    for each char in input:
+        if char != "0" and char != "1" and char != "2" and char != "3" and char != "4" and
+           char != "5" and char != "6" and char != "7" and char != "8" and char != "9" and
+           char != "." and char != "-":
+            return false
+    return length(input) > 0
+
+define function validate_password that takes password as String and returns Boolean:
+    return length(password) >= 8
+
+define function get_validated_input that takes prompt as String, validation_type as String and returns String:
+    while true:
+        io.print(prompt)
+        create input as String
+        set input to io.read_line()
+
+        if validation_type == "name":
+            if length(input) > 0:
+                return input
+            else:
+                io.println("❌ Name cannot be empty. Please try again.")
+        else if validation_type == "number":
+            if validate_number(input):
+                return input
+            else:
+                io.println("❌ Invalid number. Please try again.")
+        else if validation_type == "text":
+            if length(input) > 0:
+                return input
+            else:
+                io.println("❌ Input cannot be empty. Please try again.")
+        else:
+            return input
+
+define function get_validated_input that takes prompt as String, validation_type as String, valid_choices as List and returns String:
+    while true:
+        io.print(prompt)
+        create input as String
+        set input to io.read_line()
+
+        for each choice in valid_choices:
+            if input == choice:
+                return input
+
+        io.println("❌ Invalid choice. Please select from: " + string.join(valid_choices, ", "))
+
+# Placeholder implementations for missing functions
+define function string_to_float that takes s as String and returns Float:
+    return 0.0
+
+define function string_to_int that takes s as String and returns Integer:
+    return 0
+
+define function now that returns String:
+    return "2024-01-01 12:00:00"
+
+# Initialize the application
+main()

@@ -1,0 +1,358 @@
+# AGK Server/API Template
+# High-performance REST API server with async operations, caching, and error handling
+# Perfect for: Microservices, REST APIs, Backend Services, Data Processing
+
+import web
+import io
+import string
+import crypto
+import date
+import llm
+
+# Server configuration
+create port as Integer
+set port to 3000
+
+create server as WebServer
+create api_key as String
+set api_key to "your-secret-api-key-here"
+
+create enable_caching as Boolean
+set enable_caching to true
+
+create enable_ai as Boolean
+set enable_ai to false
+
+create ai_client as LLMClient
+
+# API statistics
+create total_requests as Integer
+set total_requests to 0
+
+create total_errors as Integer
+set total_errors to 0
+
+define function main:
+    # Initialize server
+    io.print("🚀 Starting AGK API Server...")
+
+    # Initialize AI if enabled
+    if enable_ai:
+        set ai_client to llm.create_llm_client("your-openai-key", llm.gpt4())
+        io.print("🤖 AI features enabled")
+
+    # Enable async context for better performance
+    web.create_http_context("api-server")
+
+    # Create server
+    set server to web.create_server(port)
+
+    # Health check endpoint
+    create health_route as Route
+    set health_route to web.create_route("/health", "GET")
+    set server to web.add_route(server, health_route, handle_health_check)
+
+    # API v1 routes
+    create user_route as Route
+    set user_route to web.create_route("/api/v1/users", "GET")
+    set server to web.add_route(server, user_route, handle_get_users)
+
+    create user_create_route as Route
+    set user_create_route to web.create_route("/api/v1/users", "POST")
+    set server to web.add_route(server, user_create_route, handle_create_user)
+
+    create user_detail_route as Route
+    set user_detail_route to web.create_route("/api/v1/users/{id}", "GET")
+    set server to web.add_route(server, user_detail_route, handle_get_user)
+
+    # Data processing endpoints
+    create process_route as Route
+    set process_route to web.create_route("/api/v1/process", "POST")
+    set server to web.add_route(server, process_route, handle_process_data)
+
+    # AI endpoints (if enabled)
+    if enable_ai:
+        create ai_chat_route as Route
+        set ai_chat_route to web.create_route("/api/v1/ai/chat", "POST")
+        set server to web.add_route(server, ai_chat_route, handle_ai_chat)
+
+        create ai_summarize_route as Route
+        set ai_summarize_route to web.create_route("/api/v1/ai/summarize", "POST")
+        set server to web.add_route(server, ai_summarize_route, handle_ai_summarize)
+
+    # External API integration
+    create external_api_route as Route
+    set external_api_route to web.create_route("/api/v1/external/{service}", "GET")
+    set server to web.add_route(server, external_api_route, handle_external_api)
+
+    # Statistics endpoint
+    create stats_route as Route
+    set stats_route to web.create_route("/api/v1/stats", "GET")
+    set server to web.add_route(server, stats_route, handle_get_stats)
+
+    # Start server
+    io.print("📡 Server running on port " + string.format(port))
+    io.print("📊 Health check: http://localhost:" + string.format(port) + "/health")
+    io.print("📚 API Documentation: http://localhost:" + string.format(port) + "/api/v1/stats")
+    io.print("🛑 Press Ctrl+C to stop")
+
+    web.start_server(server)
+    return 0
+
+# Health check endpoint
+define function handle_health_check that takes request as Object and returns String:
+    set total_requests to total_requests + 1
+
+    create health_data as Object
+    set health_data["status"] to "healthy"
+    set health_data["server"] to "AGK API Server"
+    set health_data["version"] to "1.0.0"
+    set health_data["uptime"] to "running"
+    set health_data["features"] to create_feature_list()
+
+    return web.to_json(health_data)
+
+define function create_feature_list that returns List:
+    create features as List
+    add "REST API" to features
+    add "Async Operations" to features
+    add "Error Handling" to features
+
+    if enable_caching:
+        add "Response Caching" to features
+
+    if enable_ai:
+        add "AI Integration" to features
+
+    return features
+
+# User management endpoints
+define function handle_get_users that takes request as Object and returns String:
+    set total_requests to total_requests + 1
+
+    # Check API key
+    if not authenticate_request(request):
+        return create_error_response(401, "Unauthorized")
+
+    # Simulate user data
+    create users as List
+    create user1 as Object
+    set user1["id"] to 1
+    set user1["name"] to "Alice Johnson"
+    set user1["email"] to "alice@example.com"
+    set user1["created_at"] to date.get_current_date()
+
+    create user2 as Object
+    set user2["id"] to 2
+    set user2["name"] to "Bob Smith"
+    set user2["email"] to "bob@example.com"
+    set user2["created_at"] to date.get_current_date()
+
+    add user1 to users
+    add user2 to users
+
+    create response_data as Object
+    set response_data["users"] to users
+    set response_data["total"] to 2
+    set response_data["success"] to true
+
+    return web.to_json(response_data)
+
+define function handle_create_user that takes request as Object and returns String:
+    set total_requests to total_requests + 1
+
+    if not authenticate_request(request):
+        return create_error_response(401, "Unauthorized")
+
+    # In real implementation, parse JSON from request body
+    create new_user as Object
+    set new_user["id"] to 3
+    set new_user["name"] to "New User"
+    set new_user["email"] to "new@example.com"
+    set new_user["created_at"] to date.get_current_date()
+
+    create response_data as Object
+    set response_data["user"] to new_user
+    set response_data["success"] to true
+    set response_data["message"] to "User created successfully"
+
+    return web.to_json(response_data)
+
+define function handle_get_user that takes request as Object and returns String:
+    set total_requests to total_requests + 1
+
+    if not authenticate_request(request):
+        return create_error_response(401, "Unauthorized")
+
+    # In real implementation, get user ID from URL parameters
+    create user_id as Integer
+    set user_id to 1
+
+    create user as Object
+    set user["id"] to user_id
+    set user["name"] to "Alice Johnson"
+    set user["email"] to "alice@example.com"
+
+    create response_data as Object
+    set response_data["user"] to user
+    set response_data["success"] to true
+
+    return web.to_json(response_data)
+
+# Data processing endpoint
+define function handle_process_data that takes request as Object and returns String:
+    set total_requests to total_requests + 1
+
+    if not authenticate_request(request):
+        return create_error_response(401, "Unauthorized")
+
+    # Simulate data processing with async operation
+    create task_id as String
+    set task_id to web.make_async_get_request("https://httpbin.org/delay/1")
+
+    # In real implementation, process the data here
+    create processed_data as Object
+    set processed_data["result"] to "Data processed successfully"
+    set processed_data["processing_time"] to 1.2
+    set processed_data["success"] to true
+
+    return web.to_json(processed_data)
+
+# AI endpoints
+define function handle_ai_chat that takes request as Object and returns String:
+    if not enable_ai:
+        return create_error_response(404, "AI features not enabled")
+
+    if not authenticate_request(request):
+        return create_error_response(401, "Unauthorized")
+
+    set total_requests to total_requests + 1
+
+    # In real implementation, get message from request body
+    create user_message as String
+    set user_message to "Hello, how can you help me?"
+
+    create ai_response as String
+    set ai_response to llm.ask_llm(ai_client, user_message)
+
+    create response_data as Object
+    set response_data["response"] to ai_response
+    set response_data["input"] to user_message
+    set response_data["success"] to true
+
+    return web.to_json(response_data)
+
+define function handle_ai_summarize that takes request as Object and returns String:
+    if not enable_ai:
+        return create_error_response(404, "AI features not enabled")
+
+    if not authenticate_request(request):
+        return create_error_response(401, "Unauthorized")
+
+    set total_requests to total_requests + 1
+
+    # In real implementation, get text from request body
+    create text_to_summarize as String
+    set text_to_summarize to "This is a long text that needs to be summarized..."
+
+    create summary as String
+    set summary to llm.summarize_text(ai_client, text_to_summarize)
+
+    create response_data as Object
+    set response_data["summary"] to summary
+    set response_data["original_length"] to string.length(text_to_summarize)
+    set response_data["summary_length"] to string.length(summary)
+    set response_data["success"] to true
+
+    return web.to_json(response_data)
+
+# External API integration
+define function handle_external_api that takes request as Object and returns String:
+    set total_requests to total_requests + 1
+
+    if not authenticate_request(request):
+        return create_error_response(401, "Unauthorized")
+
+    # In real implementation, get service name from URL parameters
+    create service as String
+    set service to "github"
+
+    create external_data as Object
+
+    if service is equal to "github":
+        # Make async call to external API
+        create task_id as String
+        set task_id to web.make_async_get_request("https://api.github.com/user")
+        set external_data["service"] to "GitHub API"
+        set external_data["status"] to "simulated"
+    else:
+        if service is equal to "weather":
+            set external_data["service"] to "Weather API"
+            set external_data["status"] to "simulated"
+        else:
+            return create_error_response(404, "Service not found")
+
+    set external_data["success"] to true
+    return web.to_json(external_data)
+
+# Statistics endpoint
+define function handle_get_stats that takes request as Object and returns String:
+    create stats as Object
+    set stats["total_requests"] to total_requests
+    set stats["total_errors"] to total_errors
+    set stats["uptime"] to "running"
+    set stats["server"] to "AGK API Server v1.0.0"
+    set stats["features"] to create_feature_list()
+    set stats["endpoints"] to create_endpoint_list()
+
+    return web.to_json(stats)
+
+define function create_endpoint_list that returns List:
+    create endpoints as List
+    add "/health" to endpoints
+    add "/api/v1/users" to endpoints
+    add "/api/v1/process" to endpoints
+
+    if enable_ai:
+        add "/api/v1/ai/chat" to endpoints
+        add "/api/v1/ai/summarize" to endpoints
+
+    return endpoints
+
+# Utility functions
+define function authenticate_request that takes request as Object and returns Boolean:
+    # In real implementation, check Authorization header against api_key
+    return true
+
+define function create_error_response that takes status_code as Integer, message as String and returns String:
+    set total_errors to total_errors + 1
+
+    create error_data as Object
+    set error_data["error"] to message
+    set error_data["status_code"] to status_code
+    set error_data["success"] to false
+    set error_data["timestamp"] to date.get_current_date()
+
+    return web.to_json(error_data)
+
+define function log_request that takes endpoint as String, method as String, status_code as Integer:
+    create log_message as String
+    set log_message to "[" + date.get_current_date() + "] " + method + " " + endpoint + " -> " + string.format(status_code)
+    io.print(log_message)
+
+define function validate_json that takes json_string as String and returns Boolean:
+    # In real implementation, try to parse JSON
+    if json_string contains "{" and json_string contains "}":
+        return true
+    else:
+        return false
+
+# Async helper for external API calls
+define function fetch_external_data_async that takes url as String and returns String:
+    create task_id as String
+    set task_id to web.make_async_get_request(url)
+
+    create response as String
+    set response to web.await_http_response(task_id)
+
+    return response

@@ -1,0 +1,559 @@
+# AGK IoT Security and Encryption Library
+# Comprehensive security framework for IoT devices and applications
+# Supports encryption, authentication, secure communication, and threat detection
+
+# Encryption Algorithms
+create constant ENCRYPTION_AES_128 as String = "aes_128"
+create constant ENCRYPTION_AES_256 as String = "aes_256"
+create constant ENCRYPTION_CHACHA20 as String = "chacha20"
+create constant ENCRYPTION_RSA as String = "rsa"
+create constant ENCRYPTION_ECC as String = "ecc"
+create constant ENCRYPTION_ED25519 as String = "ed25519"
+
+# Hash Algorithms
+create constant HASH_SHA256 as String = "sha256"
+create constant HASH_SHA384 as String = "sha384"
+create constant HASH_SHA512 as String = "sha512"
+create constant HASH_BLAKE2 as String = "blake2"
+create constant HASH_KECCAK as String = "keccak"
+
+# Authentication Methods
+create constant AUTH_PASSWORD as String = "password"
+create constant AUTH_CERTIFICATE as String = "certificate"
+create constant AUTH_TOKEN as String = "token"
+create constant AUTH_BIOMETRIC as String = "biometric"
+create constant AUTH_CHALLENGE_RESPONSE as String = "challenge_response"
+create constant AUTH_OAUTH as String = "oauth"
+
+# Security Protocols
+create constant PROTOCOL_TLS as String = "tls"
+create constant PROTOCOL_DTLS as String = "dtls"
+create constant PROTOCOL_IPSEC as String = "ipsec"
+create constant PROTOCOL_SSH as String = "ssh"
+create constant PROTOCOL_MQTT_TLS as String = "mqtt_tls"
+create constant PROTOCOL_COAPS as String = "coaps"
+
+# Key Management
+create constant KEY_TYPE_SYMMETRIC as String = "symmetric"
+create constant KEY_TYPE_ASYMMETRIC as String = "asymmetric"
+create constant KEY_TYPE_PUBLIC as String = "public"
+create constant KEY_TYPE_PRIVATE as String = "private"
+create constant KEY_TYPE_SESSION as String = "session"
+
+# Security Levels
+create constant SECURITY_LEVEL_LOW as String = "low"
+create constant SECURITY_LEVEL_MEDIUM as String = "medium"
+create constant SECURITY_LEVEL_HIGH as String = "high"
+create constant SECURITY_LEVEL_CRITICAL as String = "critical"
+
+# Security Manager
+define function create_security_manager() as SecurityManager:
+    """Create IoT security manager"""
+    external function security_manager_create() from "iot_security.so" as pointer
+    create manager as SecurityManager
+    set manager["encryption_enabled"] to false
+    set manager["authentication_enabled"] to false
+    set manager["threat_detection_enabled"] to false
+    set manager["secure_boot_enabled"] to false
+    return manager
+
+define function initialize_security(manager as SecurityManager, security_level as String) as Boolean:
+    """Initialize security with specified level"""
+    external function security_initialize(handle as pointer, level as String) from "iot_security.so" as Boolean
+    return security_initialize(manager["handle"], security_level)
+
+# Encryption Functions
+define function encrypt_data(manager as SecurityManager, data as String, algorithm as String, key as String) as String:
+    """Encrypt data using specified algorithm"""
+    external function security_encrypt_data(handle as pointer, data as String, algorithm as String, key as String) from "iot_security.so" as String
+    return security_encrypt_data(manager["handle"], data, algorithm, key)
+
+define function decrypt_data(manager as SecurityManager, encrypted_data as String, algorithm as String, key as String) as String:
+    """Decrypt data using specified algorithm"""
+    external function security_decrypt_data(handle as pointer, data as String, algorithm as String, key as String) from "iot_security.so" as String
+    return security_decrypt_data(manager["handle"], encrypted_data, algorithm, key)
+
+define function generate_encryption_key(manager as SecurityManager, algorithm as String, key_length as Integer) as String:
+    """Generate encryption key"""
+    external function security_generate_key(handle as pointer, algorithm as String, key_length as Integer) from "iot_security.so" as String
+    return security_generate_key(manager["handle"], algorithm, key_length)
+
+define function derive_key(manager as SecurityManager, password as String, salt as String, algorithm as String, iterations as Integer) as String:
+    """Derive key from password using PBKDF2"""
+    external function security_derive_key(handle as pointer, password as String, salt as String, algorithm as String, iterations as Integer) from "iot_security.so" as String
+    return security_derive_key(manager["handle"], password, salt, algorithm, iterations)
+
+# Hash Functions
+define function hash_data(manager as SecurityManager, data as String, algorithm as String) as String:
+    """Hash data using specified algorithm"""
+    external function security_hash_data(handle as pointer, data as String, algorithm as String) from "iot_security.so" as String
+    return security_hash_data(manager["handle"], data, algorithm)
+
+define function hash_file(manager as SecurityManager, file_path as String, algorithm as String) as String:
+    """Hash file content"""
+    external function security_hash_file(handle as pointer, file_path as String, algorithm as String) from "iot_security.so" as String
+    return security_hash_file(manager["handle"], file_path, algorithm)
+
+define function hmac_data(manager as SecurityManager, data as String, key as String, algorithm as String) as String:
+    """Create HMAC of data"""
+    external function security_hmac_data(handle as pointer, data as String, key as String, algorithm as String) from "iot_security.so" as String
+    return security_hmac_data(manager["handle"], data, key, algorithm)
+
+# Digital Signatures
+define function generate_key_pair(manager as SecurityManager, algorithm as String, key_size as Integer) as Object:
+    """Generate public/private key pair"""
+    external function security_generate_key_pair(handle as pointer, algorithm as String, key_size as Integer) from "iot_security.so" as pointer
+    return security_generate_key_pair(manager["handle"], algorithm, key_size)
+
+define function sign_data(manager as SecurityManager, data as String, private_key as String, algorithm as String) as String:
+    """Sign data with private key"""
+    external function security_sign_data(handle as pointer, data as String, private_key as String, algorithm as String) from "iot_security.so" as String
+    return security_sign_data(manager["handle"], data, private_key, algorithm)
+
+define function verify_signature(manager as SecurityManager, data as String, signature as String, public_key as String, algorithm as String) as Boolean:
+    """Verify data signature with public key"""
+    external function security_verify_signature(handle as pointer, data as String, signature as String, public_key as String, algorithm as String) from "iot_security.so" as Boolean
+    return security_verify_signature(manager["handle"], data, signature, public_key, algorithm)
+
+# Certificate Management
+define function generate_certificate(manager as SecurityManager, subject_info as Object, validity_days as Integer, key_pair as Object) as String:
+    """Generate X.509 certificate"""
+    external function security_generate_certificate(handle as pointer, subject as pointer, validity as Integer, keys as pointer) from "iot_security.so" as String
+    return security_generate_certificate(manager["handle"], subject_info, validity_days, key_pair)
+
+define function load_certificate(manager as SecurityManager, certificate_path as String) as Object:
+    """Load certificate from file"""
+    external function security_load_certificate(handle as pointer, cert_path as String) from "iot_security.so" as pointer
+    return security_load_certificate(manager["handle"], certificate_path)
+
+define function verify_certificate(manager as SecurityManager, certificate as String, ca_certificate as String) as Boolean:
+    """Verify certificate against CA"""
+    external function security_verify_certificate(handle as pointer, cert as String, ca_cert as String) from "iot_security.so" as Boolean
+    return security_verify_certificate(manager["handle"], certificate, ca_certificate)
+
+define function get_certificate_info(manager as SecurityManager, certificate as String) as Object:
+    """Get certificate information"""
+    external function security_get_certificate_info(handle as pointer, cert as String) from "iot_security.so" as pointer
+    return security_get_certificate_info(manager["handle"], certificate)
+
+# Authentication
+define function authenticate_device(manager as SecurityManager, device_id as String, credentials as Object, method as String) as Boolean:
+    """Authenticate device"""
+    external function security_authenticate_device(handle as pointer, device_id as String, credentials as pointer, method as String) from "iot_security.so" as Boolean
+    return security_authenticate_device(manager["handle"], device_id, credentials, method)
+
+define function create_authentication_token(manager as SecurityManager, device_id as String, expiration_minutes as Integer) as String:
+    """Create authentication token"""
+    external function security_create_token(handle as pointer, device_id as String, expiration as Integer) from "iot_security.so" as String
+    return security_create_token(manager["handle"], device_id, expiration_minutes)
+
+define function validate_authentication_token(manager as SecurityManager, token as String) as Object:
+    """Validate authentication token"""
+    external function security_validate_token(handle as pointer, token as String) from "iot_security.so" as pointer
+    return security_validate_token(manager["handle"], token)
+
+define function revoke_authentication_token(manager as SecurityManager, token as String) as Boolean:
+    """Revoke authentication token"""
+    external function security_revoke_token(handle as pointer, token as String) from "iot_security.so" as Boolean
+    return security_revoke_token(manager["handle"], token)
+
+# Secure Communication
+define function create_secure_channel(manager as SecurityManager, protocol as String, host as String, port as Integer) as SecureChannel:
+    """Create secure communication channel"""
+    external function security_create_secure_channel(handle as pointer, protocol as String, host as String, port as Integer) from "iot_security.so" as pointer
+    create channel as SecureChannel
+    set channel["protocol"] to protocol
+    set channel["host"] to host
+    set channel["port"] to port
+    set channel["connected"] to false
+    return channel
+
+define function secure_connect(manager as SecurityManager, channel as SecureChannel, credentials as Object) as Boolean:
+    """Establish secure connection"""
+    external function security_secure_connect(handle as pointer, channel as pointer, credentials as pointer) from "iot_security.so" as Boolean
+    set channel["connected"] to security_secure_connect(manager["handle"], channel["handle"], credentials)
+    return channel["connected"]
+
+define function secure_send(manager as SecurityManager, channel as SecureChannel, data as String) as Boolean:
+    """Send data over secure channel"""
+    external function security_secure_send(handle as pointer, channel as pointer, data as String) from "iot_security.so" as Boolean
+    return security_secure_send(manager["handle"], channel["handle"], data)
+
+define function secure_receive(manager as SecurityManager, channel as SecureChannel) as String:
+    """Receive data from secure channel"""
+    external function security_secure_receive(handle as pointer, channel as pointer) from "iot_security.so" as String
+    return security_secure_receive(manager["handle"], channel["handle"])
+
+define function close_secure_channel(manager as SecurityManager, channel as SecureChannel) as Boolean:
+    """Close secure channel"""
+    external function security_close_secure_channel(handle as pointer, channel as pointer) from "iot_security.so" as Boolean
+    set channel["connected"] to false
+    return security_close_secure_channel(manager["handle"], channel["handle"])
+
+# Threat Detection and Prevention
+define function enable_threat_detection(manager as SecurityManager, detection_types as List) as Boolean:
+    """Enable threat detection"""
+    external function security_enable_threat_detection(handle as pointer, types as pointer) from "iot_security.so" as Boolean
+    set manager["threat_detection_enabled"] to security_enable_threat_detection(manager["handle"], detection_types)
+    return manager["threat_detection_enabled"]
+
+define function detect_intrusion(manager as SecurityManager, network_traffic as List, threshold as Float) as Object:
+    """Detect network intrusions"""
+    external function security_detect_intrusion(handle as pointer, traffic as pointer, threshold as Float) from "iot_security.so" as pointer
+    return security_detect_intrusion(manager["handle"], network_traffic, threshold)
+
+define function detect_anomaly(manager as SecurityManager, sensor_data as List, baseline_data as List) as Object:
+    """Detect data anomalies"""
+    external function security_detect_anomaly(handle as pointer, data as pointer, baseline as pointer) from "iot_security.so" as pointer
+    return security_detect_anomaly(manager["handle"], sensor_data, baseline_data)
+
+define function block_suspicious_activity(manager as SecurityManager, activity_info as Object) as Boolean:
+    """Block suspicious activity"""
+    external function security_block_suspicious_activity(handle as pointer, activity as pointer) from "iot_security.so" as Boolean
+    return security_block_suspicious_activity(manager["handle"], activity_info)
+
+# Secure Boot and Firmware Protection
+define function enable_secure_boot(manager as SecurityManager) as Boolean:
+    """Enable secure boot"""
+    external function security_enable_secure_boot(handle as pointer) from "iot_security.so" as Boolean
+    set manager["secure_boot_enabled"] to security_enable_secure_boot(manager["handle"])
+    return manager["secure_boot_enabled"]
+
+define function verify_firmware_signature(manager as SecurityManager, firmware_path as String, signature_path as String, public_key as String) as Boolean:
+    """Verify firmware signature"""
+    external function security_verify_firmware_signature(handle as pointer, firmware as String, signature as String, public_key as String) from "iot_security.so" as Boolean
+    return security_verify_firmware_signature(manager["handle"], firmware_path, signature_path, public_key)
+
+define function encrypt_firmware(manager as SecurityManager, firmware_path as String, output_path as String, encryption_key as String) as Boolean:
+    """Encrypt firmware image"""
+    external function security_encrypt_firmware(handle as pointer, firmware as String, output as String, key as String) from "iot_security.so" as Boolean
+    return security_encrypt_firmware(manager["handle"], firmware_path, output_path, encryption_key)
+
+define function decrypt_firmware(manager as SecurityManager, encrypted_firmware_path as String, output_path as String, decryption_key as String) as Boolean:
+    """Decrypt firmware image"""
+    external function security_decrypt_firmware(handle as pointer, firmware as String, output as String, key as String) from "iot_security.so" as Boolean
+    return security_decrypt_firmware(manager["handle"], encrypted_firmware_path, output_path, decryption_key)
+
+# Key Management
+define function create_key_store(manager as SecurityManager, store_path as String, password as String) as Boolean:
+    """Create encrypted key store"""
+    external function security_create_key_store(handle as pointer, store_path as String, password as String) from "iot_security.so" as Boolean
+    return security_create_key_store(manager["handle"], store_path, password)
+
+define function store_key(manager as SecurityManager, key_store_path as String, key_id as String, key_data as String, key_type as String) as Boolean:
+    """Store key in key store"""
+    external function security_store_key(handle as pointer, store_path as String, key_id as String, key_data as String, key_type as String) from "iot_security.so" as Boolean
+    return security_store_key(manager["handle"], key_store_path, key_id, key_data, key_type)
+
+define function retrieve_key(manager as SecurityManager, key_store_path as String, key_id as String, password as String) as String:
+    """Retrieve key from key store"""
+    external function security_retrieve_key(handle as pointer, store_path as String, key_id as String, password as String) from "iot_security.so" as String
+    return security_retrieve_key(manager["handle"], key_store_path, key_id, password)
+
+define function rotate_keys(manager as SecurityManager, key_store_path as String, rotation_policy as Object) as Boolean:
+    """Rotate encryption keys"""
+    external function security_rotate_keys(handle as pointer, store_path as String, policy as pointer) from "iot_security.so" as Boolean
+    return security_rotate_keys(manager["handle"], key_store_path, rotation_policy)
+
+# Secure Data Storage
+define function encrypt_database(manager as SecurityManager, database_path as String, encryption_key as String) as Boolean:
+    """Encrypt database file"""
+    external function security_encrypt_database(handle as pointer, db_path as String, key as String) from "iot_security.so" as Boolean
+    return security_encrypt_database(manager["handle"], database_path, encryption_key)
+
+define function decrypt_database(manager as SecurityManager, encrypted_database_path as String, output_path as String, decryption_key as String) as Boolean:
+    """Decrypt database file"""
+    external function security_decrypt_database(handle as pointer, db_path as String, output as String, key as String) from "iot_security.so" as Boolean
+    return security_decrypt_database(manager["handle"], encrypted_database_path, output_path, decryption_key)
+
+define function secure_wipe_data(manager as SecurityManager, data_path as String, passes as Integer) as Boolean:
+    """Securely wipe data"""
+    external function security_wipe_data(handle as pointer, data_path as String, passes as Integer) from "iot_security.so" as Boolean
+    return security_wipe_data(manager["handle"], data_path, passes)
+
+# Network Security
+define function configure_firewall(manager as SecurityManager, rules as List) as Boolean:
+    """Configure network firewall"""
+    external function security_configure_firewall(handle as pointer, rules as pointer) from "iot_security.so" as Boolean
+    return security_configure_firewall(manager["handle"], rules)
+
+define function enable_intrusion_detection(manager as SecurityManager, network_interface as String) as Boolean:
+    """Enable network intrusion detection"""
+    external function security_enable_intrusion_detection(handle as pointer, interface as String) from "iot_security.so" as Boolean
+    return security_enable_intrusion_detection(manager["handle"], network_interface)
+
+define function monitor_network_traffic(manager as SecurityManager, interface as String, duration_seconds as Integer) as List:
+    """Monitor network traffic for security"""
+    external function security_monitor_network_traffic(handle as pointer, interface as String, duration as Integer) from "iot_security.so" as pointer
+    return security_monitor_network_traffic(manager["handle"], interface, duration_seconds)
+
+# Security Audit and Compliance
+define function perform_security_audit(manager as SecurityManager, audit_scope as List) as Object:
+    """Perform security audit"""
+    external function security_perform_audit(handle as pointer, scope as pointer) from "iot_security.so" as pointer
+    return security_perform_audit(manager["handle"], audit_scope)
+
+define function generate_security_report(manager as SecurityManager, report_type as String, time_range as String) as String:
+    """Generate security report"""
+    external function security_generate_report(handle as pointer, report_type as String, time_range as String) from "iot_security.so" as String
+    return security_generate_report(manager["handle"], report_type, time_range)
+
+define function check_compliance(manager as SecurityManager, standard as String) as Object:
+    """Check compliance with security standards"""
+    external function security_check_compliance(handle as pointer, standard as String) from "iot_security.so" as pointer
+    return security_check_compliance(manager["handle"], standard)
+
+# Error Handling and Recovery
+define function get_security_error(manager as SecurityManager) as String:
+    """Get last security error"""
+    external function security_get_last_error(handle as pointer) from "iot_security.so" as String
+    return security_get_last_error(manager["handle"])
+
+define function clear_security_error(manager as SecurityManager) as void:
+    """Clear security error"""
+    external function security_clear_error(handle as pointer) from "iot_security.so" as void
+    security_clear_error(manager["handle"])
+
+define function recover_from_security_breach(manager as SecurityManager, breach_info as Object) as Boolean:
+    """Recover from security breach"""
+    external function security_recover_from_breach(handle as pointer, breach as pointer) from "iot_security.so" as Boolean
+    return security_recover_from_breach(manager["handle"], breach_info)
+
+# Example Usage
+define function encryption_example:
+    """Encryption and decryption example"""
+    # Create security manager
+    create security_manager as SecurityManager
+    set security_manager to create_security_manager()
+
+    # Initialize with high security level
+    initialize_security(security_manager, SECURITY_LEVEL_HIGH)
+
+    # Generate encryption key
+    create encryption_key as String
+    set encryption_key to generate_encryption_key(security_manager, ENCRYPTION_AES_256, 32)
+
+    # Encrypt sensitive data
+    create sensitive_data as String
+    set sensitive_data to "This is sensitive IoT sensor data"
+
+    create encrypted_data as String
+    set encrypted_data to encrypt_data(security_manager, sensitive_data, ENCRYPTION_AES_256, encryption_key)
+
+    io.print("Data encrypted successfully")
+
+    # Decrypt the data
+    create decrypted_data as String
+    set decrypted_data to decrypt_data(security_manager, encrypted_data, ENCRYPTION_AES_256, encryption_key)
+
+    if decrypted_data == sensitive_data:
+        io.print("Encryption/decryption successful")
+    else:
+        io.print("Encryption/decryption failed")
+    end
+
+define function digital_signature_example:
+    """Digital signature example"""
+    create security_manager as SecurityManager
+    set security_manager to create_security_manager()
+
+    # Generate key pair for device
+    create key_pair as Object
+    set key_pair to generate_key_pair(security_manager, ENCRYPTION_ED25519, 256)
+
+    # Sign firmware update
+    create firmware_data as String
+    set firmware_data to "Firmware update package v1.2.0"
+
+    create signature as String
+    set signature to sign_data(security_manager, firmware_data, key_pair["private_key"], ENCRYPTION_ED25519)
+
+    io.print("Firmware signed with digital signature")
+
+    # Verify signature on receiving device
+    create verification_result as Boolean
+    set verification_result to verify_signature(security_manager, firmware_data, signature, key_pair["public_key"], ENCRYPTION_ED25519)
+
+    if verification_result:
+        io.print("Digital signature verification successful - firmware is authentic")
+    else:
+        io.print("Digital signature verification failed - firmware may be compromised")
+    end
+
+define function secure_communication_example:
+    """Secure communication example"""
+    create security_manager as SecurityManager
+    set security_manager to create_security_manager()
+
+    # Create secure channel to IoT cloud
+    create secure_channel as SecureChannel
+    set secure_channel to create_secure_channel(security_manager, PROTOCOL_TLS, "iot-cloud.example.com", 8883)
+
+    # Prepare credentials
+    create credentials as Object
+    set credentials["certificate"] to "/path/to/device.crt"
+    set credentials["private_key"] to "/path/to/device.key"
+    set credentials["ca_certificate"] to "/path/to/ca.crt"
+
+    # Establish secure connection
+    create connection_success as Boolean
+    set connection_success to secure_connect(security_manager, secure_channel, credentials)
+
+    if connection_success:
+        io.print("Secure connection established")
+
+        # Send encrypted sensor data
+        create sensor_data as String
+        set sensor_data to "temperature: 23.5, humidity: 65.2"
+
+        create send_success as Boolean
+        set send_success to secure_send(security_manager, secure_channel, sensor_data)
+
+        if send_success:
+            io.print("Sensor data sent securely")
+
+            # Receive response
+            create response as String
+            set response to secure_receive(security_manager, secure_channel)
+
+            io.print("Received response: " + response)
+        end
+
+        # Close secure connection
+        close_secure_channel(security_manager, secure_channel)
+    else:
+        io.print("Failed to establish secure connection")
+    end
+
+define function threat_detection_example:
+    """Threat detection example"""
+    create security_manager as SecurityManager
+    set security_manager to create_security_manager()
+
+    # Enable threat detection
+    create detection_types as List
+    add "intrusion_detection" to detection_types
+    add "anomaly_detection" to detection_types
+    add "malware_detection" to detection_types
+
+    enable_threat_detection(security_manager, detection_types)
+
+    # Simulate network traffic monitoring
+    create network_traffic as List
+    add "192.168.1.100:80 -> 192.168.1.200:443" to network_traffic
+    add "192.168.1.100:80 -> 10.0.0.5:22" to network_traffic
+    add "192.168.1.100:80 -> suspicious-domain.com:443" to network_traffic
+
+    # Detect intrusions
+    create intrusion_result as Object
+    set intrusion_result to detect_intrusion(security_manager, network_traffic, 0.8)
+
+    if intrusion_result["threats_detected"] > 0:
+        io.print("Network intrusion detected!")
+        io.print("Threats found: " + string.format(intrusion_result["threats_detected"]))
+
+        # Block suspicious activity
+        create activity_info as Object
+        set activity_info["source_ip"] to "suspicious-domain.com"
+        set activity_info["threat_level"] to "high"
+
+        block_suspicious_activity(security_manager, activity_info)
+        io.print("Suspicious activity blocked")
+    else:
+        io.print("No network intrusions detected")
+    end
+
+define function key_management_example:
+    """Key management example"""
+    create security_manager as SecurityManager
+    set security_manager to create_security_manager()
+
+    # Create encrypted key store
+    create key_store_path as String
+    set key_store_path to "/secure/key_store.db"
+
+    create store_success as Boolean
+    set store_success to create_key_store(security_manager, key_store_path, "strong_password_123")
+
+    if store_success:
+        io.print("Key store created successfully")
+
+        # Generate and store encryption key
+        create device_key as String
+        set device_key to generate_encryption_key(security_manager, ENCRYPTION_AES_256, 32)
+
+        create store_key_success as Boolean
+        set store_key_success to store_key(security_manager, key_store_path, "device_encryption_key", device_key, KEY_TYPE_SYMMETRIC)
+
+        if store_key_success:
+            io.print("Encryption key stored securely")
+
+            # Retrieve key when needed
+            create retrieved_key as String
+            set retrieved_key to retrieve_key(security_manager, key_store_path, "device_encryption_key", "strong_password_123")
+
+            if retrieved_key == device_key:
+                io.print("Key retrieval successful")
+            else:
+                io.print("Key retrieval failed")
+            end
+
+            # Rotate keys periodically
+            create rotation_policy as Object
+            set rotation_policy["rotation_interval_days"] to 30
+            set rotation_policy["algorithm"] to ENCRYPTION_AES_256
+
+            rotate_keys(security_manager, key_store_path, rotation_policy)
+            io.print("Key rotation initiated")
+        else:
+            io.print("Failed to store encryption key")
+        end
+    else:
+        io.print("Failed to create key store")
+    end
+
+define function certificate_management_example:
+    """Certificate management example"""
+    create security_manager as SecurityManager
+    set security_manager to create_security_manager()
+
+    # Generate key pair for device
+    create device_keys as Object
+    set device_keys to generate_key_pair(security_manager, ENCRYPTION_ECC, 256)
+
+    # Create certificate subject information
+    create subject_info as Object
+    set subject_info["common_name"] to "iot-device-001"
+    set subject_info["organization"] to "IoT Solutions Inc"
+    set subject_info["organizational_unit"] to "Device Security"
+    set subject_info["country"] to "US"
+    set subject_info["state"] to "California"
+    set subject_info["locality"] to "San Francisco"
+
+    # Generate device certificate
+    create device_certificate as String
+    set device_certificate to generate_certificate(security_manager, subject_info, 365, device_keys)
+
+    io.print("Device certificate generated")
+
+    # Load CA certificate for verification
+    create ca_certificate as String
+    set ca_certificate to load_certificate(security_manager, "/path/to/ca.crt")
+
+    # Verify device certificate
+    create verification_result as Boolean
+    set verification_result to verify_certificate(security_manager, device_certificate, ca_certificate)
+
+    if verification_result:
+        io.print("Device certificate verified successfully")
+    else:
+        io.print("Device certificate verification failed")
+    end
+
+    # Get certificate information
+    create cert_info as Object
+    set cert_info to get_certificate_info(security_manager, device_certificate)
+
+    io.print("Certificate subject: " + cert_info["subject"])
+    io.print("Certificate issuer: " + cert_info["issuer"])
+    io.print("Certificate valid until: " + cert_info["valid_until"])

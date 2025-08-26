@@ -1,0 +1,386 @@
+# AGK Mobile Application Template
+# Cross-platform mobile app with touch interface, animations, and data management
+# Perfect for: Mobile Apps, Touch Games, Productivity Apps, Health Apps
+
+import graphics
+import io
+import string
+import math
+import date
+import crypto
+
+# Mobile app configuration
+create screen_width as Integer
+set screen_width to 400  # Standard mobile width
+
+create screen_height as Integer
+set screen_height to 800  # Standard mobile height
+
+create app_name as String
+set app_name to "AGK Mobile App"
+
+# App state
+create current_screen as String
+set current_screen to "home"
+
+create touch_x as Integer
+set touch_x to 0
+
+create touch_y as Integer
+set touch_y to 0
+
+create is_touched as Boolean
+set is_touched to false
+
+create touch_start_time as Float
+set touch_start_time to 0.0
+
+# User data
+create user_profile as Object
+create app_data as Object
+create settings as Object
+
+define function main:
+    # Initialize mobile app
+    create window as graphics.Window
+    set window to graphics.create_window(screen_width, screen_height, app_name)
+
+    # Create drawing canvas
+    create canvas as graphics.Canvas
+    set canvas to graphics.create_canvas(screen_width, screen_height)
+
+    # Initialize app data
+    initialize_app_data()
+
+    # Main app loop
+    create running as Boolean
+    set running to true
+
+    while running:
+        # Handle touch input
+        create touch_events as Object
+        set touch_events to graphics.handle_mouse_events(window)  # Mouse simulates touch
+
+        if touch_events:
+            set touch_x to touch_events["x"] if touch_events contains "x" else touch_x
+            set touch_y to touch_events["y"] if touch_events contains "y" else touch_y
+            set is_touched to touch_events["click"] if touch_events contains "click" else false
+
+            # Handle touch gestures
+            if is_touched:
+                handle_touch(touch_x, touch_y)
+            else:
+                handle_touch_release(touch_x, touch_y)
+
+        # Clear canvas with app background
+        graphics.draw_rectangle(canvas, 0, 0, screen_width, screen_height, graphics.color_white(), true)
+
+        # Draw current screen
+        if current_screen is equal to "home":
+            draw_home_screen(canvas)
+        else:
+            if current_screen is equal to "profile":
+                draw_profile_screen(canvas)
+            else:
+                if current_screen is equal to "settings":
+                    draw_settings_screen(canvas)
+                else:
+                    if current_screen is equal to "game":
+                        draw_game_screen(canvas)
+
+        # Draw bottom navigation
+        draw_navigation_bar(canvas)
+
+        # Draw status bar
+        draw_status_bar(canvas)
+
+        # Update display (in real implementation, this would render to screen)
+        # graphics.render_canvas_to_window(canvas, window)
+
+        # Check for app exit (in real mobile app, this would be back button or system event)
+        if touch_x > screen_width - 50 and touch_y < 50 and is_touched:
+            set running to false
+
+    # Cleanup
+    graphics.close_window(window)
+    io.print("Mobile app ended")
+    return 0
+
+# Screen drawing functions
+define function draw_home_screen that takes canvas as Canvas:
+    # Header
+    graphics.draw_rectangle(canvas, 0, 0, screen_width, 100, graphics.color_blue(), true)
+    graphics.draw_text(canvas, 20, 30, "🏠 Home", graphics.color_white(), 24)
+    graphics.draw_text(canvas, 20, 60, "Welcome to " + app_name, graphics.color_white(), 16)
+
+    # Main content area
+    create content_y as Integer
+    set content_y to 120
+
+    # Welcome card
+    graphics.draw_rectangle(canvas, 20, content_y, screen_width - 40, 150, graphics.color_gray(), true)
+    graphics.draw_text(canvas, 40, content_y + 20, "Welcome!", graphics.color_black(), 20)
+    graphics.draw_text(canvas, 40, content_y + 50, "This is your AGK mobile app", graphics.color_black(), 14)
+    graphics.draw_text(canvas, 40, content_y + 80, "Built with natural language", graphics.color_black(), 14)
+
+    # Quick actions
+    set content_y to content_y + 180
+
+    # Profile button
+    create button_color as String
+    if is_button_touched(50, content_y, 150, 60):
+        set button_color to graphics.color_green()
+    else:
+        set button_color to graphics.color_blue()
+
+    graphics.draw_rectangle(canvas, 50, content_y, 150, 60, button_color, true)
+    graphics.draw_text(canvas, 70, content_y + 20, "👤 Profile", graphics.color_white(), 16)
+
+    # Game button
+    if is_button_touched(220, content_y, 150, 60):
+        set button_color to graphics.color_green()
+    else:
+        set button_color to graphics.color_purple()
+
+    graphics.draw_rectangle(canvas, 220, content_y, 150, 60, button_color, true)
+    graphics.draw_text(canvas, 240, content_y + 20, "🎮 Game", graphics.color_white(), 16)
+
+    # App statistics
+    set content_y to content_y + 100
+    graphics.draw_text(canvas, 20, content_y, "App Statistics:", graphics.color_black(), 16)
+    graphics.draw_text(canvas, 20, content_y + 25, "• User: " + user_profile["name"], graphics.color_gray(), 14)
+    graphics.draw_text(canvas, 20, content_y + 45, "• Version: 1.0.0", graphics.color_gray(), 14)
+    graphics.draw_text(canvas, 20, content_y + 65, "• Last login: " + date.get_current_date(), graphics.color_gray(), 14)
+
+define function draw_profile_screen that takes canvas as Canvas:
+    # Header
+    graphics.draw_rectangle(canvas, 0, 0, screen_width, 100, graphics.color_green(), true)
+    graphics.draw_text(canvas, 20, 30, "👤 Profile", graphics.color_white(), 24)
+    graphics.draw_text(canvas, 20, 60, "User Information", graphics.color_white(), 16)
+
+    # Profile content
+    create content_y as Integer
+    set content_y to 120
+
+    graphics.draw_text(canvas, 20, content_y, "Name: " + user_profile["name"], graphics.color_black(), 16)
+    graphics.draw_text(canvas, 20, content_y + 30, "Email: " + user_profile["email"], graphics.color_black(), 16)
+    graphics.draw_text(canvas, 20, content_y + 60, "Member since: " + user_profile["join_date"], graphics.color_black(), 16)
+    graphics.draw_text(canvas, 20, content_y + 90, "Level: " + string.format(user_profile["level"]), graphics.color_black(), 16)
+
+    # Profile picture placeholder
+    graphics.draw_circle(canvas, 200, content_y + 100, 50, graphics.color_blue(), false)
+    graphics.draw_text(canvas, 185, content_y + 95, "👤", graphics.color_blue(), 30)
+
+define function draw_settings_screen that takes canvas as Canvas:
+    # Header
+    graphics.draw_rectangle(canvas, 0, 0, screen_width, 100, graphics.color_purple(), true)
+    graphics.draw_text(canvas, 20, 30, "⚙️ Settings", graphics.color_white(), 24)
+    graphics.draw_text(canvas, 20, 60, "App Preferences", graphics.color_white(), 16)
+
+    # Settings content
+    create content_y as Integer
+    set content_y to 120
+
+    graphics.draw_text(canvas, 20, content_y, "Settings", graphics.color_black(), 18)
+
+    # Setting toggles
+    graphics.draw_text(canvas, 20, content_y + 40, "Notifications: " + (settings["notifications"] ? "ON" : "OFF"), graphics.color_gray(), 14)
+    graphics.draw_text(canvas, 20, content_y + 65, "Sound: " + (settings["sound"] ? "ON" : "OFF"), graphics.color_gray(), 14)
+    graphics.draw_text(canvas, 20, content_y + 90, "Vibration: " + (settings["vibration"] ? "ON" : "OFF"), graphics.color_gray(), 14)
+
+    # Toggle buttons
+    create button_y as Integer
+    set button_y to content_y + 35
+
+    create toggle_color as String
+    if is_button_touched(300, button_y, 80, 30):
+        set toggle_color to graphics.color_green()
+    else:
+        set toggle_color to graphics.color_blue()
+
+    graphics.draw_rectangle(canvas, 300, button_y, 80, 30, toggle_color, true)
+    graphics.draw_text(canvas, 320, button_y + 7, "Toggle", graphics.color_white(), 12)
+
+define function draw_game_screen that takes canvas as Canvas:
+    # Header
+    graphics.draw_rectangle(canvas, 0, 0, screen_width, 100, graphics.color_red(), true)
+    graphics.draw_text(canvas, 20, 30, "🎮 Mini Game", graphics.color_white(), 24)
+    graphics.draw_text(canvas, 20, 60, "Tap to score points!", graphics.color_white(), 16)
+
+    # Game area
+    graphics.draw_rectangle(canvas, 20, 120, screen_width - 40, screen_height - 220, graphics.color_gray(), true)
+
+    # Target button
+    create target_x as Integer
+    set target_x to 150
+    create target_y as Integer
+    set target_y to 250
+
+    create target_color as String
+    if is_button_touched(target_x, target_y, 100, 100):
+        set target_color to graphics.color_yellow()
+    else:
+        set target_color to graphics.color_red()
+
+    graphics.draw_circle(canvas, target_x + 50, target_y + 50, 50, target_color, true)
+    graphics.draw_text(canvas, target_x + 30, target_y + 40, "TAP!", graphics.color_white(), 16)
+
+    # Score display
+    graphics.draw_text(canvas, 20, screen_height - 80, "Score: " + string.format(app_data["score"]), graphics.color_black(), 16)
+    graphics.draw_text(canvas, 20, screen_height - 55, "High Score: " + string.format(app_data["high_score"]), graphics.color_black(), 14)
+
+define function draw_navigation_bar that takes canvas as Canvas:
+    # Bottom navigation bar
+    graphics.draw_rectangle(canvas, 0, screen_height - 80, screen_width, 80, graphics.color_gray(), true)
+
+    # Navigation buttons
+    create button_width as Integer
+    set button_width to screen_width / 4
+
+    # Home button
+    create home_color as String
+    if current_screen is equal to "home":
+        set home_color to graphics.color_blue()
+    else:
+        set home_color to graphics.color_gray()
+
+    graphics.draw_rectangle(canvas, 0, screen_height - 80, button_width, 80, home_color, true)
+    graphics.draw_text(canvas, 20, screen_height - 50, "🏠", graphics.color_white(), 20)
+    graphics.draw_text(canvas, 15, screen_height - 25, "Home", graphics.color_white(), 12)
+
+    # Profile button
+    create profile_color as String
+    if current_screen is equal to "profile":
+        set profile_color to graphics.color_green()
+    else:
+        set profile_color to graphics.color_gray()
+
+    graphics.draw_rectangle(canvas, button_width, screen_height - 80, button_width, 80, profile_color, true)
+    graphics.draw_text(canvas, button_width + 20, screen_height - 50, "👤", graphics.color_white(), 20)
+    graphics.draw_text(canvas, button_width + 10, screen_height - 25, "Profile", graphics.color_white(), 12)
+
+    # Game button
+    create game_color as String
+    if current_screen is equal to "game":
+        set game_color to graphics.color_red()
+    else:
+        set game_color to graphics.color_gray()
+
+    graphics.draw_rectangle(canvas, button_width * 2, screen_height - 80, button_width, 80, game_color, true)
+    graphics.draw_text(canvas, button_width * 2 + 20, screen_height - 50, "🎮", graphics.color_white(), 20)
+    graphics.draw_text(canvas, button_width * 2 + 15, screen_height - 25, "Game", graphics.color_white(), 12)
+
+    # Settings button
+    create settings_color as String
+    if current_screen is equal to "settings":
+        set settings_color to graphics.color_purple()
+    else:
+        set settings_color to graphics.color_gray()
+
+    graphics.draw_rectangle(canvas, button_width * 3, screen_height - 80, button_width, 80, settings_color, true)
+    graphics.draw_text(canvas, button_width * 3 + 20, screen_height - 50, "⚙️", graphics.color_white(), 20)
+    graphics.draw_text(canvas, button_width * 3 + 5, screen_height - 25, "Settings", graphics.color_white(), 12)
+
+define function draw_status_bar that takes canvas as Canvas:
+    # Top status bar
+    graphics.draw_rectangle(canvas, 0, 0, screen_width, 30, graphics.color_black(), true)
+    graphics.draw_text(canvas, 10, 8, "📱 " + app_name, graphics.color_white(), 12)
+    graphics.draw_text(canvas, screen_width - 60, 8, "🔋 100%", graphics.color_white(), 12)
+
+# Touch handling functions
+define function handle_touch that takes x as Integer, y as Integer:
+    # Navigation bar touch handling
+    if y >= screen_height - 80:
+        create button_width as Integer
+        set button_width to screen_width / 4
+
+        if x < button_width:
+            set current_screen to "home"
+        else:
+            if x < button_width * 2:
+                set current_screen to "profile"
+            else:
+                if x < button_width * 3:
+                    set current_screen to "game"
+                else:
+                    set current_screen to "settings"
+
+    # Game screen touch handling
+    if current_screen is equal to "game":
+        if is_button_touched(150, 250, 100, 100):
+            set app_data["score"] to app_data["score"] + 1
+            if app_data["score"] > app_data["high_score"]:
+                set app_data["high_score"] to app_data["score"]
+
+define function handle_touch_release that takes x as Integer, y as Integer:
+    # Handle touch release events if needed
+    pass
+
+define function is_button_touched that takes button_x as Integer, button_y as Integer, button_width as Integer, button_height as Integer and returns Boolean:
+    if is_touched and touch_x >= button_x and touch_x <= button_x + button_width and touch_y >= button_y and touch_y <= button_y + button_height:
+        return true
+    else:
+        return false
+
+# Data management functions
+define function initialize_app_data:
+    # User profile
+    set user_profile["name"] to "John Doe"
+    set user_profile["email"] to "john@example.com"
+    set user_profile["join_date"] to date.get_current_date()
+    set user_profile["level"] to 5
+
+    # App data
+    set app_data["score"] to 0
+    set app_data["high_score"] to 0
+    set app_data["games_played"] to 0
+
+    # Settings
+    set settings["notifications"] to true
+    set settings["sound"] to true
+    set settings["vibration"] to false
+
+define function save_user_data:
+    # In real implementation, this would save to file or database
+    io.print("Saving user data...")
+    io.print("Profile: " + user_profile["name"])
+    io.print("Score: " + string.format(app_data["score"]))
+
+define function load_user_data:
+    # In real implementation, this would load from file or database
+    io.print("Loading user data...")
+
+# Utility functions
+define function calculate_distance that takes x1 as Integer, y1 as Integer, x2 as Integer, y2 as Integer and returns Float:
+    create dx as Float
+    set dx to x2 - x1
+    create dy as Float
+    set dy to y2 - y1
+    return math.sqrt(dx * dx + dy * dy)
+
+define function is_point_in_circle that takes px as Integer, py as Integer, cx as Integer, cy as Integer, radius as Integer and returns Boolean:
+    create distance as Float
+    set distance to calculate_distance(px, py, cx, cy)
+    return distance <= radius
+
+define function format_currency that takes amount as Float and returns String:
+    return "$" + string.format(amount)
+
+define function generate_session_id that returns String:
+    create random_part as String
+    set random_part to crypto.generate_secure_token(8)
+    return "session_" + date.get_current_date() + "_" + random_part
+
+# Animation and effects
+define function animate_button_press that takes button_x as Integer, button_y as Integer:
+    # In real implementation, this would create animation effects
+    io.print("Button pressed at: " + string.format(button_x) + ", " + string.format(button_y))
+
+define function play_sound_effect that takes sound_name as String:
+    # In real implementation, this would play audio
+    io.print("Playing sound: " + sound_name)
+
+define function vibrate_device that takes duration as Integer:
+    # In real implementation, this would trigger device vibration
+    if settings["vibration"]:
+        io.print("Vibrating for " + string.format(duration) + "ms")

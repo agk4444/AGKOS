@@ -1,0 +1,880 @@
+# AGK Industrial IoT (IIoT) Frameworks
+# Comprehensive industrial IoT solutions for manufacturing, process control, and asset management
+# Supports SCADA, PLC integration, predictive maintenance, and industrial protocols
+
+# Industrial Protocols
+create constant PROTOCOL_MODBUS as String = "modbus"
+create constant PROTOCOL_PROFINET as String = "profinet"
+create constant PROTOCOL_ETHERNET_IP as String = "ethernet_ip"
+create constant PROTOCOL_DEVICE_NET as String = "device_net"
+create constant PROTOCOL_CANOPEN as String = "canopen"
+create constant PROTOCOL_OPC_UA as String = "opc_ua"
+create constant PROTOCOL_MQTT_SPARKPLUG as String = "mqtt_sparkplug"
+create constant PROTOCOL_DNP3 as String = "dnp3"
+
+# Industry Standards
+create constant STANDARD_ISA95 as String = "isa95"
+create constant STANDARD_ISA100 as String = "isa100"
+create constant STANDARD_IEC61131 as String = "iec61131"
+create constant STANDARD_IEC61499 as String = "iec61499"
+create constant STANDARD_IEC62541 as String = "iec62541"
+
+# Asset Types
+create constant ASSET_MOTOR as String = "motor"
+create constant ASSET_PUMP as String = "pump"
+create constant ASSET_VALVE as String = "valve"
+create constant ASSET_SENSOR as String = "sensor"
+create constant ASSET_CONTROLLER as String = "controller"
+create constant ASSET_ROBOT as String = "robot"
+create constant ASSET_CONVEYOR as String = "conveyor"
+create constant ASSET_GENERATOR as String = "generator"
+create constant ASSET_TRANSFORMER as String = "transformer"
+create constant ASSET_SWITCHGEAR as String = "switchgear"
+
+# Maintenance Types
+create constant MAINTENANCE_PREVENTIVE as String = "preventive"
+create constant MAINTENANCE_PREDICTIVE as String = "predictive"
+create constant MAINTENANCE_CONDITION_BASED as String = "condition_based"
+create constant MAINTENANCE_CORRECTIVE as String = "corrective"
+create constant MAINTENANCE_PRESCRIPTIVE as String = "prescriptive"
+
+# Production Metrics
+create constant METRIC_OEE as String = "oee"  # Overall Equipment Effectiveness
+create constant METRIC_AVAILABILITY as String = "availability"
+create constant METRIC_PERFORMANCE as String = "performance"
+create constant METRIC_QUALITY as String = "quality"
+create constant METRIC_THROUGHPUT as String = "throughput"
+create constant METRIC_CYCLE_TIME as String = "cycle_time"
+create constant METRIC_YIELD as String = "yield"
+create constant METRIC_SCRAP_RATE as String = "scrap_rate"
+
+# Industrial IoT Controller
+define function create_industrial_controller() as IndustrialController:
+    """Create industrial IoT controller"""
+    external function industrial_create_controller() from "iot_industrial.so" as pointer
+    create controller as IndustrialController
+    set controller["assets"] to []
+    set controller["production_lines"] to []
+    set controller["maintenance_schedule"] to []
+    set controller["alert_system"] to []
+    set controller["monitoring_enabled"] to false
+    return controller
+end
+
+define function initialize_industrial_network(controller as IndustrialController, network_config as Object) as Boolean:
+    """Initialize industrial network with safety protocols"""
+    external function industrial_initialize_network(handle as pointer, config as pointer) from "iot_industrial.so" as Boolean
+    return industrial_initialize_network(controller["handle"], network_config)
+end
+
+# Asset Management
+define function register_industrial_asset(controller as IndustrialController, asset_info as Object) as String:
+    """Register industrial asset"""
+    external function industrial_register_asset(handle as pointer, info as pointer) from "iot_industrial.so" as String
+    create asset_id as String
+    set asset_id to industrial_register_asset(controller["handle"], asset_info)
+
+    if asset_id != "":
+        create asset as Object
+        set asset["id"] to asset_id
+        set asset["info"] to asset_info
+        set asset["status"] to "operational"
+        set asset["last_maintenance"] to ""
+        set asset["health_score"] to 100.0
+        add asset to controller["assets"]
+    end
+
+    return asset_id
+end
+
+define function get_asset_status(controller as IndustrialController, asset_id as String) as Object:
+    """Get asset operational status"""
+    external function industrial_get_asset_status(handle as pointer, asset_id as String) from "iot_industrial.so" as pointer
+    return industrial_get_asset_status(controller["handle"], asset_id)
+end
+
+define function update_asset_health(controller as IndustrialController, asset_id as String, health_data as Object) as Boolean:
+    """Update asset health metrics"""
+    external function industrial_update_asset_health(handle as pointer, asset_id as String, health as pointer) from "iot_industrial.so" as Boolean
+    return industrial_update_asset_health(controller["handle"], asset_id, health_data)
+end
+
+define function schedule_asset_maintenance(controller as IndustrialController, asset_id as String, maintenance_info as Object) as String:
+    """Schedule maintenance for asset"""
+    external function industrial_schedule_maintenance(handle as pointer, asset_id as String, info as pointer) from "iot_industrial.so" as String
+    return industrial_schedule_maintenance(controller["handle"], asset_id, maintenance_info)
+end
+
+# Production Line Management
+define function create_production_line(controller as IndustrialController, line_info as Object) as String:
+    """Create production line configuration"""
+    external function industrial_create_production_line(handle as pointer, info as pointer) from "iot_industrial.so" as String
+    create line_id as String
+    set line_id to industrial_create_production_line(controller["handle"], line_info)
+
+    if line_id != "":
+        create line as Object
+        set line["id"] to line_id
+        set line["info"] to line_info
+        set line["status"] to "stopped"
+        set line["production_rate"] to 0.0
+        add line to controller["production_lines"]
+    end
+
+    return line_id
+end
+
+define function start_production_line(controller as IndustrialController, line_id as String, parameters as Object) as Boolean:
+    """Start production line"""
+    external function industrial_start_production_line(handle as pointer, line_id as String, params as pointer) from "iot_industrial.so" as Boolean
+    return industrial_start_production_line(controller["handle"], line_id, parameters)
+end
+
+define function stop_production_line(controller as IndustrialController, line_id as String) as Boolean:
+    """Stop production line"""
+    external function industrial_stop_production_line(handle as pointer, line_id as String) from "iot_industrial.so" as Boolean
+    return industrial_stop_production_line(controller["handle"], line_id)
+end
+
+define function get_production_metrics(controller as IndustrialController, line_id as String, time_range as String) as Object:
+    """Get production line metrics"""
+    external function industrial_get_production_metrics(handle as pointer, line_id as String, time_range as String) from "iot_industrial.so" as pointer
+    return industrial_get_production_metrics(controller["handle"], line_id, time_range)
+end
+
+define function calculate_oee(controller as IndustrialController, line_id as String, time_range as String) as Float:
+    """Calculate Overall Equipment Effectiveness (OEE)"""
+    create metrics as Object
+    set metrics to get_production_metrics(controller, line_id, time_range)
+
+    create availability as Float
+    set availability to metrics["availability"]
+
+    create performance as Float
+    set performance to metrics["performance"]
+
+    create quality as Float
+    set quality to metrics["quality"]
+
+    # OEE = Availability × Performance × Quality
+    return availability * performance * quality
+end
+
+# Industrial Protocols
+define function setup_modbus_master(controller as IndustrialController, modbus_config as Object) as String:
+    """Setup Modbus master"""
+    external function industrial_setup_modbus_master(handle as pointer, config as pointer) from "iot_industrial.so" as String
+    return industrial_setup_modbus_master(controller["handle"], modbus_config)
+end
+
+define function modbus_read_registers(controller as IndustrialController, connection_id as String, start_address as Integer, count as Integer) as List:
+    """Read Modbus registers"""
+    external function industrial_modbus_read_registers(handle as pointer, conn_id as String, start as Integer, count as Integer) from "iot_industrial.so" as pointer
+    return industrial_modbus_read_registers(controller["handle"], connection_id, start_address, count)
+end
+
+define function modbus_write_registers(controller as IndustrialController, connection_id as String, start_address as Integer, values as List) as Boolean:
+    """Write Modbus registers"""
+    external function industrial_modbus_write_registers(handle as pointer, conn_id as String, start as Integer, values as pointer) from "iot_industrial.so" as Boolean
+    return industrial_modbus_write_registers(controller["handle"], connection_id, start_address, values)
+end
+
+define function setup_opc_ua_client(controller as IndustrialController, opc_config as Object) as String:
+    """Setup OPC UA client"""
+    external function industrial_setup_opc_ua_client(handle as pointer, config as pointer) from "iot_industrial.so" as String
+    return industrial_setup_opc_ua_client(controller["handle"], opc_config)
+end
+
+define function opc_ua_read_node(controller as IndustrialController, connection_id as String, node_id as String) as Object:
+    """Read OPC UA node"""
+    external function industrial_opc_ua_read_node(handle as pointer, conn_id as String, node_id as String) from "iot_industrial.so" as pointer
+    return industrial_opc_ua_read_node(controller["handle"], connection_id, node_id)
+end
+
+define function opc_ua_write_node(controller as IndustrialController, connection_id as String, node_id as String, value as Object) as Boolean:
+    """Write OPC UA node"""
+    external function industrial_opc_ua_write_node(handle as pointer, conn_id as String, node_id as String, value as pointer) from "iot_industrial.so" as Boolean
+    return industrial_opc_ua_write_node(controller["handle"], connection_id, node_id, value)
+end
+
+# Predictive Maintenance
+define function setup_predictive_maintenance(controller as IndustrialController, asset_id as String, model_config as Object) as Boolean:
+    """Setup predictive maintenance for asset"""
+    external function industrial_setup_predictive_maintenance(handle as pointer, asset_id as String, config as pointer) from "iot_industrial.so" as Boolean
+    return industrial_setup_predictive_maintenance(controller["handle"], asset_id, model_config)
+end
+
+define function get_maintenance_prediction(controller as IndustrialController, asset_id as String) as Object:
+    """Get maintenance prediction for asset"""
+    external function industrial_get_maintenance_prediction(handle as pointer, asset_id as String) from "iot_industrial.so" as pointer
+    return industrial_get_maintenance_prediction(controller["handle"], asset_id)
+end
+
+define function train_maintenance_model(controller as IndustrialController, asset_id as String, training_data as List) as Boolean:
+    """Train predictive maintenance model"""
+    external function industrial_train_maintenance_model(handle as pointer, asset_id as String, data as pointer) from "iot_industrial.so" as Boolean
+    return industrial_train_maintenance_model(controller["handle"], asset_id, training_data)
+end
+
+define function get_asset_health_trend(controller as IndustrialController, asset_id as String, days as Integer) as List:
+    """Get asset health trend over time"""
+    external function industrial_get_asset_health_trend(handle as pointer, asset_id as String, days as Integer) from "iot_industrial.so" as pointer
+    return industrial_get_asset_health_trend(controller["handle"], asset_id, days)
+end
+
+# SCADA Integration
+define function setup_scada_integration(controller as IndustrialController, scada_config as Object) as Boolean:
+    """Setup SCADA system integration"""
+    external function industrial_setup_scada_integration(handle as pointer, config as pointer) from "iot_industrial.so" as Boolean
+    return industrial_setup_scada_integration(controller["handle"], scada_config)
+end
+
+define function send_scada_data(controller as IndustrialController, tag_name as String, value as Object, timestamp as String) as Boolean:
+    """Send data to SCADA system"""
+    external function industrial_send_scada_data(handle as pointer, tag as String, value as pointer, timestamp as String) from "iot_industrial.so" as Boolean
+    return industrial_send_scada_data(controller["handle"], tag_name, value, timestamp)
+end
+
+define function receive_scada_command(controller as IndustrialController) as Object:
+    """Receive command from SCADA system"""
+    external function industrial_receive_scada_command(handle as pointer) from "iot_industrial.so" as pointer
+    return industrial_receive_scada_command(controller["handle"])
+end
+
+# PLC Integration
+define function connect_to_plc(controller as IndustrialController, plc_config as Object) as String:
+    """Connect to PLC system"""
+    external function industrial_connect_to_plc(handle as pointer, config as pointer) from "iot_industrial.so" as String
+    return industrial_connect_to_plc(controller["handle"], plc_config)
+end
+
+define function read_plc_data(controller as IndustrialController, connection_id as String, data_points as List) as Object:
+    """Read data from PLC"""
+    external function industrial_read_plc_data(handle as pointer, conn_id as String, points as pointer) from "iot_industrial.so" as pointer
+    return industrial_read_plc_data(controller["handle"], connection_id, data_points)
+end
+
+define function write_plc_data(controller as IndustrialController, connection_id as String, data_points as Object) as Boolean:
+    """Write data to PLC"""
+    external function industrial_write_plc_data(handle as pointer, conn_id as String, points as pointer) from "iot_industrial.so" as Boolean
+    return industrial_write_plc_data(controller["handle"], connection_id, data_points)
+end
+
+# Industrial Alert System
+define function setup_industrial_alerts(controller as IndustrialController, alert_config as Object) as Boolean:
+    """Setup industrial alert system"""
+    external function industrial_setup_alerts(handle as pointer, config as pointer) from "iot_industrial.so" as Boolean
+    return industrial_setup_alerts(controller["handle"], alert_config)
+end
+
+define function create_alert_rule(controller as IndustrialController, rule_info as Object) as String:
+    """Create alert rule"""
+    external function industrial_create_alert_rule(handle as pointer, info as pointer) from "iot_industrial.so" as String
+    return industrial_create_alert_rule(controller["handle"], rule_info)
+end
+
+define function trigger_industrial_alert(controller as IndustrialController, alert_type as String, severity as String, data as Object) as Boolean:
+    """Trigger industrial alert"""
+    external function industrial_trigger_alert(handle as pointer, type as String, severity as String, data as pointer) from "iot_industrial.so" as Boolean
+    return industrial_trigger_alert(controller["handle"], alert_type, severity, data)
+end
+
+define function acknowledge_alert(controller as IndustrialController, alert_id as String, operator_id as String) as Boolean:
+    """Acknowledge industrial alert"""
+    external function industrial_acknowledge_alert(handle as pointer, alert_id as String, operator as String) from "iot_industrial.so" as Boolean
+    return industrial_acknowledge_alert(controller["handle"], alert_id, operator_id)
+end
+
+# Energy Management
+define function monitor_industrial_energy(controller as IndustrialController, equipment_list as List) as Object:
+    """Monitor industrial energy usage"""
+    external function industrial_monitor_energy(handle as pointer, equipment as pointer) from "iot_industrial.so" as pointer
+    return industrial_monitor_energy(controller["handle"], equipment_list)
+end
+
+define function optimize_energy_usage(controller as IndustrialController, optimization_config as Object) as Boolean:
+    """Optimize industrial energy usage"""
+    external function industrial_optimize_energy(handle as pointer, config as pointer) from "iot_industrial.so" as Boolean
+    return industrial_optimize_energy_usage(controller["handle"], optimization_config)
+end
+
+define function get_energy_efficiency_metrics(controller as IndustrialController, time_range as String) as Object:
+    """Get energy efficiency metrics"""
+    external function industrial_get_energy_efficiency_metrics(handle as pointer, time_range as String) from "iot_industrial.so" as pointer
+    return industrial_get_energy_efficiency_metrics(controller["handle"], time_range)
+end
+
+# Quality Control
+define function setup_quality_monitoring(controller as IndustrialController, quality_config as Object) as Boolean:
+    """Setup quality monitoring system"""
+    external function industrial_setup_quality_monitoring(handle as pointer, config as pointer) from "iot_industrial.so" as Boolean
+    return industrial_setup_quality_monitoring(controller["handle"], quality_config)
+end
+
+define function record_quality_data(controller as IndustrialController, product_id as String, quality_metrics as Object) as Boolean:
+    """Record quality control data"""
+    external function industrial_record_quality_data(handle as pointer, product_id as String, metrics as pointer) from "iot_industrial.so" as Boolean
+    return industrial_record_quality_data(controller["handle"], product_id, quality_metrics)
+end
+
+define function get_quality_trends(controller as IndustrialController, time_range as String, product_type as String) as Object:
+    """Get quality trends over time"""
+    external function industrial_get_quality_trends(handle as pointer, time_range as String, product_type as String) from "iot_industrial.so" as pointer
+    return industrial_get_quality_trends(controller["handle"], time_range, product_type)
+end
+
+# Safety Systems
+define function setup_safety_systems(controller as IndustrialController, safety_config as Object) as Boolean:
+    """Setup industrial safety systems"""
+    external function industrial_setup_safety_systems(handle as pointer, config as pointer) from "iot_industrial.so" as Boolean
+    return industrial_setup_safety_systems(controller["handle"], safety_config)
+end
+
+define function monitor_safety_conditions(controller as IndustrialController) as Object:
+    """Monitor safety conditions"""
+    external function industrial_monitor_safety_conditions(handle as pointer) from "iot_industrial.so" as pointer
+    return industrial_monitor_safety_conditions(controller["handle"])
+end
+
+define function emergency_stop_procedure(controller as IndustrialController, emergency_info as Object) as Boolean:
+    """Execute emergency stop procedure"""
+    external function industrial_emergency_stop(handle as pointer, info as pointer) from "iot_industrial.so" as Boolean
+    return industrial_emergency_stop_procedure(controller["handle"], emergency_info)
+end
+
+# Analytics and Reporting
+define function generate_production_report(controller as IndustrialController, time_range as String, report_type as String) as String:
+    """Generate production report"""
+    external function industrial_generate_production_report(handle as pointer, time_range as String, report_type as String) from "iot_industrial.so" as String
+    return industrial_generate_production_report(controller["handle"], time_range, report_type)
+end
+
+define function analyze_production_efficiency(controller as IndustrialController, analysis_config as Object) as Object:
+    """Analyze production efficiency"""
+    external function industrial_analyze_production_efficiency(handle as pointer, config as pointer) from "iot_industrial.so" as pointer
+    return industrial_analyze_production_efficiency(controller["handle"], analysis_config)
+end
+
+define function get_maintenance_effectiveness(controller as IndustrialController, time_range as String) as Object:
+    """Get maintenance effectiveness metrics"""
+    external function industrial_get_maintenance_effectiveness(handle as pointer, time_range as String) from "iot_industrial.so" as pointer
+    return industrial_get_maintenance_effectiveness(controller["handle"], time_range)
+end
+
+# Error Handling and Diagnostics
+define function get_industrial_error(controller as IndustrialController) as String:
+    """Get last industrial controller error"""
+    external function industrial_get_error(handle as pointer) from "iot_industrial.so" as String
+    return industrial_get_error(controller["handle"])
+end
+
+define function clear_industrial_error(controller as IndustrialController) as void:
+    """Clear industrial controller error"""
+    external function industrial_clear_error(handle as pointer) from "iot_industrial.so" as void
+    industrial_clear_error(controller["handle"])
+end
+
+define function run_industrial_diagnostics(controller as IndustrialController, diagnostic_type as String) as Object:
+    """Run industrial system diagnostics"""
+    external function industrial_run_diagnostics(handle as pointer, type as String) from "iot_industrial.so" as pointer
+    return industrial_run_diagnostics(controller["handle"], diagnostic_type)
+end
+
+# Example Usage
+define function industrial_asset_management_example:
+    """Industrial asset management example"""
+    # Create industrial controller
+    create controller as IndustrialController
+    set controller to create_industrial_controller()
+
+    # Initialize industrial network
+    create network_config as Object
+    set network_config["protocol"] to PROTOCOL_MODBUS
+    set network_config["safety_level"] to "SIL2"
+    set network_config["redundancy"] to true
+
+    initialize_industrial_network(controller, network_config)
+
+    # Register industrial assets
+    create asset_list as List
+
+    create motor_info as Object
+    set motor_info["type"] to ASSET_MOTOR
+    set motor_info["name"] to "Conveyor Motor Unit 1"
+    set motor_info["location"] to "Production Line A"
+    set motor_info["specifications"] to {"power": "5.5kW", "voltage": "400V", "rpm": "1450"}
+    set motor_info["maintenance_schedule"] to MAINTENANCE_PREVENTIVE
+    add motor_info to asset_list
+
+    create pump_info as Object
+    set pump_info["type"] to ASSET_PUMP
+    set pump_info["name"] to "Cooling Pump System"
+    set pump_info["location"] to "HVAC Unit 2"
+    set pump_info["specifications"] to {"flow_rate": "50m3/h", "head": "25m", "power": "3.7kW"}
+    set pump_info["maintenance_schedule"] to MAINTENANCE_CONDITION_BASED
+    add pump_info to asset_list
+
+    # Register assets
+    create i as Integer
+    set i to 0
+    while i < list.length(asset_list):
+        create asset_info as Object
+        set asset_info to asset_list[i]
+        create asset_id as String
+        set asset_id to register_industrial_asset(controller, asset_info)
+        io.print("Asset registered: " + asset_id)
+        set i to i + 1
+    end
+
+    # Setup predictive maintenance for motor
+    create motor_model_config as Object
+    set motor_model_config["model_type"] to "vibration_analysis"
+    set motor_model_config["sensors"] to ["vibration", "temperature", "current"]
+    set motor_model_config["prediction_horizon"] to 30  # days
+
+    setup_predictive_maintenance(controller, "conveyor_motor_unit_1", motor_model_config)
+
+    # Get maintenance predictions
+    create predictions as Object
+    set predictions to get_maintenance_prediction(controller, "conveyor_motor_unit_1")
+
+    io.print("Next maintenance due: " + predictions["next_maintenance_date"])
+    io.print("Confidence level: " + string.format(predictions["confidence"] * 100) + "%")
+
+    # Schedule maintenance
+    create maintenance_info as Object
+    set maintenance_info["type"] to MAINTENANCE_PREVENTIVE
+    set maintenance_info["scheduled_date"] to "2024-02-15"
+    set maintenance_info["estimated_duration"] to 4.0  # hours
+    set maintenance_info["required_parts"] to ["motor_oil", "filter", "belts"]
+
+    create maintenance_id as String
+    set maintenance_id to schedule_asset_maintenance(controller, "conveyor_motor_unit_1", maintenance_info)
+
+    io.print("Maintenance scheduled: " + maintenance_id)
+
+define function modbus_communication_example:
+    """Modbus communication example"""
+    create controller as IndustrialController
+    set controller to create_industrial_controller()
+
+    # Setup Modbus master
+    create modbus_config as Object
+    set modbus_config["mode"] to "rtu"
+    set modbus_config["port"] to "COM1"
+    set modbus_config["baud_rate"] to 9600
+    set modbus_config["parity"] to "none"
+    set modbus_config["data_bits"] to 8
+    set modbus_config["stop_bits"] to 1
+
+    create modbus_id as String
+    set modbus_id to setup_modbus_master(controller, modbus_config)
+
+    if modbus_id != "":
+        io.print("Modbus master configured: " + modbus_id)
+
+        # Read holding registers from slave device
+        create registers as List
+        set registers to modbus_read_registers(controller, modbus_id, 0, 10)
+
+        io.print("Read " + string.format(list.length(registers)) + " registers")
+
+        create j as Integer
+        set j to 0
+        while j < list.length(registers):
+            create value as Integer
+            set value to registers[j]
+            io.print("Register " + string.format(j) + ": " + string.format(value))
+            set j to j + 1
+        end
+
+        # Write to holding registers
+        create write_values as List
+        add 100 to write_values
+        add 200 to write_values
+        add 300 to write_values
+
+        create write_success as Boolean
+        set write_success to modbus_write_registers(controller, modbus_id, 10, write_values)
+
+        if write_success:
+            io.print("Successfully wrote to Modbus registers")
+        else:
+            io.print("Failed to write to Modbus registers")
+        end
+    else:
+        io.print("Failed to configure Modbus master")
+    end
+
+define function opc_ua_integration_example:
+    """OPC UA integration example"""
+    create controller as IndustrialController
+    set controller to create_industrial_controller()
+
+    # Setup OPC UA client
+    create opc_config as Object
+    set opc_config["server_url"] to "opc.tcp://192.168.1.100:4840"
+    set opc_config["security_mode"] to "sign_encrypt"
+    set opc_config["security_policy"] to "basic256sha256"
+    set opc_config["username"] to "industrial_user"
+    set opc_config["password"] to "secure_password"
+
+    create opc_id as String
+    set opc_id to setup_opc_ua_client(controller, opc_config)
+
+    if opc_id != "":
+        io.print("OPC UA client connected: " + opc_id)
+
+        # Read node values
+        create temperature_node as String
+        set temperature_node to "ns=2;s=TemperatureSensor"
+
+        create temp_value as Object
+        set temp_value to opc_ua_read_node(controller, opc_id, temperature_node)
+
+        io.print("Temperature: " + string.format(temp_value["value"]) + " " + temp_value["unit"])
+
+        # Write to control node
+        create setpoint_node as String
+        set setpoint_node to "ns=2;s=TemperatureSetpoint"
+
+        create setpoint_value as Object
+        set setpoint_value["value"] to 75.0
+        set setpoint_value["data_type"] to "float"
+
+        create write_success as Boolean
+        set write_success to opc_ua_write_node(controller, opc_id, setpoint_node, setpoint_value)
+
+        if write_success:
+            io.print("Temperature setpoint updated successfully")
+        else:
+            io.print("Failed to update temperature setpoint")
+        end
+    else:
+        io.print("Failed to connect to OPC UA server")
+    end
+
+define function production_line_monitoring_example:
+    """Production line monitoring example"""
+    create controller as IndustrialController
+    set controller to create_industrial_controller()
+
+    # Create production line
+    create line_info as Object
+    set line_info["name"] to "Assembly Line 1"
+    set line_info["product_type"] to "automotive_sensors"
+    set line_info["capacity_per_hour"] to 500
+    set line_info["workstations"] to ["welding", "testing", "packaging"]
+    set line_info["quality_checkpoints"] to ["visual_inspection", "functional_test"]
+
+    create line_id as String
+    set line_id to create_production_line(controller, line_info)
+
+    io.print("Production line created: " + line_id)
+
+    # Start production
+    create start_params as Object
+    set start_params["batch_size"] to 1000
+    set start_params["target_cycle_time"] to 45  # seconds
+    set start_params["operator_id"] to "operator_001"
+
+    create start_success as Boolean
+    set start_success to start_production_line(controller, line_id, start_params)
+
+    if start_success:
+        io.print("Production line started successfully")
+
+        # Monitor production metrics
+        delay(30000)  # Wait 30 seconds
+
+        create metrics as Object
+        set metrics to get_production_metrics(controller, line_id, "current_shift")
+
+        io.print("Production metrics:")
+        io.print("  Units produced: " + string.format(metrics["units_produced"]))
+        io.print("  Production rate: " + string.format(metrics["production_rate"]) + " units/hour")
+        io.print("  Quality rate: " + string.format(metrics["quality_rate"] * 100) + "%")
+        io.print("  OEE: " + string.format(calculate_oee(controller, line_id, "current_shift") * 100) + "%")
+
+        # Calculate availability, performance, quality
+        io.print("  Availability: " + string.format(metrics["availability"] * 100) + "%")
+        io.print("  Performance: " + string.format(metrics["performance"] * 100) + "%")
+        io.print("  Quality: " + string.format(metrics["quality"] * 100) + "%")
+
+        # Stop production after some time
+        stop_production_line(controller, line_id)
+        io.print("Production line stopped")
+    else:
+        io.print("Failed to start production line")
+    end
+
+define function predictive_maintenance_example:
+    """Predictive maintenance example"""
+    create controller as IndustrialController
+    set controller to create_industrial_controller()
+
+    # Setup predictive maintenance for pump
+    create pump_id as String
+    set pump_id to "cooling_pump_system"
+
+    create pm_config as Object
+    set pm_config["model_type"] to "vibration_frequency_analysis"
+    set pm_config["prediction_horizon"] to 14  # days
+    set pm_config["alert_threshold"] to 0.8
+    set pm_config["training_data_window"] to 90  # days
+
+    setup_predictive_maintenance(controller, pump_id, pm_config)
+
+    # Get current health prediction
+    create prediction as Object
+    set prediction to get_maintenance_prediction(controller, pump_id)
+
+    io.print("Asset: " + pump_id)
+    io.print("Health score: " + string.format(prediction["health_score"] * 100) + "%")
+    io.print("Predicted RUL: " + string.format(prediction["remaining_useful_life"]) + " days")
+    io.print("Maintenance urgency: " + prediction["maintenance_urgency"])
+
+    if prediction["maintenance_required"]:
+        io.print("MAINTENANCE REQUIRED!")
+        io.print("Recommended actions:")
+        create i as Integer
+        set i to 0
+        while i < list.length(prediction["recommended_actions"]):
+            create action as String
+            set action to prediction["recommended_actions"][i]
+            io.print("  - " + action)
+            set i to i + 1
+        end
+    end
+
+    # Get health trend over time
+    create health_trend as List
+    set health_trend to get_asset_health_trend(controller, pump_id, 30)
+
+    io.print("Health trend over last 30 days:")
+    create j as Integer
+    set j to 0
+    while j < list.length(health_trend):
+        create day_data as Object
+        set day_data to health_trend[j]
+        io.print("  Day " + string.format(j + 1) + ": " + string.format(day_data["health_score"] * 100) + "%")
+        set j to j + 1
+    end
+
+define function industrial_alert_system_example:
+    """Industrial alert system example"""
+    create controller as IndustrialController
+    set controller to create_industrial_controller()
+
+    # Setup industrial alert system
+    create alert_config as Object
+    set alert_config["notification_channels"] to ["email", "sms", "dashboard", "alarm_sirens"]
+    set alert_config["escalation_levels"] to ["operator", "supervisor", "maintenance_team", "emergency_services"]
+    set alert_config["response_times"] to [300, 600, 1800, 300]  # seconds
+
+    setup_industrial_alerts(controller, alert_config)
+
+    # Create alert rules
+    create temperature_rule as Object
+    set temperature_rule["name"] to "High Temperature Alert"
+    set temperature_rule["condition"] to "temperature > 80.0"
+    set temperature_rule["severity"] to "high"
+    set temperature_rule["asset_id"] to "industrial_oven_1"
+    set temperature_rule["escalation"] to true
+
+    create temp_rule_id as String
+    set temp_rule_id to create_alert_rule(controller, temperature_rule)
+
+    create vibration_rule as Object
+    set vibration_rule["name"] to "Excessive Vibration Alert"
+    set vibration_rule["condition"] to "vibration > 5.0"
+    set vibration_rule["severity"] to "critical"
+    set vibration_rule["asset_id"] to "conveyor_motor_1"
+    set vibration_rule["escalation"] to true
+
+    create vib_rule_id as String
+    set vib_rule_id to create_alert_rule(controller, vibration_rule)
+
+    io.print("Alert rules created:")
+    io.print("  - " + temp_rule_id)
+    io.print("  - " + vib_rule_id)
+
+    # Simulate alert trigger
+    create temperature_data as Object
+    set temperature_data["asset_id"] to "industrial_oven_1"
+    set temperature_data["temperature"] to 85.5
+    set temperature_data["threshold"] to 80.0
+    set temperature_data["timestamp"] to "2024-01-15T14:30:00Z"
+
+    create alert_triggered as Boolean
+    set alert_triggered to trigger_industrial_alert(controller, "temperature_threshold_exceeded", "high", temperature_data)
+
+    if alert_triggered:
+        io.print("Temperature alert triggered successfully")
+    else:
+        io.print("Failed to trigger temperature alert")
+    end
+
+    # Simulate critical vibration alert
+    create vibration_data as Object
+    set vibration_data["asset_id"] to "conveyor_motor_1"
+    set vibration_data["vibration"] to 7.2
+    set vibration_data["threshold"] to 5.0
+    set vibration_data["frequency"] to 45.5
+    set vibration_data["timestamp"] to "2024-01-15T14:35:00Z"
+
+    set alert_triggered to trigger_industrial_alert(controller, "vibration_threshold_exceeded", "critical", vibration_data)
+
+    if alert_triggered:
+        io.print("Critical vibration alert triggered - emergency procedures initiated")
+    end
+
+define function scada_integration_example:
+    """SCADA integration example"""
+    create controller as IndustrialController
+    set controller to create_industrial_controller()
+
+    # Setup SCADA integration
+    create scada_config as Object
+    set scada_config["scada_system"] to "wonderware"
+    set scada_config["server_address"] to "192.168.1.200"
+    set scada_config["server_port"] to 44818
+    set scada_config["authentication"] to true
+    set scada_config["username"] to "iiot_user"
+    set scada_config["password"] to "secure_scada_password"
+
+    create scada_setup_success as Boolean
+    set scada_setup_success to setup_scada_integration(controller, scada_config)
+
+    if scada_setup_success:
+        io.print("SCADA integration established successfully")
+
+        # Send production data to SCADA
+        create production_data as Object
+        set production_data["production_line"] to "line_1"
+        set production_data["units_produced"] to 1250
+        set production_data["cycle_time"] to 42.5
+        set production_data["quality_rate"] to 0.987
+        set production_data["oee"] to 0.89
+
+        create current_timestamp as String
+        set current_timestamp to "2024-01-15T15:00:00Z"
+
+        create data_sent as Boolean
+        set data_sent to send_scada_data(controller, "production_metrics", production_data, current_timestamp)
+
+        if data_sent:
+            io.print("Production data sent to SCADA system")
+        else:
+            io.print("Failed to send data to SCADA system")
+        end
+
+        # Send alarm data to SCADA
+        create alarm_data as Object
+        set alarm_data["alarm_type"] to "low_oil_pressure"
+        set alarm_data["severity"] to "medium"
+        set alarm_data["asset"] to "hydraulic_press_1"
+        set alarm_data["value"] to 15.2
+        set alarm_data["threshold"] to 20.0
+
+        set data_sent to send_scada_data(controller, "alarm_condition", alarm_data, current_timestamp)
+
+        if data_sent:
+            io.print("Alarm data sent to SCADA system")
+        end
+
+        # Receive command from SCADA
+        create received_command as Object
+        set received_command to receive_scada_command(controller)
+
+        if received_command != null:
+            io.print("Command received from SCADA:")
+            io.print("  Command: " + received_command["command"])
+            io.print("  Target: " + received_command["target"])
+            io.print("  Parameters: " + received_command["parameters"])
+        else:
+            io.print("No commands received from SCADA")
+        end
+    else:
+        io.print("Failed to establish SCADA integration")
+    end
+
+define function energy_management_example:
+    """Industrial energy management example"""
+    create controller as IndustrialController
+    set controller to create_industrial_controller()
+
+    # List of equipment to monitor
+    create equipment_list as List
+    add "injection_molding_machine_1" to equipment_list
+    add "conveyor_system_main" to equipment_list
+    add "air_compressor_unit" to equipment_list
+    add "lighting_system_production" to equipment_list
+    add "hvac_system_main" to equipment_list
+
+    # Monitor energy usage
+    create energy_monitoring as Object
+    set energy_monitoring to monitor_industrial_energy(controller, equipment_list)
+
+    io.print("Industrial Energy Monitoring:")
+    io.print("Total facility power: " + string.format(energy_monitoring["total_power_kw"]) + " kW")
+    io.print("Peak demand: " + string.format(energy_monitoring["peak_demand_kw"]) + " kW")
+    io.print("Power factor: " + string.format(energy_monitoring["power_factor"]))
+
+    # Show equipment-specific usage
+    create equipment_energy as Object
+    set equipment_energy to energy_monitoring["equipment_usage"]
+
+    create equipment_names as List
+    set equipment_names to object.keys(equipment_energy)
+
+    create i as Integer
+    set i to 0
+    while i < list.length(equipment_names):
+        create equipment_name as String
+        set equipment_name to equipment_names[i]
+        create equipment_data as Object
+        set equipment_data to equipment_energy[equipment_name]
+        io.print("  " + equipment_name + ": " + string.format(equipment_data["power_kw"]) + " kW (" + string.format(equipment_data["efficiency"] * 100) + "% efficient)")
+        set i to i + 1
+    end
+
+    # Optimize energy usage
+    create optimization_config as Object
+    set optimization_config["target_reduction"] to 0.15  # 15% reduction
+    set optimization_config["non_critical_equipment"] to ["lighting_system_production", "hvac_system_main"]
+    set optimization_config["peak_shaving"] to true
+    set optimization_config["load_shifting"] to true
+
+    create optimization_success as Boolean
+    set optimization_success to optimize_energy_usage(controller, optimization_config)
+
+    if optimization_success:
+        io.print("Energy optimization initiated")
+
+        # Monitor optimization results
+        delay(60000)  # Wait 1 minute
+
+        create optimized_energy as Object
+        set optimized_energy to monitor_industrial_energy(controller, equipment_list)
+
+        create reduction_achieved as Float
+        set reduction_achieved to (energy_monitoring["total_power_kw"] - optimized_energy["total_power_kw"]) / energy_monitoring["total_power_kw"]
+
+        io.print("Energy optimization results:")
+        io.print("  Original usage: " + string.format(energy_monitoring["total_power_kw"]) + " kW")
+        io.print("  Optimized usage: " + string.format(optimized_energy["total_power_kw"]) + " kW")
+        io.print("  Reduction achieved: " + string.format(reduction_achieved * 100) + "%")
+    else:
+        io.print("Energy optimization failed")
+    end
+
+    # Get energy efficiency metrics
+    create efficiency_metrics as Object
+    set efficiency_metrics to get_energy_efficiency_metrics(controller, "last_24_hours")
+
+    io.print("Energy Efficiency Metrics:")
+    io.print("  Energy per unit produced: " + string.format(efficiency_metrics["energy_per_unit"]) + " kWh/unit")
+    io.print("  Carbon footprint: " + string.format(efficiency_metrics["carbon_footprint"]) + " kg CO2")
+    io.print("  Cost per kWh: $" + string.format(efficiency_metrics["cost_per_kwh"]))
+    io.print("  Total energy cost (24h): $" + string.format(efficiency_metrics["total_cost_24h"]))

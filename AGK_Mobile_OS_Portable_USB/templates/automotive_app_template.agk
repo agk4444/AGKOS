@@ -1,0 +1,697 @@
+# AGK Automotive Platform Application Template
+# Cross-platform automotive app with infotainment, ADAS, and vehicle control
+# Perfect for: Car Infotainment, ADAS Apps, Vehicle Control, Safety Systems
+
+import graphics
+import io
+import string
+import math
+import date
+import automotive
+
+# Automotive app configuration
+create screen_width as Integer
+set screen_width to 1280  # Automotive infotainment display width
+
+create screen_height as Integer
+set screen_height to 720   # Automotive infotainment display height
+
+create app_name as String
+set app_name to "AGK Automotive App"
+
+# App state
+create current_screen as String
+set current_screen to "dashboard"
+
+create selected_index as Integer
+set selected_index to 0
+
+# ADAS sessions
+create adas_sessions as Object
+create cruise_control_session as Integer
+set cruise_control_session to 0
+
+create lane_keeping_session as Integer
+set lane_keeping_session to 0
+
+create blind_spot_session as Integer
+set blind_spot_session to 0
+
+# Vehicle data
+create vehicle_speed as Float
+set vehicle_speed to 0.0
+
+create engine_rpm as Integer
+set engine_rpm to 0
+
+create fuel_level as Float
+set fuel_level to 0.75
+
+create odometer as Integer
+set odometer to 0
+
+# Navigation data
+create navigation_session as Integer
+set navigation_session to 0
+
+create current_location as List
+create destination as List
+create navigation_active as Boolean
+set navigation_active to false
+
+# Audio/Infotainment
+create current_audio_source as String
+set current_audio_source to "radio"
+
+create volume_level as Float
+set volume_level to 0.5
+
+create current_radio_station as Float
+set current_radio_station to 95.5
+
+# Climate control
+create driver_temperature as Float
+set driver_temperature to 72.0
+
+create passenger_temperature as Float
+set passenger_temperature to 72.0
+
+# Safety systems
+create safety_warnings as List
+
+define function main:
+    # Initialize automotive app
+    create window as graphics.Window
+    set window to graphics.create_window(screen_width, screen_height, app_name)
+
+    # Create drawing canvas
+    create canvas as graphics.Canvas
+    set canvas to graphics.create_canvas(screen_width, screen_height)
+
+    # Initialize automotive systems
+    initialize_automotive_systems()
+
+    # Main app loop
+    create running as Boolean
+    set running to true
+
+    while running:
+        # Update vehicle data
+        update_vehicle_data()
+
+        # Check safety systems
+        check_safety_systems()
+
+        # Handle input (simulated touch/voice/steering wheel buttons)
+        create input_events as Object
+        set input_events to handle_automotive_input()
+
+        if input_events:
+            handle_touch_input(input_events)
+            handle_button_input(input_events)
+
+        # Clear canvas with automotive theme
+        graphics.draw_rectangle(canvas, 0, 0, screen_width, screen_height, graphics.color_black(), true)
+
+        # Draw current screen
+        if current_screen is equal to "dashboard":
+            draw_dashboard_screen(canvas)
+        else:
+            if current_screen is equal to "navigation":
+                draw_navigation_screen(canvas)
+            else:
+                if current_screen is equal to "audio":
+                    draw_audio_screen(canvas)
+                else:
+                    if current_screen is equal to "climate":
+                        draw_climate_screen(canvas)
+                    else:
+                        if current_screen is equal to "safety":
+                            draw_safety_screen(canvas)
+
+        # Draw common automotive UI elements
+        draw_status_bar(canvas)
+        draw_speedometer_overlay(canvas)
+        draw_warning_indicators(canvas)
+
+        # Update display
+        # graphics.render_canvas_to_window(canvas, window)
+
+        # Safety check - ensure driver attention
+        if vehicle_speed > 5.0 and safety_warnings.length > 0:
+            show_safety_warning(canvas)
+
+        # Check for app exit (emergency stop)
+        if is_emergency_button_pressed():
+            set running to false
+
+    # Cleanup
+    cleanup_automotive_systems()
+    graphics.close_window(window)
+    io.print("Automotive app ended")
+    return 0
+
+# Screen drawing functions
+define function draw_dashboard_screen that takes canvas as Canvas:
+    # Main vehicle dashboard
+    graphics.draw_text(canvas, 50, 50, "🚗 Vehicle Dashboard", graphics.color_white(), 36)
+
+    # Primary gauges
+    draw_speedometer(canvas, 100, 150, 200, vehicle_speed)
+    draw_tachometer(canvas, screen_width - 300, 150, 200, engine_rpm)
+
+    # Secondary information
+    graphics.draw_text(canvas, 50, screen_height - 200, "Fuel Level:", graphics.color_white(), 20)
+    graphics.draw_rectangle(canvas, 50, screen_height - 170, 200, 20, graphics.color_gray(), true)
+    graphics.draw_rectangle(canvas, 50, screen_height - 170, fuel_level * 200, 20, graphics.color_green(), true)
+    graphics.draw_text(canvas, 260, screen_height - 160, string.format(fuel_level * 100) + "%", graphics.color_white(), 16)
+
+    graphics.draw_text(canvas, 50, screen_height - 130, "Odometer: " + string.format(odometer) + " miles", graphics.color_white(), 20)
+
+    # Quick action buttons
+    create buttons as List
+    set buttons to ["🧭 Navigation", "🎵 Audio", "🌡️ Climate", "🛡️ Safety", "⚙️ Settings"]
+
+    for i from 0 to buttons.length - 1:
+        create button_x as Integer
+        set button_x to 400 + i * 150
+        create button_y as Integer
+        set button_y to screen_height - 120
+
+        if i is equal to selected_index:
+            graphics.draw_rectangle(canvas, button_x, button_y, 130, 80, graphics.color_blue(), true)
+        else:
+            graphics.draw_rectangle(canvas, button_x, button_y, 130, 80, graphics.color_gray(), true)
+
+        graphics.draw_text(canvas, button_x + 10, button_y + 25, buttons[i], graphics.color_white(), 14)
+
+define function draw_navigation_screen that takes canvas as Canvas:
+    # Navigation screen
+    graphics.draw_text(canvas, 50, 50, "🧭 Navigation", graphics.color_white(), 36)
+
+    if navigation_active:
+        graphics.draw_text(canvas, 50, 100, "Navigation Active", graphics.color_green(), 20)
+
+        if current_location and destination:
+            graphics.draw_text(canvas, 50, 140, "Current Location: " + string.format(current_location[0]) + ", " + string.format(current_location[1]), graphics.color_white(), 16)
+            graphics.draw_text(canvas, 50, 170, "Destination: " + string.format(destination[0]) + ", " + string.format(destination[1]), graphics.color_white(), 16)
+
+            create distance as Float
+            set distance to automotive.get_distance_to_destination()
+            graphics.draw_text(canvas, 50, 200, "Distance: " + string.format(distance) + " miles", graphics.color_white(), 16)
+
+            create eta as String
+            set eta to automotive.get_estimated_time_of_arrival()
+            graphics.draw_text(canvas, 50, 230, "ETA: " + eta, graphics.color_white(), 16)
+
+        # Navigation instructions
+        create instructions as List
+        set instructions to automotive.get_navigation_instructions()
+        if instructions and instructions.length > 0:
+            graphics.draw_text(canvas, 50, 280, "Next: " + instructions[0], graphics.color_yellow(), 18)
+    else:
+        graphics.draw_text(canvas, 50, 100, "Navigation Inactive", graphics.color_red(), 20)
+
+        # Quick destinations
+        create destinations as List
+        set destinations to ["🏠 Home", "🏢 Work", "🛒 Grocery Store", "⛽ Gas Station", "🏥 Hospital"]
+
+        for i from 0 to destinations.length - 1:
+            create dest_x as Integer
+            set dest_x to 50 + i * 200
+            create dest_y as Integer
+            set dest_y to 150
+
+            if i is equal to selected_index:
+                graphics.draw_rectangle(canvas, dest_x, dest_y, 180, 60, graphics.color_blue(), true)
+            else:
+                graphics.draw_rectangle(canvas, dest_x, dest_y, 180, 60, graphics.color_gray(), true)
+
+            graphics.draw_text(canvas, dest_x + 10, dest_y + 25, destinations[i], graphics.color_white(), 16)
+
+define function draw_audio_screen that takes canvas as Canvas:
+    # Audio/Infotainment screen
+    graphics.draw_text(canvas, 50, 50, "🎵 Audio System", graphics.color_white(), 36)
+
+    # Current source
+    graphics.draw_text(canvas, 50, 100, "Source: " + current_audio_source, graphics.color_white(), 20)
+
+    if current_audio_source is equal to "radio":
+        graphics.draw_text(canvas, 50, 140, "Station: " + string.format(current_radio_station) + " FM", graphics.color_white(), 18)
+
+        # Radio controls
+        graphics.draw_rectangle(canvas, 50, 200, 80, 60, graphics.color_blue(), true)
+        graphics.draw_text(canvas, 60, 220, "◀◀", graphics.color_white(), 20)
+
+        graphics.draw_rectangle(canvas, 150, 200, 80, 60, graphics.color_green(), true)
+        graphics.draw_text(canvas, 170, 220, "▶", graphics.color_white(), 20)
+
+        graphics.draw_rectangle(canvas, 250, 200, 80, 60, graphics.color_blue(), true)
+        graphics.draw_text(canvas, 270, 220, "▶▶", graphics.color_white(), 20)
+
+    # Volume control
+    graphics.draw_text(canvas, 50, 300, "Volume:", graphics.color_white(), 20)
+    graphics.draw_rectangle(canvas, 50, 330, 300, 30, graphics.color_gray(), true)
+    graphics.draw_rectangle(canvas, 50, 330, volume_level * 300, 30, graphics.color_green(), true)
+    graphics.draw_text(canvas, 360, 340, string.format(volume_level * 100) + "%", graphics.color_white(), 16)
+
+    # Source selection
+    create sources as List
+    set sources to ["📻 Radio", "🎵 Bluetooth", "💿 USB", "📱 Phone"]
+
+    for i from 0 to sources.length - 1:
+        create source_x as Integer
+        set source_x to 50 + i * 150
+        create source_y as Integer
+        set source_y to 400
+
+        if sources[i] contains current_audio_source:
+            graphics.draw_rectangle(canvas, source_x, source_y, 130, 60, graphics.color_green(), true)
+        else:
+            if i is equal to selected_index:
+                graphics.draw_rectangle(canvas, source_x, source_y, 130, 60, graphics.color_blue(), true)
+            else:
+                graphics.draw_rectangle(canvas, source_x, source_y, 130, 60, graphics.color_gray(), true)
+
+        graphics.draw_text(canvas, source_x + 10, source_y + 20, sources[i], graphics.color_white(), 14)
+
+define function draw_climate_screen that takes canvas as Canvas:
+    # Climate control screen
+    graphics.draw_text(canvas, 50, 50, "🌡️ Climate Control", graphics.color_white(), 36)
+
+    # Temperature controls
+    graphics.draw_text(canvas, 100, 120, "Driver", graphics.color_white(), 20)
+    graphics.draw_text(canvas, 200, 120, string.format(driver_temperature) + "°F", graphics.color_white(), 24)
+
+    graphics.draw_text(canvas, screen_width - 300, 120, "Passenger", graphics.color_white(), 20)
+    graphics.draw_text(canvas, screen_width - 200, 120, string.format(passenger_temperature) + "°F", graphics.color_white(), 24)
+
+    # Temperature buttons
+    draw_temperature_controls(canvas, 150, 160, "driver")
+    draw_temperature_controls(canvas, screen_width - 350, 160, "passenger")
+
+    # Climate presets
+    create presets as List
+    set presets to ["Auto", "Defrost", "AC Max", "Eco"]
+
+    for i from 0 to presets.length - 1:
+        create preset_x as Integer
+        set preset_x to 100 + i * 150
+        create preset_y as Integer
+        set preset_y to 300
+
+        if i is equal to selected_index:
+            graphics.draw_rectangle(canvas, preset_x, preset_y, 120, 60, graphics.color_blue(), true)
+        else:
+            graphics.draw_rectangle(canvas, preset_x, preset_y, 120, 60, graphics.color_gray(), true)
+
+        graphics.draw_text(canvas, preset_x + 10, preset_y + 20, presets[i], graphics.color_white(), 16)
+
+define function draw_safety_screen that takes canvas as Canvas:
+    # Vehicle safety systems
+    graphics.draw_text(canvas, 50, 50, "🛡️ Safety Systems", graphics.color_white(), 36)
+
+    # ADAS status
+    create y_pos as Integer
+    set y_pos to 100
+
+    create systems as List
+    set systems to [
+        ["Adaptive Cruise Control", cruise_control_session > 0],
+        ["Lane Keeping Assist", lane_keeping_session > 0],
+        ["Blind Spot Monitoring", blind_spot_session > 0],
+        ["Forward Collision Warning", true],
+        ["Automatic Emergency Braking", true]
+    ]
+
+    for system in systems:
+        create system_name as String
+        set system_name to system[0]
+        create is_active as Boolean
+        set is_active to system[1]
+
+        if is_active:
+            graphics.draw_text(canvas, 50, y_pos, "✅ " + system_name, graphics.color_green(), 18)
+        else:
+            graphics.draw_text(canvas, 50, y_pos, "❌ " + system_name, graphics.color_red(), 18)
+
+        set y_pos to y_pos + 40
+
+    # Safety warnings
+    if safety_warnings.length > 0:
+        graphics.draw_text(canvas, 50, y_pos + 40, "⚠️ Active Warnings:", graphics.color_yellow(), 20)
+        set y_pos to y_pos + 80
+
+        for warning in safety_warnings:
+            graphics.draw_text(canvas, 70, y_pos, "• " + warning, graphics.color_yellow(), 16)
+            set y_pos to y_pos + 30
+
+# Gauge drawing functions
+define function draw_speedometer that takes canvas as Canvas, x as Integer, y as Integer, radius as Integer, speed as Float:
+    # Speedometer gauge
+    graphics.draw_circle(canvas, x, y, radius, graphics.color_white(), false)
+
+    # Speed text
+    graphics.draw_text(canvas, x - 30, y - 10, string.format(speed), graphics.color_white(), 24)
+    graphics.draw_text(canvas, x - 20, y + 15, "MPH", graphics.color_gray(), 12)
+
+    # Speed arc (0-140 mph)
+    create speed_angle as Float
+    set speed_angle to (speed / 140.0) * 270.0 - 135.0  # -135 to +135 degrees
+
+    create end_x as Integer
+    set end_x to x + radius * math.cos(speed_angle * math.PI / 180.0)
+    create end_y as Integer
+    set end_y to y + radius * math.sin(speed_angle * math.PI / 180.0)
+
+    graphics.draw_line(canvas, x, y, end_x, end_y, graphics.color_blue(), 3)
+
+define function draw_tachometer that takes canvas as Canvas, x as Integer, y as Integer, radius as Integer, rpm as Integer:
+    # Tachometer gauge
+    graphics.draw_circle(canvas, x, y, radius, graphics.color_white(), false)
+
+    # RPM text
+    graphics.draw_text(canvas, x - 40, y - 10, string.format(rpm), graphics.color_white(), 24)
+    graphics.draw_text(canvas, x - 30, y + 15, "RPM", graphics.color_gray(), 12)
+
+    # RPM arc (0-8000 rpm)
+    create rpm_angle as Float
+    set rpm_angle to (rpm as Float / 8000.0) * 270.0 - 135.0
+
+    create end_x as Integer
+    set end_x to x + radius * math.cos(rpm_angle * math.PI / 180.0)
+    create end_y as Integer
+    set end_y to y + radius * math.sin(rpm_angle * math.PI / 180.0)
+
+    if rpm > 6000:
+        graphics.draw_line(canvas, x, y, end_x, end_y, graphics.color_red(), 3)
+    else:
+        graphics.draw_line(canvas, x, y, end_x, end_y, graphics.color_green(), 3)
+
+define function draw_temperature_controls that takes canvas as Canvas, x as Integer, y as Integer, zone as String:
+    # Temperature up button
+    graphics.draw_rectangle(canvas, x, y, 50, 50, graphics.color_blue(), true)
+    graphics.draw_text(canvas, x + 15, y + 15, "+", graphics.color_white(), 24)
+
+    # Temperature down button
+    graphics.draw_rectangle(canvas, x, y + 60, 50, 50, graphics.color_blue(), true)
+    graphics.draw_text(canvas, x + 15, y + 75, "-", graphics.color_white(), 24)
+
+# Common UI elements
+define function draw_status_bar that takes canvas as Canvas:
+    # Top status bar
+    graphics.draw_rectangle(canvas, 0, 0, screen_width, 40, graphics.color_black(), true)
+
+    # Current time
+    create time_text as String
+    set time_text to date.get_current_time()
+    graphics.draw_text(canvas, 20, 25, time_text, graphics.color_white(), 16)
+
+    # Vehicle info
+    graphics.draw_text(canvas, screen_width / 2 - 100, 25, automotive.get_vehicle_make() + " " + automotive.get_vehicle_model(), graphics.color_white(), 16)
+
+    # System status
+    if navigation_active:
+        graphics.draw_text(canvas, screen_width - 150, 25, "🧭 Nav Active", graphics.color_green(), 14)
+    else:
+        graphics.draw_text(canvas, screen_width - 150, 25, "🧭 Nav Inactive", graphics.color_gray(), 14)
+
+define function draw_speedometer_overlay that takes canvas as Canvas:
+    # Mini speed display in corner
+    graphics.draw_rectangle(canvas, screen_width - 120, screen_height - 80, 100, 60, graphics.color_black(), true)
+    graphics.draw_text(canvas, screen_width - 100, screen_height - 60, string.format(vehicle_speed), graphics.color_white(), 20)
+    graphics.draw_text(canvas, screen_width - 90, screen_height - 35, "MPH", graphics.color_gray(), 12)
+
+define function draw_warning_indicators that takes canvas as Canvas:
+    # Warning indicators (check engine, low fuel, etc.)
+    create warnings_x as Integer
+    set warnings_x to screen_width - 200
+
+    if fuel_level < 0.15:
+        graphics.draw_circle(canvas, warnings_x, 60, 20, graphics.color_yellow(), true)
+        graphics.draw_text(canvas, warnings_x - 8, 55, "⛽", graphics.color_black(), 16)
+
+    if engine_rpm > 6500:
+        graphics.draw_circle(canvas, warnings_x + 50, 60, 20, graphics.color_red(), true)
+        graphics.draw_text(canvas, warnings_x + 42, 55, "⚠️", graphics.color_white(), 16)
+
+define function show_safety_warning that takes canvas as Canvas:
+    # Overlay safety warning
+    graphics.draw_rectangle(canvas, screen_width / 2 - 200, screen_height / 2 - 100, 400, 200, graphics.color_red(), true)
+    graphics.draw_text(canvas, screen_width / 2 - 180, screen_height / 2 - 60, "⚠️ SAFETY WARNING", graphics.color_white(), 24)
+
+    for i from 0 to safety_warnings.length - 1:
+        graphics.draw_text(canvas, screen_width / 2 - 180, screen_height / 2 - 20 + i * 30, safety_warnings[i], graphics.color_white(), 18)
+
+# Input handling
+define function handle_automotive_input:
+    create events as Object
+
+    # Simulate button presses from steering wheel or center console
+    # In real implementation, this would interface with CAN bus or vehicle APIs
+
+    create random_input as Integer
+    set random_input to math.random(0, 100)
+
+    if random_input < 10:  # 10% chance of input per frame
+        create button_options as List
+        set button_options to ["up", "down", "left", "right", "ok", "back", "voice"]
+
+        create random_button as String
+        set random_button to button_options[math.random(0, button_options.length - 1)]
+
+        set events["button"] to random_button
+
+    return events
+
+define function handle_touch_input that takes events as Object:
+    # Handle touch events (for touchscreen infotainment systems)
+    if events contains "touch_x" and events contains "touch_y":
+        create x as Integer
+        set x to events["touch_x"]
+        create y as Integer
+        set y to events["touch_y"]
+
+        if current_screen is equal to "dashboard":
+            handle_dashboard_touch(x, y)
+        else:
+            if current_screen is equal to "navigation":
+                handle_navigation_touch(x, y)
+
+define function handle_button_input that takes events as Object:
+    if events contains "button":
+        create button as String
+        set button to events["button"]
+
+        if button is equal to "up":
+            set selected_index to math.max(0, selected_index - 1)
+        else:
+            if button is equal to "down":
+                set selected_index to selected_index + 1
+            else:
+                if button is equal to "left":
+                    set selected_index to math.max(0, selected_index - 1)
+                else:
+                    if button is equal to "right":
+                        set selected_index to selected_index + 1
+                    else:
+                        if button is equal to "ok":
+                            handle_ok_button()
+                        else:
+                            if button is equal to "back":
+                                handle_back_button()
+                            else:
+                                if button is equal to "voice":
+                                    handle_voice_command()
+
+define function handle_dashboard_touch that takes x as Integer, y as Integer:
+    # Handle touch on dashboard screen
+    create button_width as Integer
+    set button_width to 130
+
+    for i from 0 to 4:
+        create button_x as Integer
+        set button_x to 400 + i * 150
+
+        if x >= button_x and x <= button_x + button_width and y >= screen_height - 120 and y <= screen_height - 40:
+            set selected_index to i
+            handle_ok_button()
+            break
+
+define function handle_navigation_touch that takes x as Integer, y as Integer:
+    # Handle touch on navigation screen
+    for i from 0 to 4:
+        create dest_x as Integer
+        set dest_x to 50 + i * 200
+
+        if x >= dest_x and x <= dest_x + 180 and y >= 150 and y <= 210:
+            set selected_index to i
+            handle_ok_button()
+            break
+
+define function handle_ok_button:
+    if current_screen is equal to "dashboard":
+        handle_dashboard_selection()
+    else:
+        if current_screen is equal to "navigation":
+            handle_navigation_selection()
+
+define function handle_back_button:
+    set current_screen to "dashboard"
+    set selected_index to 0
+
+define function handle_voice_command:
+    # Simulate voice command processing
+    create commands as List
+    set commands to ["navigate home", "play music", "temperature up", "cruise control on"]
+
+    create random_command as String
+    set random_command to commands[math.random(0, commands.length - 1)]
+
+    io.print("Voice command: " + random_command)
+
+    if random_command is equal to "cruise control on":
+        if cruise_control_session is equal to 0:
+            set cruise_control_session to automotive.start_adaptive_cruise_control()
+            automotive.set_cruise_speed(vehicle_speed)
+
+define function handle_dashboard_selection:
+    if selected_index is equal to 0:
+        set current_screen to "navigation"
+        set selected_index to 0
+    else:
+        if selected_index is equal to 1:
+            set current_screen to "audio"
+            set selected_index to 0
+        else:
+            if selected_index is equal to 2:
+                set current_screen to "climate"
+                set selected_index to 0
+            else:
+                if selected_index is equal to 3:
+                    set current_screen to "safety"
+                    set selected_index to 0
+
+define function handle_navigation_selection:
+    create destinations as List
+    set destinations to [
+        [37.7749, -122.4194],  # San Francisco
+        [40.7128, -74.0060],   # New York
+        [41.8781, -87.6298],   # Chicago
+        [34.0522, -118.2437],  # Los Angeles
+        [39.7392, -104.9903]   # Denver
+    ]
+
+    if selected_index < destinations.length:
+        set destination to destinations[selected_index]
+
+        if navigation_session is equal to 0:
+            set navigation_session to automotive.start_navigation()
+
+        automotive.set_destination(destination[0], destination[1])
+        set navigation_active to true
+
+# Automotive systems management
+define function initialize_automotive_systems:
+    # Initialize ADAS systems
+    if automotive.is_adaptive_cruise_control_available():
+        io.print("Adaptive Cruise Control available")
+
+    if automotive.is_lane_keeping_assist_available():
+        set lane_keeping_session to automotive.start_lane_keeping_assist()
+
+    if automotive.is_blind_spot_monitoring_available():
+        set blind_spot_session to automotive.start_blind_spot_monitoring()
+
+    # Initialize vehicle data monitoring
+    set current_location to automotive.get_current_location()
+    set odometer to automotive.get_vehicle_odometer()
+
+    # Initialize safety warnings list
+    safety_warnings.clear()
+
+define function update_vehicle_data:
+    set vehicle_speed to automotive.get_vehicle_speed()
+    set engine_rpm to automotive.get_engine_rpm()
+    set fuel_level to automotive.get_fuel_level()
+
+    # Update location if navigation is active
+    if navigation_active:
+        set current_location to automotive.get_current_location()
+
+define function check_safety_systems:
+    safety_warnings.clear()
+
+    # Check fuel level
+    if fuel_level < 0.15:
+        safety_warnings.append("Low fuel level")
+
+    # Check engine temperature
+    create engine_temp as Float
+    set engine_temp to automotive.get_engine_temperature()
+    if engine_temp > 220.0:  # Overheating
+        safety_warnings.append("Engine overheating")
+
+    # Check tire pressure
+    create tire_pressures as List
+    set tire_pressures to automotive.get_tire_pressure()
+    if tire_pressures:
+        for i from 0 to tire_pressures.length - 1:
+            if tire_pressures[i] < 30.0:  # Low pressure
+                safety_warnings.append("Low tire pressure - " + string.format(i + 1))
+
+    # Check ADAS warnings
+    if automotive.get_time_to_collision() < 2.0:
+        safety_warnings.append("Collision warning")
+
+    if automotive.get_lane_position() < -0.8 or automotive.get_lane_position() > 0.8:
+        safety_warnings.append("Lane departure warning")
+
+define function cleanup_automotive_systems:
+    # Stop all active systems
+    if cruise_control_session > 0:
+        automotive.stop_adaptive_cruise_control(cruise_control_session)
+
+    if lane_keeping_session > 0:
+        automotive.stop_lane_keeping_assist(lane_keeping_session)
+
+    if blind_spot_session > 0:
+        automotive.stop_blind_spot_monitoring(blind_spot_session)
+
+    if navigation_session > 0:
+        automotive.stop_navigation(navigation_session)
+
+# Utility functions
+define function is_emergency_button_pressed:
+    # In real implementation, this would check emergency stop button
+    return false
+
+define function format_temperature that takes temp as Float and returns String:
+    return string.format(temp) + "°F"
+
+define function format_distance that takes distance as Float and returns String:
+    return string.format(distance) + " miles"
+
+# Vehicle diagnostics
+define function run_vehicle_diagnostics:
+    io.print("Running vehicle diagnostics...")
+
+    create diagnostics as Object
+    set diagnostics["make"] to automotive.get_vehicle_make()
+    set diagnostics["model"] to automotive.get_vehicle_model()
+    set diagnostics["vin"] to automotive.get_vehicle_vin()
+    set diagnostics["odometer"] to automotive.get_vehicle_odometer()
+    set diagnostics["fuel_level"] to automotive.get_fuel_level()
+    set diagnostics["engine_rpm"] to automotive.get_engine_rpm()
+    set diagnostics["engine_temp"] to automotive.get_engine_temperature()
+
+    io.print("Vehicle: " + diagnostics["make"] + " " + diagnostics["model"])
+    io.print("VIN: " + diagnostics["vin"])
+    io.print("Odometer: " + string.format(diagnostics["odometer"]) + " miles")
+    io.print("Fuel Level: " + string.format(diagnostics["fuel_level"] * 100) + "%")
+    io.print("Engine RPM: " + string.format(diagnostics["engine_rpm"]))
+    io.print("Engine Temp: " + string.format(diagnostics["engine_temp"]) + "°F")
+
+    create health_report as Object
+    set health_report to automotive.get_vehicle_health_report()
+    io.print("Vehicle Health: " + health_report["status"])

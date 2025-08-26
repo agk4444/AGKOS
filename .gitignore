@@ -13,6 +13,9 @@ __pycache__/
 agk_*
 !agk_compiler.py
 
+# USB Distribution (keep this for distribution)
+!AGK_Mobile_OS_Portable_USB/
+
 # IDE files
 .vscode/
 .idea/

@@ -1,0 +1,551 @@
+# AGK TV Platform Application Template
+# Cross-platform TV app with remote control, streaming, and smart features
+# Perfect for: Streaming Apps, Smart TV Apps, Media Centers, Gaming Consoles
+
+import graphics
+import io
+import string
+import math
+import date
+import tv
+
+# TV app configuration
+create screen_width as Integer
+set screen_width to 1920  # Full HD width
+
+create screen_height as Integer
+set screen_height to 1080  # Full HD height
+
+create app_name as String
+set app_name to "AGK TV App"
+
+# App state
+create current_screen as String
+set current_screen to "home"
+
+create selected_index as Integer
+set selected_index to 0
+
+create content_list as List
+create streaming_services as List
+create favorite_channels as List
+
+# Remote control state
+create last_remote_button as String
+set last_remote_button to ""
+
+# Content data
+create current_channel as Integer
+set current_channel to 1
+
+create current_streaming_app as String
+set current_streaming_app to ""
+
+create volume_level as Float
+set volume_level to 0.5
+
+create is_muted as Boolean
+set is_muted to false
+
+define function main:
+    # Initialize TV app
+    create window as graphics.Window
+    set window to graphics.create_window(screen_width, screen_height, app_name)
+
+    # Create drawing canvas
+    create canvas as graphics.Canvas
+    set canvas to graphics.create_canvas(screen_width, screen_height)
+
+    # Initialize TV services
+    initialize_tv_services()
+
+    # Main app loop
+    create running as Boolean
+    set running to true
+
+    while running:
+        # Handle remote control input
+        create remote_button as String
+        set remote_button to tv.get_remote_button_press()
+
+        if remote_button and remote_button is not equal to last_remote_button:
+            handle_remote_input(remote_button)
+            set last_remote_button to remote_button
+
+        # Clear canvas with TV background
+        graphics.draw_rectangle(canvas, 0, 0, screen_width, screen_height, graphics.color_black(), true)
+
+        # Draw current screen
+        if current_screen is equal to "home":
+            draw_home_screen(canvas)
+        else:
+            if current_screen is equal to "guide":
+                draw_guide_screen(canvas)
+            else:
+                if current_screen is equal to "streaming":
+                    draw_streaming_screen(canvas)
+                else:
+                    if current_screen is equal to "settings":
+                        draw_settings_screen(canvas)
+
+        # Draw TV interface elements
+        draw_status_bar(canvas)
+        draw_remote_indicator(canvas)
+
+        # Update display
+        # graphics.render_canvas_to_window(canvas, window)
+
+        # Check for app exit
+        if remote_button is equal to tv.REMOTE_BUTTON_BACK and current_screen is equal to "home":
+            set running to false
+
+    # Cleanup
+    graphics.close_window(window)
+    io.print("TV app ended")
+    return 0
+
+# Screen drawing functions
+define function draw_home_screen that takes canvas as Canvas:
+    # TV home screen with app grid
+    graphics.draw_text(canvas, 50, 50, "🏠 TV Home", graphics.color_white(), 36)
+
+    # Featured content section
+    graphics.draw_text(canvas, 50, 120, "Featured Content", graphics.color_white(), 24)
+    graphics.draw_rectangle(canvas, 50, 150, screen_width - 100, 200, graphics.color_gray(), true)
+
+    if content_list and content_list.length > 0:
+        create featured_content as String
+        set featured_content to content_list[0]["title"]
+        graphics.draw_text(canvas, 70, 180, "🎬 " + featured_content, graphics.color_white(), 20)
+        graphics.draw_text(canvas, 70, 220, "Now Playing", graphics.color_gray(), 16)
+
+    # App grid
+    create apps as List
+    set apps to ["📺 Live TV", "🎬 Streaming", "📱 Apps", "⚙️ Settings", "🎮 Games", "🌤️ Weather", "📰 News", "🎵 Music"]
+
+    create grid_x as Integer
+    set grid_x to 50
+    create grid_y as Integer
+    set grid_y to 400
+    create app_width as Integer
+    set app_width to 200
+    create app_height as Integer
+    set app_height to 150
+    create apps_per_row as Integer
+    set apps_per_row to 4
+
+    for i from 0 to apps.length - 1:
+        create row as Integer
+        set row to i / apps_per_row
+        create col as Integer
+        set col to i % apps_per_row
+
+        create app_x as Integer
+        set app_x to grid_x + col * (app_width + 20)
+        create app_y as Integer
+        set app_y to grid_y + row * (app_height + 20)
+
+        # Highlight selected app
+        if i is equal to selected_index:
+            graphics.draw_rectangle(canvas, app_x, app_y, app_width, app_height, graphics.color_blue(), true)
+        else:
+            graphics.draw_rectangle(canvas, app_x, app_y, app_width, app_height, graphics.color_gray(), true)
+
+        graphics.draw_text(canvas, app_x + 20, app_y + 50, apps[i], graphics.color_white(), 18)
+        graphics.draw_text(canvas, app_x + 20, app_y + 80, "App " + string.format(i + 1), graphics.color_gray(), 14)
+
+define function draw_guide_screen that takes canvas as Canvas:
+    # Electronic Program Guide
+    graphics.draw_text(canvas, 50, 50, "📺 Program Guide", graphics.color_white(), 36)
+
+    # Channel list
+    graphics.draw_text(canvas, 50, 120, "Channel", graphics.color_white(), 20)
+    graphics.draw_text(canvas, 200, 120, "Current Program", graphics.color_white(), 20)
+    graphics.draw_text(canvas, screen_width - 300, 120, "Next Program", graphics.color_white(), 20)
+
+    for i from 0 to 10:
+        create y_pos as Integer
+        set y_pos to 160 + i * 60
+
+        if i is equal to selected_index:
+            graphics.draw_rectangle(canvas, 50, y_pos - 5, screen_width - 100, 50, graphics.color_blue(), true)
+
+        create channel_num as Integer
+        set channel_num to current_channel + i
+        graphics.draw_text(canvas, 50, y_pos, string.format(channel_num), graphics.color_white(), 18)
+
+        create program_name as String
+        set program_name to "Program " + string.format(i + 1)
+        graphics.draw_text(canvas, 200, y_pos, program_name, graphics.color_white(), 18)
+
+        create next_program as String
+        set next_program to "Next: Program " + string.format(i + 2)
+        graphics.draw_text(canvas, screen_width - 300, y_pos, next_program, graphics.color_gray(), 16)
+
+define function draw_streaming_screen that takes canvas as Canvas:
+    # Streaming services screen
+    graphics.draw_text(canvas, 50, 50, "🎬 Streaming Services", graphics.color_white(), 36)
+
+    # Service grid
+    create services as List
+    set services to ["Netflix", "Hulu", "Disney+", "Amazon Prime", "HBO Max", "YouTube TV", "Peacock", "Apple TV+"]
+
+    create grid_x as Integer
+    set grid_x to 50
+    create grid_y as Integer
+    set grid_y to 120
+    create service_width as Integer
+    set service_width to 250
+    create service_height as Integer
+    set service_height to 150
+    create services_per_row as Integer
+    set services_per_row to 3
+
+    for i from 0 to services.length - 1:
+        create row as Integer
+        set row to i / services_per_row
+        create col as Integer
+        set col to i % services_per_row
+
+        create service_x as Integer
+        set service_x to grid_x + col * (service_width + 30)
+        create service_y as Integer
+        set service_y to grid_y + row * (service_height + 30)
+
+        if i is equal to selected_index:
+            graphics.draw_rectangle(canvas, service_x, service_y, service_width, service_height, graphics.color_red(), true)
+        else:
+            graphics.draw_rectangle(canvas, service_x, service_y, service_width, service_height, graphics.color_gray(), true)
+
+        graphics.draw_text(canvas, service_x + 20, service_y + 60, services[i], graphics.color_white(), 24)
+
+        if current_streaming_app is equal to services[i]:
+            graphics.draw_text(canvas, service_x + 20, service_y + 100, "Active", graphics.color_green(), 16)
+
+define function draw_settings_screen that takes canvas as Canvas:
+    # TV settings screen
+    graphics.draw_text(canvas, 50, 50, "⚙️ TV Settings", graphics.color_white(), 36)
+
+    # Settings menu
+    create settings_items as List
+    set settings_items to ["Picture", "Sound", "Network", "Apps", "System", "Parental Controls", "Accessibility"]
+
+    for i from 0 to settings_items.length - 1:
+        create y_pos as Integer
+        set y_pos to 120 + i * 60
+
+        if i is equal to selected_index:
+            graphics.draw_rectangle(canvas, 50, y_pos - 5, 400, 50, graphics.color_blue(), true)
+
+        graphics.draw_text(canvas, 50, y_pos, settings_items[i], graphics.color_white(), 20)
+
+        # Show current values for some settings
+        if settings_items[i] is equal to "Picture":
+            graphics.draw_text(canvas, 300, y_pos, tv.get_picture_mode(), graphics.color_gray(), 18)
+        else:
+            if settings_items[i] is equal to "Sound":
+                graphics.draw_text(canvas, 300, y_pos, string.format(volume_level * 100) + "%", graphics.color_gray(), 18)
+
+    # Current TV info
+    graphics.draw_text(canvas, screen_width - 400, 120, "TV Information:", graphics.color_white(), 20)
+    graphics.draw_text(canvas, screen_width - 400, 160, "Model: " + tv.get_tv_model(), graphics.color_gray(), 16)
+    graphics.draw_text(canvas, screen_width - 400, 190, "Resolution: " + string.format(screen_width) + "x" + string.format(screen_height), graphics.color_gray(), 16)
+    graphics.draw_text(canvas, screen_width - 400, 220, "Volume: " + string.format(volume_level * 100) + "%", graphics.color_gray(), 16)
+    graphics.draw_text(canvas, screen_width - 400, 250, "Channel: " + string.format(current_channel), graphics.color_gray(), 16)
+
+define function draw_status_bar that takes canvas as Canvas:
+    # Top status bar
+    graphics.draw_rectangle(canvas, 0, 0, screen_width, 40, graphics.color_black(), true)
+
+    # Current time
+    create time_text as String
+    set time_text to date.get_current_time()
+    graphics.draw_text(canvas, 20, 25, time_text, graphics.color_white(), 16)
+
+    # Current channel/app
+    create channel_info as String
+    if current_streaming_app:
+        set channel_info to "🎬 " + current_streaming_app
+    else:
+        set channel_info to "📺 Channel " + string.format(current_channel)
+    graphics.draw_text(canvas, screen_width / 2 - 100, 25, channel_info, graphics.color_white(), 16)
+
+    # Volume indicator
+    create volume_text as String
+    if is_muted:
+        set volume_text to "🔇"
+    else:
+        set volume_text to "🔊 " + string.format(volume_level * 100) + "%"
+    graphics.draw_text(canvas, screen_width - 150, 25, volume_text, graphics.color_white(), 16)
+
+define function draw_remote_indicator that takes canvas as Canvas:
+    # Show last remote button press for debugging
+    if last_remote_button:
+        graphics.draw_text(canvas, screen_width - 200, screen_height - 50, "Remote: " + last_remote_button, graphics.color_yellow(), 14)
+
+# Remote control handling
+define function handle_remote_input that takes button as String:
+    if button is equal to tv.REMOTE_BUTTON_OK:
+        handle_ok_button()
+    else:
+        if button is equal to tv.REMOTE_BUTTON_UP:
+            set selected_index to math.max(0, selected_index - 1)
+        else:
+            if button is equal to tv.REMOTE_BUTTON_DOWN:
+                set selected_index to selected_index + 1
+            else:
+                if button is equal to tv.REMOTE_BUTTON_LEFT:
+                    set selected_index to math.max(0, selected_index - 1)
+                else:
+                    if button is equal to tv.REMOTE_BUTTON_RIGHT:
+                        set selected_index to selected_index + 1
+                    else:
+                        if button is equal to tv.REMOTE_BUTTON_BACK:
+                            handle_back_button()
+                        else:
+                            if button is equal to tv.REMOTE_BUTTON_HOME:
+                                set current_screen to "home"
+                                set selected_index to 0
+                            else:
+                                if button is equal to tv.REMOTE_BUTTON_VOLUME_UP:
+                                    set volume_level to math.min(1.0, volume_level + 0.1)
+                                    tv.set_volume(volume_level)
+                                else:
+                                    if button is equal to tv.REMOTE_BUTTON_VOLUME_DOWN:
+                                        set volume_level to math.max(0.0, volume_level - 0.1)
+                                        tv.set_volume(volume_level)
+                                    else:
+                                        if button is equal to tv.REMOTE_BUTTON_MUTE:
+                                            if is_muted:
+                                                tv.unmute()
+                                                set is_muted to false
+                                            else:
+                                                tv.mute()
+                                                set is_muted to true
+                                        else:
+                                            if button is equal to tv.REMOTE_BUTTON_CHANNEL_UP:
+                                                set current_channel to current_channel + 1
+                                                tv.set_channel(current_channel)
+                                            else:
+                                                if button is equal to tv.REMOTE_BUTTON_CHANNEL_DOWN:
+                                                    set current_channel to math.max(1, current_channel - 1)
+                                                    tv.set_channel(current_channel)
+
+define function handle_ok_button:
+    if current_screen is equal to "home":
+        handle_home_selection()
+    else:
+        if current_screen is equal to "guide":
+            # Tune to selected channel
+            set current_channel to current_channel + selected_index
+            tv.set_channel(current_channel)
+            set current_screen to "home"
+            set selected_index to 0
+        else:
+            if current_screen is equal to "streaming":
+                handle_streaming_selection()
+            else:
+                if current_screen is equal to "settings":
+                    handle_settings_selection()
+
+define function handle_back_button:
+    if current_screen is equal to "home":
+        # Could exit app or go to system menu
+        pass
+    else:
+        set current_screen to "home"
+        set selected_index to 0
+
+define function handle_home_selection:
+    if selected_index is equal to 0:
+        # Live TV
+        set current_screen to "guide"
+        set selected_index to 0
+    else:
+        if selected_index is equal to 1:
+            # Streaming
+            set current_screen to "streaming"
+            set selected_index to 0
+        else:
+            if selected_index is equal to 3:
+                # Settings
+                set current_screen to "settings"
+                set selected_index to 0
+
+define function handle_streaming_selection:
+    create services as List
+    set services to ["Netflix", "Hulu", "Disney+", "Amazon Prime", "HBO Max", "YouTube TV", "Peacock", "Apple TV+"]
+
+    if selected_index < services.length:
+        set current_streaming_app to services[selected_index]
+        tv.launch_streaming_app(current_streaming_app)
+
+define function handle_settings_selection:
+    create settings_items as List
+    set settings_items to ["Picture", "Sound", "Network", "Apps", "System", "Parental Controls", "Accessibility"]
+
+    if selected_index < settings_items.length:
+        create setting as String
+        set setting to settings_items[selected_index]
+
+        if setting is equal to "Picture":
+            tv.set_picture_mode("movie")
+        else:
+            if setting is equal to "Sound":
+                tv.set_audio_mode("surround")
+
+# TV services initialization
+define function initialize_tv_services:
+    # Load content list
+    content_list.clear()
+
+    for i from 1 to 20:
+        create content as Object
+        set content["title"] to "TV Show " + string.format(i)
+        set content["channel"] to i
+        set content["time"] to "8:00 PM"
+        content_list.append(content)
+
+    # Load streaming services
+    set streaming_services to tv.get_streaming_services()
+
+    # Set initial TV state
+    tv.set_volume(volume_level)
+    tv.set_channel(current_channel)
+
+    # Load favorite channels
+    favorite_channels.clear()
+    for i from 1 to 5:
+        favorite_channels.append(i * 10)
+
+# Content management functions
+define function search_tv_content that takes query as String:
+    create results as List
+    results.clear()
+
+    for content in content_list:
+        if string.contains(content["title"], query):
+            results.append(content)
+
+    return results
+
+define function get_current_program that takes channel as Integer and returns String:
+    for content in content_list:
+        if content["channel"] is equal to channel:
+            return content["title"]
+
+    return "No Program Info"
+
+define function add_to_favorites that takes channel as Integer:
+    if not favorite_channels.contains(channel):
+        favorite_channels.append(channel)
+
+define function remove_from_favorites that takes channel as Integer:
+    create index as Integer
+    set index to favorite_channels.index_of(channel)
+
+    if index >= 0:
+        favorite_channels.remove(index)
+
+# Voice control functions
+define function initialize_voice_control:
+    if tv.is_voice_supported():
+        tv.start_voice_listening()
+
+define function handle_voice_command that takes command as String:
+    io.print("Voice command: " + command)
+
+    if string.contains(command, "channel"):
+        # Extract channel number from command
+        create parts as List
+        set parts to string.split(command, " ")
+        for part in parts:
+            if string.is_numeric(part):
+                create channel_num as Integer
+                set channel_num to string.to_integer(part)
+                tv.set_channel(channel_num)
+                set current_channel to channel_num
+                break
+    else:
+        if string.contains(command, "volume"):
+            if string.contains(command, "up"):
+                set volume_level to math.min(1.0, volume_level + 0.1)
+                tv.set_volume(volume_level)
+            else:
+                if string.contains(command, "down"):
+                    set volume_level to math.max(0.0, volume_level - 0.1)
+                    tv.set_volume(volume_level)
+                else:
+                    if string.contains(command, "mute"):
+                        tv.mute()
+                        set is_muted to true
+
+# Smart features
+define function show_weather:
+    create weather_info as Object
+    set weather_info to tv.get_weather_info()
+
+    io.print("Weather: " + weather_info["condition"])
+    io.print("Temperature: " + string.format(weather_info["temperature"]) + "°F")
+
+define function show_news:
+    create headlines as List
+    set headlines to tv.get_news_headlines()
+
+    for headline in headlines:
+        io.print("News: " + headline)
+
+define function set_reminder that takes message as String, time as String:
+    tv.set_alarm(time, message)
+
+# Utility functions
+define function clamp_index that takes index as Integer, max_index as Integer and returns Integer:
+    if index < 0:
+        return 0
+    else:
+        if index >= max_index:
+            return max_index - 1
+        else:
+            return index
+
+define function get_channel_name that takes channel as Integer and returns String:
+    if channel >= 2 and channel <= 13:
+        return "Local Channel " + string.format(channel)
+    else:
+        return "Channel " + string.format(channel)
+
+# TV diagnostics
+define function run_tv_diagnostics:
+    io.print("Running TV diagnostics...")
+
+    create diagnostics as Object
+    set diagnostics["model"] to tv.get_tv_model()
+    set diagnostics["resolution"] to string.format(screen_width) + "x" + string.format(screen_height)
+    set diagnostics["4k_supported"] to tv.is_4k_supported()
+    set diagnostics["hdr_supported"] to tv.is_hdr_supported()
+    set diagnostics["remote_connected"] to tv.is_remote_connected()
+    set diagnostics["network_connected"] to tv.get_network_status()
+    set diagnostics["volume"] to volume_level
+    set diagnostics["current_channel"] to current_channel
+
+    io.print("TV Model: " + diagnostics["model"])
+    io.print("Resolution: " + diagnostics["resolution"])
+    io.print("4K Supported: " + string.format(diagnostics["4k_supported"]))
+    io.print("HDR Supported: " + string.format(diagnostics["hdr_supported"]))
+    io.print("Remote Connected: " + string.format(diagnostics["remote_connected"]))
+    io.print("Network Status: " + diagnostics["network_connected"])
+
+# Power management
+define function handle_power_events:
+    # This would handle power on/off events in a real implementation
+    pass
+
+define function set_power_timer that takes hours as Integer:
+    tv.set_power_timer(hours)
+
+# Parental controls
+define function initialize_parental_controls:
+    if not tv.is_parental_controls_enabled():
+        tv.enable_parental_controls()
+        tv.set_parental_pin("1234")
+        tv.set_content_rating_limit("PG-13")

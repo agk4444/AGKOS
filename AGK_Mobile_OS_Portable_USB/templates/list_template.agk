@@ -1,0 +1,522 @@
+# AGK List Template - Data Structure Operations
+# This template demonstrates comprehensive list operations including
+# creation, manipulation, searching, sorting, and advanced list processing
+# Perfect for: Data processing, collection management, algorithm development
+
+import list
+import io
+import logging
+import string
+
+# Global configuration
+define constant LOG_FILE as String = "list_operations.log"
+
+# Main application entry point
+define function main:
+    # Initialize logging for the List application
+    create logger as Logger
+    set logger to logging.get_logger("List_App")
+    logging.set_level(logger, logging.INFO)
+    logging.add_console_handler(logger)
+    logging.add_file_handler(logger, LOG_FILE)
+
+    logging.info(logger, "Starting AGK List Operations Application")
+
+    # Run the main application loop
+    run_list_application_loop(logger)
+
+# Main application loop with menu-driven interface
+define function run_list_application_loop that takes logger as Logger:
+    create running as Boolean
+    set running to true
+
+    while running:
+        io.println("\n📋 AGK List Operations Demo")
+        io.println("1. Basic List Operations")
+        io.println("2. List Manipulation")
+        io.println("3. Searching and Finding")
+        io.println("4. Sorting Operations")
+        io.println("5. Advanced List Processing")
+        io.println("6. List Utilities")
+        io.println("7. Performance Testing")
+        io.println("8. Exit")
+        io.print("Enter your choice (1-8): ")
+
+        create choice as String
+        set choice to io.read_line()
+
+        if choice == "1":
+            basic_list_demo(logger)
+        else if choice == "2":
+            list_manipulation_demo(logger)
+        else if choice == "3":
+            search_demo(logger)
+        else if choice == "4":
+            sorting_demo(logger)
+        else if choice == "5":
+            advanced_processing_demo(logger)
+        else if choice == "6":
+            utilities_demo(logger)
+        else if choice == "7":
+            performance_demo(logger)
+        else if choice == "8":
+            set running to false
+            logging.info(logger, "List application shutting down")
+        else:
+            io.println("❌ Invalid choice. Please try again.")
+
+# Basic list operations demonstration
+define function basic_list_demo that takes logger as Logger:
+    io.println("\n🔧 Basic List Operations Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "basic_list_operations")
+
+    io.println("=== Creating Lists ===")
+    create empty_list as List
+    set empty_list to list.create_list()
+    io.println("✅ Created empty list")
+
+    create numbers as List
+    set numbers to list.create_list()
+    set numbers to list.append(numbers, 10)
+    set numbers to list.append(numbers, 20)
+    set numbers to list.append(numbers, 30)
+    io.println("✅ Created numbers list: [10, 20, 30]")
+
+    create fruits as List
+    set fruits to list.create_list()
+    set fruits to list.append(fruits, "apple")
+    set fruits to list.append(fruits, "banana")
+    set fruits to list.append(fruits, "cherry")
+    io.println("✅ Created fruits list: [apple, banana, cherry]")
+
+    io.println("\n=== List Information ===")
+    io.println("Empty list length: " + string(list.length(empty_list)))
+    io.println("Numbers list length: " + string(list.length(numbers)))
+    io.println("Fruits list length: " + string(list.length(fruits)))
+
+    io.println("\n=== Accessing Elements ===")
+    if list.length(numbers) > 0:
+        io.println("First number: " + string(list.get_item(numbers, 0)))
+        io.println("Last number: " + string(list.get_item(numbers, 2)))
+
+    if list.length(fruits) > 0:
+        io.println("First fruit: " + list.get_item(fruits, 0))
+        io.println("Last fruit: " + list.get_item(fruits, 2))
+
+    logging.end_timer(timer)
+    logging.info(logger, "Basic list operations completed")
+
+# List manipulation demonstration
+define function list_manipulation_demo that takes logger as Logger:
+    io.println("\n⚡ List Manipulation Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "list_manipulation")
+
+    io.println("=== Building a List Interactively ===")
+    create user_list as List
+    set user_list to list.create_list()
+
+    io.println("Let's build a list! Enter 5 items:")
+
+    create i as Integer
+    set i to 0
+    while i < 5:
+        io.print("Item " + string(i + 1) + ": ")
+        create item as String
+        set item to io.read_line()
+
+        if item == "":
+            set item to "default_item_" + string(i + 1)
+
+        set user_list to list.append(user_list, item)
+        set i to i + 1
+
+    io.println("✅ Created list with " + string(list.length(user_list)) + " items")
+
+    io.println("\n=== List Contents ===")
+    display_list(user_list, "User List")
+
+    io.println("\n=== Prepending and Appending ===")
+    set user_list to list.prepend(user_list, "FIRST_ITEM")
+    set user_list to list.append(user_list, "LAST_ITEM")
+    io.println("✅ Added items to beginning and end")
+    display_list(user_list, "Modified List")
+
+    io.println("\n=== Inserting at Specific Position ===")
+    if list.length(user_list) >= 3:
+        set user_list to list.insert_at(user_list, 2, "INSERTED_AT_INDEX_2")
+        io.println("✅ Inserted item at index 2")
+        display_list(user_list, "List with Insertion")
+
+    io.println("\n=== Removing Items ===")
+    if list.length(user_list) > 0:
+        set user_list to list.remove_at(user_list, 0)
+        io.println("✅ Removed first item")
+        display_list(user_list, "List after Removal")
+
+    logging.end_timer(timer)
+    logging.info(logger, "List manipulation completed")
+
+# Searching and finding demonstration
+define function search_demo that takes logger as Logger:
+    io.println("\n🔍 Search and Find Operations Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "search_operations")
+
+    io.println("=== Creating Test Data ===")
+    create test_list as List
+    set test_list to list.create_list()
+    set test_list to list.append(test_list, "apple")
+    set test_list to list.append(test_list, "banana")
+    set test_list to list.append(test_list, "cherry")
+    set test_list to list.append(test_list, "date")
+    set test_list to list.append(test_list, "elderberry")
+    set test_list to list.append(test_list, "apple")  # Duplicate
+
+    display_list(test_list, "Test List")
+
+    io.println("\n=== Searching for Items ===")
+    create search_items as List
+    set search_items to list.create_list()
+    set search_items to list.append(search_items, "banana")
+    set search_items to list.append(search_items, "grape")
+    set search_items to list.append(search_items, "apple")
+
+    for each item in search_items:
+        create index as Integer
+        set index to list.find_index(test_list, item)
+
+        if index >= 0:
+            io.println("✅ Found '" + item + "' at index: " + string(index))
+        else:
+            io.println("❌ '" + item + "' not found")
+
+    io.println("\n=== Containment Testing ===")
+    create test_items as List
+    set test_items to list.create_list()
+    set test_items to list.append(test_items, "cherry")
+    set test_items to list.append(test_items, "watermelon")
+
+    for each item in test_items:
+        if list.contains(test_list, item):
+            io.println("✅ List contains: " + item)
+        else:
+            io.println("❌ List does not contain: " + item)
+
+    io.println("\n=== Removing Specific Items ===")
+    set test_list to list.remove_item(test_list, "apple")
+    io.println("✅ Removed all 'apple' items")
+    display_list(test_list, "List after Apple Removal")
+
+    logging.end_timer(timer)
+    logging.info(logger, "Search operations completed")
+
+# Sorting operations demonstration
+define function sorting_demo that takes logger as Logger:
+    io.println("\n🔄 Sorting Operations Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "sorting_operations")
+
+    io.println("=== Creating Unsorted Lists ===")
+    create numbers as List
+    set numbers to list.create_list()
+    set numbers to list.append(numbers, 42)
+    set numbers to list.append(numbers, 17)
+    set numbers to list.append(numbers, 89)
+    set numbers to list.append(numbers, 23)
+    set numbers to list.append(numbers, 5)
+    set numbers to list.append(numbers, 71)
+
+    create words as List
+    set words to list.create_list()
+    set words to list.append(words, "zebra")
+    set words to list.append(words, "apple")
+    set words to list.append(words, "mango")
+    set words to list.append(words, "cherry")
+    set words to list.append(words, "banana")
+
+    io.println("Original numbers:")
+    display_list(numbers, "Unsorted Numbers")
+
+    io.println("Original words:")
+    display_list(words, "Unsorted Words")
+
+    io.println("\n=== Sorting Lists ===")
+    create sorted_numbers as List
+    set sorted_numbers to list.sort(numbers)
+    io.println("✅ Numbers sorted")
+    display_list(sorted_numbers, "Sorted Numbers")
+
+    create sorted_words as List
+    set sorted_words to list.sort(words)
+    io.println("✅ Words sorted")
+    display_list(sorted_words, "Sorted Words")
+
+    io.println("\n=== Reversing Lists ===")
+    create reversed_numbers as List
+    set reversed_numbers to list.reverse(sorted_numbers)
+    io.println("✅ Numbers reversed")
+    display_list(reversed_numbers, "Reversed Numbers")
+
+    logging.end_timer(timer)
+    logging.info(logger, "Sorting operations completed")
+
+# Advanced list processing demonstration
+define function advanced_processing_demo that takes logger as Logger:
+    io.println("\n🚀 Advanced List Processing Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "advanced_processing")
+
+    io.println("=== Creating Complex Data ===")
+    create data_list as List
+    set data_list to list.create_list()
+
+    # Add some sample data
+    set data_list to list.append(data_list, "user_1")
+    set data_list to list.append(data_list, "user_2")
+    set data_list to list.append(data_list, "admin_1")
+    set data_list to list.append(data_list, "user_3")
+    set data_list to list.append(data_list, "admin_2")
+    set data_list to list.append(data_list, "user_4")
+
+    display_list(data_list, "User Data")
+
+    io.println("\n=== Slicing Operations ===")
+    create slice1 as List
+    set slice1 to list.slice(data_list, 0, 3)
+    io.println("✅ First 3 items:")
+    display_list(slice1, "Slice [0:3]")
+
+    create slice2 as List
+    set slice2 to list.slice(data_list, 2, 5)
+    io.println("✅ Items 2-4:")
+    display_list(slice2, "Slice [2:5]")
+
+    create slice3 as List
+    set slice3 to list.slice(data_list, 1, -1)
+    io.println("✅ Items 1 to second-to-last:")
+    display_list(slice3, "Slice [1:-1]")
+
+    io.println("\n=== Range Generation ===")
+    create range1 as List
+    set range1 to list.range1(10)
+    io.println("✅ Range from 0 to 9:")
+    display_list(range1, "Range(10)")
+
+    create range2 as List
+    set range2 to list.range(5, 15)
+    io.println("✅ Range from 5 to 14:")
+    display_list(range2, "Range(5, 15)")
+
+    create range3 as List
+    set range3 to list.range(20, 10, -2)
+    io.println("✅ Range from 20 to 10 (step -2):")
+    display_list(range3, "Range(20, 10, -2)")
+
+    io.println("\n=== Filtering and Mapping ===")
+    io.println("Note: Advanced filtering and mapping would require function pointers")
+    io.println("This demonstrates the structure for such operations")
+
+    logging.end_timer(timer)
+    logging.info(logger, "Advanced processing completed")
+
+# List utilities demonstration
+define function utilities_demo that takes logger as Logger:
+    io.println("\n🔨 List Utilities Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "utilities")
+
+    io.println("=== List Statistics ===")
+    create numbers as List
+    set numbers to list.create_list()
+    set numbers to list.append(numbers, 10)
+    set numbers to list.append(numbers, 25)
+    set numbers to list.append(numbers, 8)
+    set numbers to list.append(numbers, 42)
+    set numbers to list.append(numbers, 15)
+    set numbers to list.append(numbers, 30)
+
+    display_list(numbers, "Numbers for Statistics")
+
+    io.println("List length: " + string(list.length(numbers)))
+
+    # Find min/max (manual implementation)
+    if list.length(numbers) > 0:
+        create min_val as Integer
+        create max_val as Integer
+        set min_val to list.get_item(numbers, 0)
+        set max_val to list.get_item(numbers, 0)
+
+        create i as Integer
+        set i to 1
+        while i < list.length(numbers):
+            create current as Integer
+            set current to list.get_item(numbers, i)
+
+            if current < min_val:
+                set min_val to current
+            if current > max_val:
+                set max_val to current
+
+            set i to i + 1
+
+        io.println("Minimum value: " + string(min_val))
+        io.println("Maximum value: " + string(max_val))
+
+    io.println("\n=== List Transformation ===")
+    create words as List
+    set words to list.create_list()
+    set words to list.append(words, "hello")
+    set words to list.append(words, "world")
+    set words to list.append(words, "agk")
+    set words to list.append(words, "list")
+
+    display_list(words, "Original Words")
+
+    # Convert to uppercase (simulated)
+    io.println("Uppercase conversion (simulated):")
+    for each word in words:
+        io.println("  " + word + " -> " + word)  # In real implementation, would call string.to_upper()
+
+    io.println("\n=== List Comparison ===")
+    create list1 as List
+    set list1 to list.create_list()
+    set list1 to list.append(list1, "a")
+    set list1 to list.append(list1, "b")
+    set list1 to list.append(list1, "c")
+
+    create list2 as List
+    set list2 to list.create_list()
+    set list2 to list.append(list2, "a")
+    set list2 to list.append(list2, "b")
+    set list2 to list.append(list2, "c")
+
+    create list3 as List
+    set list3 to list.create_list()
+    set list3 to list.append(list3, "x")
+    set list3 to list.append(list3, "y")
+    set list3 to list.append(list3, "z")
+
+    io.print("List1 equals List2: ")
+    if lists_equal(list1, list2):
+        io.println("✅ True")
+    else:
+        io.println("❌ False")
+
+    io.print("List1 equals List3: ")
+    if lists_equal(list1, list3):
+        io.println("✅ True")
+    else:
+        io.println("❌ False")
+
+    logging.end_timer(timer)
+    logging.info(logger, "Utilities demonstration completed")
+
+# Performance testing demonstration
+define function performance_demo that takes logger as Logger:
+    io.println("\n⚡ List Performance Testing Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "performance_test")
+
+    io.println("=== Performance Test: Building Large List ===")
+
+    create large_list as List
+    set large_list to list.create_list()
+
+    create target_size as Integer
+    set target_size to 1000
+
+    io.println("Building list with " + string(target_size) + " elements...")
+
+    create build_timer as Timer
+    set build_timer to logging.start_timer(logger, "list_building")
+
+    create i as Integer
+    set i to 0
+    while i < target_size:
+        set large_list to list.append(large_list, "item_" + string(i))
+        set i to i + 1
+
+    logging.end_timer(build_timer)
+
+    io.println("✅ List built successfully")
+    io.println("Final list length: " + string(list.length(large_list)))
+
+    io.println("\n=== Performance Test: Random Access ===")
+    create access_timer as Timer
+    set access_timer to logging.start_timer(logger, "random_access")
+
+    create access_count as Integer
+    set access_count to 1000
+
+    set i to 0
+    while i < access_count:
+        create random_index as Integer
+        set random_index to i % list.length(large_list)
+        create item
+        set item to list.get_item(large_list, random_index)
+        set i to i + 1
+
+    logging.end_timer(access_timer)
+    io.println("✅ Completed " + string(access_count) + " random access operations")
+
+    io.println("\n=== Performance Test: Linear Search ===")
+    create search_timer as Timer
+    set search_timer to logging.start_timer(logger, "linear_search")
+
+    create search_count as Integer
+    set search_count to 100
+
+    set i to 0
+    while i < search_count:
+        create target_item as String
+        set target_item to "item_" + string(i % 100)
+        create found_index as Integer
+        set found_index to list.find_index(large_list, target_item)
+        set i to i + 1
+
+    logging.end_timer(search_timer)
+    io.println("✅ Completed " + string(search_count) + " search operations")
+
+    logging.end_timer(timer)
+    logging.info(logger, "Performance testing completed")
+
+# Helper functions
+define function display_list that takes lst as List, title as String:
+    io.println("\n--- " + title + " ---")
+    io.print("[")
+
+    create i as Integer
+    set i to 0
+    while i < list.length(lst):
+        if i > 0:
+            io.print(", ")
+        io.print(list.get_item(lst, i))
+        set i to i + 1
+
+    io.println("]")
+    io.println("Length: " + string(list.length(lst)))
+
+define function lists_equal that takes list1 as List, list2 as List and returns Boolean:
+    if list.length(list1) != list.length(list2):
+        return false
+
+    create i as Integer
+    set i to 0
+    while i < list.length(list1):
+        if list.get_item(list1, i) != list.get_item(list2, i):
+            return false
+        set i to i + 1
+
+    return true
+
+# Initialize the application
+main()

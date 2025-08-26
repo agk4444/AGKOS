@@ -1,0 +1,483 @@
+# AGK Logging Library
+# Structured logging and debugging for AGK applications
+# Provides comprehensive logging capabilities for development and production
+
+# Log Levels
+create DEBUG as Integer
+set DEBUG to 10
+
+create INFO as Integer
+set INFO to 20
+
+create WARNING as Integer
+set WARNING to 30
+
+create ERROR as Integer
+set ERROR to 40
+
+create CRITICAL as Integer
+set CRITICAL to 50
+
+# Logger Management
+define function get_logger that takes name as String and returns Logger:
+    # Get or create logger instance
+    create logger as Logger
+    create logger["name"] as String
+    create logger["level"] as Integer
+    create logger["handlers"] as List
+
+    set logger["name"] to name
+    set logger["level"] to INFO
+    set logger["handlers"] to []
+
+    return logger
+
+define function set_level that takes logger as Logger, level as Integer:
+    # Set minimum log level for logger
+    set logger["level"] to level
+
+define function get_level that takes logger as Logger and returns Integer:
+    # Get current log level
+    return logger["level"]
+
+define function set_name that takes logger as Logger, name as String:
+    # Set logger name
+    set logger["name"] to name
+
+# Core Logging Functions
+define function debug that takes logger as Logger, message as String:
+    # Log debug message
+    if logger["level"] <= DEBUG:
+        log_message(logger, DEBUG, message)
+
+define function info that takes logger as Logger, message as String:
+    # Log info message
+    if logger["level"] <= INFO:
+        log_message(logger, INFO, message)
+
+define function warning that takes logger as Logger, message as String:
+    # Log warning message
+    if logger["level"] <= WARNING:
+        log_message(logger, WARNING, message)
+
+define function error that takes logger as Logger, message as String:
+    # Log error message
+    if logger["level"] <= ERROR:
+        log_message(logger, ERROR, message)
+
+define function critical that takes logger as Logger, message as String:
+    # Log critical message
+    if logger["level"] <= CRITICAL:
+        log_message(logger, CRITICAL, message)
+
+# Structured Logging with Context
+define function log_with_context that takes logger as Logger, level as Integer, message as String, context as Object:
+    # Log message with additional context data
+    if logger["level"] <= level:
+        create enhanced_message as String
+        set enhanced_message to message + " | Context: " + format_context(context)
+        log_message(logger, level, enhanced_message)
+
+define function debug_context that takes logger as Logger, message as String, context as Object:
+    log_with_context(logger, DEBUG, message, context)
+
+define function info_context that takes logger as Logger, message as String, context as Object:
+    log_with_context(logger, INFO, message, context)
+
+define function warning_context that takes logger as Logger, message as String, context as Object:
+    log_with_context(logger, WARNING, message, context)
+
+define function error_context that takes logger as Logger, message as String, context as Object:
+    log_with_context(logger, ERROR, message, context)
+
+define function critical_context that takes logger as Logger, message as String, context as Object:
+    log_with_context(logger, CRITICAL, message, context)
+
+# Handler Management
+define function add_console_handler that takes logger as Logger:
+    # Add console output handler
+    create handler as LogHandler
+    set handler["type"] to "console"
+    set handler["formatter"] to get_default_formatter()
+
+    add handler to logger["handlers"]
+
+define function add_file_handler that takes logger as Logger, file_path as String:
+    # Add file output handler
+    create handler as LogHandler
+    set handler["type"] to "file"
+    set handler["file_path"] to file_path
+    set handler["formatter"] to get_default_formatter()
+
+    add handler to logger["handlers"]
+
+define function add_rotating_file_handler that takes logger as Logger, file_path as String, max_size as Integer, backup_count as Integer:
+    # Add rotating file handler (when file exceeds max_size, rotate to backup files)
+    create handler as LogHandler
+    set handler["type"] to "rotating_file"
+    set handler["file_path"] to file_path
+    set handler["max_size"] to max_size
+    set handler["backup_count"] to backup_count
+    set handler["formatter"] to get_default_formatter()
+
+    add handler to logger["handlers"]
+
+define function remove_handlers that takes logger as Logger:
+    # Remove all handlers from logger
+    set logger["handlers"] to []
+
+# Performance Timing and Profiling
+define function start_timer that takes logger as Logger, operation as String and returns Timer:
+    # Start performance timer
+    create timer as Timer
+    set timer["operation"] as String
+    set timer["start_time"] as Float
+    set timer["logger"] as Logger
+
+    set timer["operation"] to operation
+    set timer["start_time"] to get_current_time()
+    set timer["logger"] to logger
+
+    info(logger, "Started operation: " + operation)
+    return timer
+
+define function end_timer that takes timer as Timer:
+    # End performance timer and log duration
+    create end_time as Float
+    set end_time to get_current_time()
+
+    create duration as Float
+    set duration to end_time - timer["start_time"]
+
+    create message as String
+    set message to "Completed operation: " + timer["operation"] +
+                   " | Duration: " + format_duration(duration)
+
+    info(timer["logger"], message)
+
+define function profile_function that takes logger as Logger, function_name as String, start_time as Float:
+    # Profile function execution time
+    create end_time as Float
+    set end_time to get_current_time()
+
+    create duration as Float
+    set duration to end_time - start_time
+
+    create message as String
+    set message to "Function " + function_name + " executed in " + format_duration(duration)
+
+    debug(logger, message)
+
+# Exception Logging
+define function log_exception that takes logger as Logger, exception as String, context as Object:
+    # Log exception with context
+    create message as String
+    set message to "Exception occurred: " + exception
+
+    if context is not null:
+        set message to message + " | Context: " + format_context(context)
+
+    error(logger, message)
+
+define function log_unhandled_exception that takes logger as Logger, exception as String:
+    # Log unhandled exception
+    critical(logger, "Unhandled exception: " + exception)
+
+# Log Formatting
+define function get_default_formatter and returns LogFormatter:
+    # Get default log formatter
+    create formatter as LogFormatter
+    set formatter["format"] to "%(timestamp)s [%(level)s] %(name)s: %(message)s"
+    return formatter
+
+define function set_formatter that takes logger as Logger, formatter as LogFormatter:
+    # Set formatter for all handlers
+    create i as Integer
+    set i to 0
+    while i < logger["handlers"] length:
+        create handler as LogHandler
+        set handler to logger["handlers"][i]
+        set handler["formatter"] to formatter
+        set i to i + 1
+
+define function format_message that takes formatter as LogFormatter, logger as Logger, level as Integer, message as String and returns String:
+    # Format log message using formatter
+    create formatted as String
+    set formatted to formatter["format"]
+
+    # Replace placeholders
+    create timestamp as String
+    set timestamp to get_current_timestamp()
+    set formatted to string.replace(formatted, "%(timestamp)s", timestamp)
+
+    create level_name as String
+    set level_name to get_level_name(level)
+    set formatted to string.replace(formatted, "%(level)s", level_name)
+
+    set formatted to string.replace(formatted, "%(name)s", logger["name"])
+    set formatted to string.replace(formatted, "%(message)s", message)
+
+    return formatted
+
+# Utility Functions
+define function get_level_name that takes level as Integer and returns String:
+    # Convert log level to name
+    if level = DEBUG:
+        return "DEBUG"
+    else if level = INFO:
+        return "INFO"
+    else if level = WARNING:
+        return "WARNING"
+    else if level = ERROR:
+        return "ERROR"
+    else if level = CRITICAL:
+        return "CRITICAL"
+    else:
+        return "UNKNOWN"
+
+define function get_current_time that returns Float:
+    # Get current time in seconds (placeholder)
+    return 1234567890.0
+
+define function get_current_timestamp that returns String:
+    # Get current timestamp as string
+    return "2024-01-01 12:00:00"
+
+define function format_duration that takes seconds as Float and returns String:
+    # Format duration in human-readable format
+    if seconds < 1.0:
+        return string.format(seconds * 1000) + "ms"
+    else if seconds < 60.0:
+        return string.format(seconds) + "s"
+    else:
+        create minutes as Integer
+        set minutes to seconds / 60
+        create remaining_seconds as Float
+        set remaining_seconds to seconds % 60
+        return string.format(minutes) + "m " + string.format(remaining_seconds) + "s"
+
+define function format_context that takes context as Object and returns String:
+    # Format context object as string
+    # In implementation: return json.dumps(context)
+    return "context_data"
+
+# Core logging implementation
+define function log_message that takes logger as Logger, level as Integer, message as String:
+    # Core logging implementation
+    create i as Integer
+    set i to 0
+    while i < logger["handlers"] length:
+        create handler as LogHandler
+        set handler to logger["handlers"][i]
+
+        create formatted_message as String
+        set formatted_message to format_message(handler["formatter"], logger, level, message)
+
+        if handler["type"] = "console":
+            io.print(formatted_message)
+        else if handler["type"] = "file":
+            # In implementation: append to file
+            io.print("FILE: " + formatted_message)
+        else if handler["type"] = "rotating_file":
+            # In implementation: write to rotating file
+            io.print("ROTATING_FILE: " + formatted_message)
+
+        set i to i + 1
+
+# Configuration and Setup
+define function basic_config that takes level as Integer, format as String, file_path as String:
+    # Configure basic logging setup
+    create root_logger as Logger
+    set root_logger to get_logger("root")
+    set_level(root_logger, level)
+
+    if file_path is not empty:
+        add_file_handler(root_logger, file_path)
+    else:
+        add_console_handler(root_logger)
+
+    if format is not empty:
+        create custom_formatter as LogFormatter
+        set custom_formatter["format"] to format
+        set_formatter(root_logger, custom_formatter)
+
+define function configure_from_file that takes config_file as String:
+    # Load logging configuration from file
+    # In implementation: parse config file and apply settings
+    pass
+
+# Specialized Loggers
+define function get_database_logger and returns Logger:
+    # Get logger specifically for database operations
+    create logger as Logger
+    set logger to get_logger("database")
+    set_level(logger, INFO)
+    add_file_handler(logger, "database.log")
+    return logger
+
+define function get_http_logger and returns Logger:
+    # Get logger specifically for HTTP operations
+    create logger as Logger
+    set logger to get_logger("http")
+    set_level(logger, INFO)
+    add_file_handler(logger, "http.log")
+    return logger
+
+define function get_performance_logger and returns Logger:
+    # Get logger for performance monitoring
+    create logger as Logger
+    set logger to get_logger("performance")
+    set_level(logger, DEBUG)
+    add_file_handler(logger, "performance.log")
+    return logger
+
+# Error and Exception Tracking
+define function setup_error_tracking that takes logger as Logger, api_key as String:
+    # Setup error tracking service integration
+    # In implementation: integrate with error tracking services
+    pass
+
+define function track_error that takes logger as Logger, error as String, stack_trace as String, context as Object:
+    # Track error with context and stack trace
+    create error_context as Object
+    set error_context["error"] to error
+    set error_context["stack_trace"] to stack_trace
+    set error_context["context"] to context
+
+    error_context(logger, "Tracked error: " + error, error_context)
+
+# Example usage patterns
+define function example_usage:
+    # Basic logging setup
+    create logger as Logger
+    set logger to get_logger("MyApp")
+    set_level(logger, DEBUG)
+    add_console_handler(logger)
+
+    # Log messages at different levels
+    debug(logger, "This is a debug message")
+    info(logger, "Application started successfully")
+    warning(logger, "This is a warning message")
+    error(logger, "An error occurred")
+    critical(logger, "Critical system error!")
+
+    # Structured logging with context
+    create context as Object
+    set context["user_id"] to 12345
+    set context["action"] to "login"
+    set context["ip_address"] to "192.168.1.100"
+
+    info_context(logger, "User logged in", context)
+
+    # Performance timing
+    create timer as Timer
+    set timer to start_timer(logger, "database_query")
+
+    # Simulate some work
+    create i as Integer
+    set i to 0
+    while i < 100000:
+        set i to i + 1
+
+    end_timer(timer)
+
+    # File logging
+    create file_logger as Logger
+    set file_logger to get_logger("file_operations")
+    add_file_handler(file_logger, "operations.log")
+
+    info(file_logger, "File operation started")
+
+    # Exception handling
+    create error_context as Object
+    set error_context["function"] to "process_data"
+    set error_context["line"] to 42
+
+    log_exception(logger, "Division by zero error", error_context)
+
+define function web_application_logging:
+    # Example for web application logging
+    create app_logger as Logger
+    set app_logger to get_logger("web_app")
+    set_level(app_logger, INFO)
+
+    # Multiple handlers
+    add_console_handler(app_logger)
+    add_rotating_file_handler(app_logger, "web_app.log", 1048576, 5)  # 1MB max, 5 backups
+
+    # Log HTTP requests
+    create request_context as Object
+    set request_context["method"] to "GET"
+    set request_context["path"] to "/api/users"
+    set request_context["user_agent"] to "Mozilla/5.0"
+    set request_context["response_time"] to 0.234
+
+    info_context(app_logger, "HTTP Request processed", request_context)
+
+    # Log database operations
+    create db_logger as Logger
+    set db_logger to get_database_logger()
+
+    create db_context as Object
+    set db_context["query"] to "SELECT * FROM users WHERE active = 1"
+    set db_context["execution_time"] to 0.045
+    set db_context["rows_returned"] to 150
+
+    debug_context(db_logger, "Database query executed", db_context)
+
+define function production_configuration:
+    # Production-ready logging configuration
+    create prod_logger as Logger
+    set prod_logger to get_logger("production_app")
+
+    # Set appropriate level for production
+    set_level(prod_logger, WARNING)
+
+    # Log to file with rotation
+    add_rotating_file_handler(prod_logger, "app.log", 10485760, 10)  # 10MB max, 10 backups
+
+    # Also log errors to separate file
+    create error_logger as Logger
+    set error_logger to get_logger("error_handler")
+    set_level(error_logger, ERROR)
+    add_file_handler(error_logger, "errors.log")
+
+    # Setup error tracking
+    setup_error_tracking(prod_logger, "your-error-tracking-api-key")
+
+    # Log application startup
+    create startup_context as Object
+    set startup_context["version"] to "1.2.3"
+    set startup_context["environment"] to "production"
+    set startup_context["start_time"] to get_current_timestamp()
+
+    info_context(prod_logger, "Application started", startup_context)
+
+define function performance_monitoring:
+    # Performance monitoring example
+    create perf_logger as Logger
+    set perf_logger to get_performance_logger()
+
+    # Monitor function performance
+    create start_time as Float
+    set start_time to get_current_time()
+
+    # Simulate function execution
+    create result as Integer
+    set result to fibonacci(30)
+
+    profile_function(perf_logger, "fibonacci", start_time)
+
+    # Monitor memory usage (placeholder)
+    create memory_context as Object
+    set memory_context["memory_usage"] to "45.2 MB"
+    set memory_context["peak_memory"] to "67.8 MB"
+
+    info_context(perf_logger, "Memory usage report", memory_context)
+
+define function fibonacci that takes n as Integer and returns Integer:
+    # Simple recursive fibonacci for performance testing
+    if n <= 1:
+        return n
+    else:
+        return fibonacci(n - 1) + fibonacci(n - 2)

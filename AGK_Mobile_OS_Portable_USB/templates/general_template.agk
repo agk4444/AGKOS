@@ -1,0 +1,763 @@
+# AGK General Application Template - Universal Starting Point
+# This template provides a foundation for any type of application
+# Perfect for: General-purpose applications, utilities, business apps, productivity tools
+
+import io
+import logging
+import json
+
+# Global configuration
+define constant APP_NAME as String = "My Application"
+define constant APP_VERSION as String = "1.0.0"
+define constant CONFIG_FILENAME as String = "config.json"
+define constant LOG_FILENAME as String = "application.log"
+
+# Application state
+define constant STATE_INITIALIZING as Integer = 0
+define constant STATE_RUNNING as Integer = 1
+define constant STATE_SHUTTING_DOWN as Integer = 2
+
+# Main application entry point
+define function main:
+    # Initialize application
+    create app_context as Object
+    set app_context to initialize_application()
+
+    # Run main application loop
+    run_application(app_context)
+
+# Initialize the application
+define function initialize_application and returns Object:
+    io.println("🚀 " + APP_NAME + " v" + APP_VERSION)
+    io.println("─" * 40)
+
+    # Initialize logging system
+    create logger as Logger
+    set logger to logging.get_logger(APP_NAME)
+    logging.set_level(logger, logging.INFO)
+    logging.add_console_handler(logger)
+    logging.add_file_handler(logger, LOG_FILENAME)
+
+    logging.info(logger, "Starting " + APP_NAME + " v" + APP_VERSION)
+
+    # Load configuration
+    create config as Object
+    set config to load_configuration(logger)
+
+    # Create application context
+    create app_context as Object
+    set app_context["logger"] to logger
+    set app_context["config"] to config
+    set app_context["state"] to STATE_INITIALIZING
+    set app_context["start_time"] to "current_timestamp"
+    set app_context["version"] to APP_VERSION
+
+    # Initialize application components
+    initialize_components(app_context)
+
+    logging.info(logger, "Application initialization completed")
+    set app_context["state"] to STATE_RUNNING
+
+    return app_context
+
+# Load application configuration
+define function load_configuration that takes logger as Logger and returns Object:
+    create config as Object
+    set config["debug_mode"] to false
+    set config["max_connections"] to 10
+    set config["timeout"] to 30
+    set config["log_level"] to "INFO"
+    set config["data_directory"] to "./data"
+    set config["temp_directory"] to "./temp"
+
+    # Try to load from file (simplified for template)
+    # In real implementation: load JSON config file
+    io.println("✅ Configuration loaded")
+    logging.info(logger, "Configuration loaded successfully")
+
+    return config
+
+# Initialize application components
+define function initialize_components that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("🔧 Initializing application components...")
+
+    # Initialize data directory
+    ensure_directory_exists("./data", logger)
+    ensure_directory_exists("./temp", logger)
+
+    # Initialize core systems
+    initialize_core_systems(app_context)
+
+    # Load application data
+    load_application_data(app_context)
+
+    io.println("✅ All components initialized successfully")
+    logging.info(logger, "Application components initialized")
+
+# Initialize core systems
+define function initialize_core_systems that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("  - Core system 1: Database connection")
+    io.println("  - Core system 2: Network services")
+    io.println("  - Core system 3: Security systems")
+    io.println("  - Core system 4: Logging system")
+    io.println("  - Core system 5: Configuration system")
+
+    logging.info(logger, "Core systems initialized")
+
+# Load application data
+define function load_application_data that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("  - Loading user preferences")
+    io.println("  - Loading application state")
+    io.println("  - Loading cached data")
+
+    logging.info(logger, "Application data loaded")
+
+# Ensure directory exists
+define function ensure_directory_exists that takes dir_path as String, logger as Logger:
+    # In real implementation: create directory if it doesn't exist
+    io.println("  - Ensuring directory exists: " + dir_path)
+    logging.info(logger, "Directory verified: " + dir_path)
+
+# Main application loop
+define function run_application that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    create running as Boolean
+    set running to true
+
+    logging.info(logger, "Entering main application loop")
+
+    while running:
+        display_main_menu()
+        create choice as String
+        set choice to io.read_line()
+
+        if choice == "1":
+            handle_data_management(app_context)
+        else if choice == "2":
+            handle_user_management(app_context)
+        else if choice == "3":
+            handle_system_operations(app_context)
+        else if choice == "4":
+            handle_configuration(app_context)
+        else if choice == "5":
+            handle_reports(app_context)
+        else if choice == "6":
+            handle_utilities(app_context)
+        else if choice == "7":
+            display_about(app_context)
+        else if choice == "8":
+            running = handle_exit(app_context)
+        else:
+            io.println("❌ Invalid choice. Please try again.")
+
+# Display main menu
+define function display_main_menu:
+    io.println("\n📋 Main Menu - " + APP_NAME)
+    io.println("─" * 30)
+    io.println("1. 📊 Data Management")
+    io.println("2. 👥 User Management")
+    io.println("3. ⚙️ System Operations")
+    io.println("4. 🔧 Configuration")
+    io.println("5. 📈 Reports & Analytics")
+    io.println("6. 🛠️ Utilities")
+    io.println("7. ℹ️ About")
+    io.println("8. 🚪 Exit")
+    io.print("Enter your choice (1-8): ")
+
+# Handle data management
+define function handle_data_management that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    create data_running as Boolean
+    set data_running to true
+
+    while data_running:
+        io.println("\n📊 Data Management")
+        io.println("─" * 20)
+        io.println("1. View Data")
+        io.println("2. Add New Data")
+        io.println("3. Edit Data")
+        io.println("4. Delete Data")
+        io.println("5. Search Data")
+        io.println("6. Import Data")
+        io.println("7. Export Data")
+        io.println("8. Back to Main Menu")
+        io.print("Enter your choice (1-8): ")
+
+        create choice as String
+        set choice to io.read_line()
+
+        if choice == "1":
+            view_data(app_context)
+        else if choice == "2":
+            add_data(app_context)
+        else if choice == "3":
+            edit_data(app_context)
+        else if choice == "4":
+            delete_data(app_context)
+        else if choice == "5":
+            search_data(app_context)
+        else if choice == "6":
+            import_data(app_context)
+        else if choice == "7":
+            export_data(app_context)
+        else if choice == "8":
+            set data_running to false
+        else:
+            io.println("❌ Invalid choice. Please try again.")
+
+# Data management functions
+define function view_data that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("\n👁️ Viewing Data")
+    io.println("─" * 15)
+    io.println("Data records would be displayed here.")
+    io.println("Example: ID, Name, Value, Timestamp")
+    logging.info(logger, "Data view requested")
+
+define function add_data that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("\n➕ Adding New Data")
+    io.println("─" * 18)
+    io.print("Enter name: ")
+    create name as String
+    set name to io.read_line()
+    io.print("Enter value: ")
+    create value as String
+    set value to io.read_line()
+
+    io.println("✅ Data added successfully: " + name + " = " + value)
+    logging.info(logger, "New data added: " + name)
+
+define function edit_data that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("\n✏️ Editing Data")
+    io.println("─" * 14)
+    io.print("Enter ID to edit: ")
+    create id as String
+    set id to io.read_line()
+
+    io.println("✅ Data edit functionality (ID: " + id + ")")
+    logging.info(logger, "Data edit requested for ID: " + id)
+
+define function delete_data that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("\n🗑️ Deleting Data")
+    io.println("─" * 16)
+    io.print("Enter ID to delete: ")
+    create id as String
+    set id to io.read_line()
+
+    io.print("⚠️ Are you sure you want to delete ID " + id + "? (y/n): ")
+    create confirmation as String
+    set confirmation to io.read_line()
+
+    if confirmation == "y":
+        io.println("✅ Data deleted successfully")
+        logging.info(logger, "Data deleted: " + id)
+    else:
+        io.println("ℹ️ Delete operation cancelled")
+
+define function search_data that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("\n🔍 Searching Data")
+    io.println("─" * 17)
+    io.print("Enter search term: ")
+    create search_term as String
+    set search_term to io.read_line()
+
+    io.println("✅ Search results for: " + search_term)
+    logging.info(logger, "Data search performed: " + search_term)
+
+define function import_data that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("\n📥 Importing Data")
+    io.println("─" * 18)
+    io.print("Enter import filename: ")
+    create filename as String
+    set filename to io.read_line()
+
+    io.println("✅ Data imported from: " + filename)
+    logging.info(logger, "Data import completed: " + filename)
+
+define function export_data that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("\n📤 Exporting Data")
+    io.println("─" * 18)
+    io.print("Enter export filename: ")
+    create filename as String
+    set filename to io.read_line()
+
+    io.println("✅ Data exported to: " + filename)
+    logging.info(logger, "Data export completed: " + filename)
+
+# Handle user management
+define function handle_user_management that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("\n👥 User Management")
+    io.println("─" * 18)
+    io.println("1. List Users")
+    io.println("2. Add User")
+    io.println("3. Edit User")
+    io.println("4. Delete User")
+    io.println("5. User Permissions")
+    io.println("6. Back to Main Menu")
+    io.print("Enter your choice (1-6): ")
+
+    create choice as String
+    set choice to io.read_line()
+
+    if choice == "1":
+        io.println("📋 User list functionality")
+        logging.info(logger, "User list requested")
+    else if choice == "2":
+        io.println("➕ Add user functionality")
+        logging.info(logger, "Add user requested")
+    else if choice == "3":
+        io.println("✏️ Edit user functionality")
+        logging.info(logger, "Edit user requested")
+    else if choice == "4":
+        io.println("🗑️ Delete user functionality")
+        logging.info(logger, "Delete user requested")
+    else if choice == "5":
+        io.println("🔐 User permissions functionality")
+        logging.info(logger, "User permissions requested")
+    else if choice == "6":
+        return
+    else:
+        io.println("❌ Invalid choice")
+
+# Handle system operations
+define function handle_system_operations that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("\n⚙️ System Operations")
+    io.println("─" * 20)
+    io.println("1. System Status")
+    io.println("2. Performance Monitor")
+    io.println("3. Backup System")
+    io.println("4. Maintenance")
+    io.println("5. System Logs")
+    io.println("6. Back to Main Menu")
+    io.print("Enter your choice (1-6): ")
+
+    create choice as String
+    set choice to io.read_line()
+
+    if choice == "1":
+        display_system_status(app_context)
+    else if choice == "2":
+        display_performance_monitor(app_context)
+    else if choice == "3":
+        handle_backup_system(app_context)
+    else if choice == "4":
+        handle_maintenance(app_context)
+    else if choice == "5":
+        display_system_logs(app_context)
+    else if choice == "6":
+        return
+    else:
+        io.println("❌ Invalid choice")
+
+# System operation functions
+define function display_system_status that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("\n📊 System Status")
+    io.println("─" * 15)
+    io.println("Application: " + APP_NAME + " v" + APP_VERSION)
+    io.println("Status: Running")
+    io.println("Uptime: (current uptime)")
+    io.println("Memory Usage: 45.2 MB")
+    io.println("CPU Usage: 12.5%")
+    io.println("Active Connections: 3")
+    io.println("Data Directory: ./data (OK)")
+    io.println("Log Directory: ./logs (OK)")
+
+    logging.info(logger, "System status displayed")
+
+define function display_performance_monitor that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("\n📈 Performance Monitor")
+    io.println("─" * 22)
+    io.println("Response Time: 245ms (avg)")
+    io.println("Throughput: 1,250 requests/min")
+    io.println("Error Rate: 0.2%")
+    io.println("Memory Peak: 67.8 MB")
+    io.println("Database Connections: 5/10")
+    io.println("Cache Hit Rate: 89.5%")
+
+    logging.info(logger, "Performance monitor displayed")
+
+define function handle_backup_system that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("\n💾 Backup System")
+    io.println("─" * 15)
+    io.println("1. Create Backup")
+    io.println("2. Restore from Backup")
+    io.println("3. View Backup History")
+    io.print("Enter your choice (1-3): ")
+
+    create choice as String
+    set choice to io.read_line()
+
+    if choice == "1":
+        io.println("✅ Backup created successfully")
+        logging.info(logger, "Backup created")
+    else if choice == "2":
+        io.println("✅ Backup restored successfully")
+        logging.info(logger, "Backup restored")
+    else if choice == "3":
+        io.println("📋 Backup history displayed")
+        logging.info(logger, "Backup history viewed")
+
+define function handle_maintenance that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("\n🛠️ Maintenance Operations")
+    io.println("─" * 25)
+    io.println("1. Clean Temp Files")
+    io.println("2. Optimize Database")
+    io.println("3. Update System")
+    io.println("4. Health Check")
+    io.print("Enter your choice (1-4): ")
+
+    create choice as String
+    set choice to io.read_line()
+
+    if choice == "1":
+        io.println("✅ Temporary files cleaned")
+        logging.info(logger, "Temp files cleaned")
+    else if choice == "2":
+        io.println("✅ Database optimized")
+        logging.info(logger, "Database optimized")
+    else if choice == "3":
+        io.println("✅ System updated")
+        logging.info(logger, "System updated")
+    else if choice == "4":
+        io.println("✅ Health check passed")
+        logging.info(logger, "Health check completed")
+
+define function display_system_logs that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("\n📋 System Logs")
+    io.println("─" * 13)
+    io.println("[INFO] Application started")
+    io.println("[INFO] User login successful")
+    io.println("[WARNING] High memory usage detected")
+    io.println("[INFO] Data backup completed")
+    io.println("[ERROR] Network connection timeout")
+    io.println("[INFO] System maintenance completed")
+
+    logging.info(logger, "System logs displayed")
+
+# Handle configuration
+define function handle_configuration that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("\n🔧 Configuration Management")
+    io.println("─" * 27)
+    io.println("1. View Current Settings")
+    io.println("2. Edit Settings")
+    io.println("3. Reset to Defaults")
+    io.println("4. Save Configuration")
+    io.println("5. Load Configuration")
+    io.println("6. Back to Main Menu")
+    io.print("Enter your choice (1-6): ")
+
+    create choice as String
+    set choice to io.read_line()
+
+    if choice == "1":
+        display_current_settings(app_context)
+    else if choice == "2":
+        edit_settings(app_context)
+    else if choice == "3":
+        reset_to_defaults(app_context)
+    else if choice == "4":
+        save_configuration(app_context)
+    else if choice == "5":
+        load_configuration_file(app_context)
+    else if choice == "6":
+        return
+    else:
+        io.println("❌ Invalid choice")
+
+# Configuration functions
+define function display_current_settings that takes app_context as Object:
+    create config as Object
+    set config to app_context["config"]
+
+    io.println("\n⚙️ Current Configuration")
+    io.println("─" * 23)
+    io.println("Debug Mode: " + config["debug_mode"])
+    io.println("Max Connections: " + config["max_connections"])
+    io.println("Timeout: " + config["timeout"])
+    io.println("Log Level: " + config["log_level"])
+    io.println("Data Directory: " + config["data_directory"])
+    io.println("Temp Directory: " + config["temp_directory"])
+
+define function edit_settings that takes app_context as Object:
+    io.println("\n✏️ Edit Settings")
+    io.println("─" * 14)
+    io.println("Settings editing functionality would be implemented here.")
+
+define function reset_to_defaults that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("\n🔄 Reset to Defaults")
+    io.println("─" * 19)
+    io.print("⚠️ Are you sure you want to reset all settings? (y/n): ")
+    create confirmation as String
+    set confirmation to io.read_line()
+
+    if confirmation == "y":
+        io.println("✅ Settings reset to defaults")
+        logging.info(logger, "Settings reset to defaults")
+    else:
+        io.println("ℹ️ Reset cancelled")
+
+define function save_configuration that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("\n💾 Save Configuration")
+    io.println("─" * 22)
+    io.println("✅ Configuration saved to " + CONFIG_FILENAME)
+    logging.info(logger, "Configuration saved")
+
+define function load_configuration_file that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("\n📂 Load Configuration")
+    io.println("─" * 21)
+    io.println("✅ Configuration loaded from " + CONFIG_FILENAME)
+    logging.info(logger, "Configuration loaded")
+
+# Handle reports and analytics
+define function handle_reports that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("\n📈 Reports & Analytics")
+    io.println("─" * 22)
+    io.println("1. Generate User Report")
+    io.println("2. Generate System Report")
+    io.println("3. Generate Activity Report")
+    io.println("4. Generate Performance Report")
+    io.println("5. Export Reports")
+    io.println("6. Back to Main Menu")
+    io.print("Enter your choice (1-6): ")
+
+    create choice as String
+    set choice to io.read_line()
+
+    if choice == "1":
+        generate_user_report(app_context)
+    else if choice == "2":
+        generate_system_report(app_context)
+    else if choice == "3":
+        generate_activity_report(app_context)
+    else if choice == "4":
+        generate_performance_report(app_context)
+    else if choice == "5":
+        export_reports(app_context)
+    else if choice == "6":
+        return
+    else:
+        io.println("❌ Invalid choice")
+
+# Report generation functions
+define function generate_user_report that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("\n👤 User Report")
+    io.println("─" * 12)
+    io.println("Total Users: 150")
+    io.println("Active Users: 89")
+    io.println("New Users (30 days): 12")
+    io.println("User Retention: 78.5%")
+    logging.info(logger, "User report generated")
+
+define function generate_system_report that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("\n🖥️ System Report")
+    io.println("─" * 14)
+    io.println("System Uptime: 99.2%")
+    io.println("Average Response Time: 245ms")
+    io.println("Total Requests: 15,420")
+    io.println("Error Rate: 0.3%")
+    logging.info(logger, "System report generated")
+
+define function generate_activity_report that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("\n📊 Activity Report")
+    io.println("─" * 17)
+    io.println("Daily Active Users: 67")
+    io.println("Monthly Active Users: 123")
+    io.println("Average Session Duration: 12.5 min")
+    io.println("Most Popular Feature: Data Management")
+    logging.info(logger, "Activity report generated")
+
+define function generate_performance_report that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("\n⚡ Performance Report")
+    io.println("─" * 20)
+    io.println("CPU Usage: 23.5%")
+    io.println("Memory Usage: 45.2 MB")
+    io.println("Disk I/O: 12.3 MB/s")
+    io.println("Network I/O: 2.1 MB/s")
+    logging.info(logger, "Performance report generated")
+
+define function export_reports that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("\n📤 Export Reports")
+    io.println("─" * 16)
+    io.print("Enter export format (json/csv/pdf): ")
+    create format as String
+    set format to io.read_line()
+
+    io.println("✅ Reports exported in " + format + " format")
+    logging.info(logger, "Reports exported in format: " + format)
+
+# Handle utilities
+define function handle_utilities that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("\n🛠️ Utilities")
+    io.println("─" * 11)
+    io.println("1. Calculator")
+    io.println("2. Text Tools")
+    io.println("3. File Tools")
+    io.println("4. System Tools")
+    io.println("5. Back to Main Menu")
+    io.print("Enter your choice (1-5): ")
+
+    create choice as String
+    set choice to io.read_line()
+
+    if choice == "1":
+        io.println("🧮 Calculator functionality")
+        logging.info(logger, "Calculator accessed")
+    else if choice == "2":
+        io.println("📝 Text tools functionality")
+        logging.info(logger, "Text tools accessed")
+    else if choice == "3":
+        io.println("📁 File tools functionality")
+        logging.info(logger, "File tools accessed")
+    else if choice == "4":
+        io.println("⚙️ System tools functionality")
+        logging.info(logger, "System tools accessed")
+    else if choice == "5":
+        return
+    else:
+        io.println("❌ Invalid choice")
+
+# Display about information
+define function display_about that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("\nℹ️ About " + APP_NAME)
+    io.println("─" * (8 + APP_NAME))
+    io.println("Version: " + APP_VERSION)
+    io.println("Built with: AGK Language")
+    io.println("Purpose: General application template")
+    io.println("Features: Data management, user management, reporting")
+    io.println("Status: Running")
+
+    create start_time as String
+    set start_time to app_context["start_time"]
+    io.println("Started: " + start_time)
+
+    logging.info(logger, "About information displayed")
+
+# Handle application exit
+define function handle_exit that takes app_context as Object and returns Boolean:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.print("\n🚪 Are you sure you want to exit? (y/n): ")
+    create confirmation as String
+    set confirmation to io.read_line()
+
+    if confirmation == "y":
+        set app_context["state"] to STATE_SHUTTING_DOWN
+
+        io.println("🔄 Shutting down " + APP_NAME + "...")
+
+        # Cleanup operations
+        perform_cleanup(app_context)
+
+        logging.info(logger, "Application shutdown initiated")
+        return false
+    else:
+        io.println("ℹ️ Exit cancelled")
+        logging.info(logger, "Exit cancelled by user")
+        return true
+
+# Perform cleanup operations
+define function perform_cleanup that takes app_context as Object:
+    create logger as Logger
+    set logger to app_context["logger"]
+
+    io.println("  - Saving application state")
+    io.println("  - Closing database connections")
+    io.println("  - Cleaning up temporary files")
+    io.println("  - Shutting down services")
+
+    logging.info(logger, "Cleanup operations completed")
+    io.println("✅ Application shutdown complete. Goodbye!")
+
+# Initialize the application
+main()

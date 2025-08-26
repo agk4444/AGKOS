@@ -1,0 +1,537 @@
+# AGK Operating System Template - System Programming & OS Development
+# This template demonstrates operating system development, process management,
+# file systems, networking, and system-level programming
+# Perfect for: OS development, system utilities, embedded systems, device drivers
+
+import os
+import io
+import logging
+import system_ast
+
+# Global configuration
+define constant TEST_FILE as String = "os_demo.txt"
+define constant DEMO_CONTENT as String = "Hello from AGK OS programming!"
+
+# Main application entry point
+define function main:
+    # Initialize logging for the OS application
+    create logger as Logger
+    set logger to logging.get_logger("OS_App")
+    logging.set_level(logger, logging.INFO)
+    logging.add_console_handler(logger)
+
+    logging.info(logger, "Starting AGK Operating System Application")
+
+    # Run the main application loop
+    run_os_application_loop(logger)
+
+# Main application loop with menu-driven interface
+define function run_os_application_loop that takes logger as Logger:
+    create running as Boolean
+    set running to true
+
+    while running:
+        io.println("\n🖥️ AGK Operating System Environment")
+        io.println("1. Process Management")
+        io.println("2. File System Operations")
+        io.println("3. Memory Management")
+        io.println("4. Thread Management")
+        io.println("5. Network Programming")
+        io.println("6. System Information")
+        io.println("7. Synchronization Primitives")
+        io.println("8. System Calls")
+        io.println("9. Hardware I/O")
+        io.println("10. System Constants")
+        io.println("11. Exit")
+        io.print("Enter your choice (1-11): ")
+
+        create choice as String
+        set choice to io.read_line()
+
+        if choice == "1":
+            process_management_demo(logger)
+        else if choice == "2":
+            filesystem_demo(logger)
+        else if choice == "3":
+            memory_management_demo(logger)
+        else if choice == "4":
+            thread_demo(logger)
+        else if choice == "5":
+            network_demo(logger)
+        else if choice == "6":
+            system_info_demo(logger)
+        else if choice == "7":
+            synchronization_demo(logger)
+        else if choice == "8":
+            system_calls_demo(logger)
+        else if choice == "9":
+            hardware_io_demo(logger)
+        else if choice == "10":
+            constants_demo(logger)
+        else if choice == "11":
+            set running to false
+            logging.info(logger, "OS application shutting down")
+        else:
+            io.println("❌ Invalid choice. Please try again.")
+
+# Process management demonstration
+define function process_management_demo that takes logger as Logger:
+    io.println("\n🔄 Process Management")
+
+    io.println("Current Process Information:")
+    create pid as Integer
+    set pid to os.get_process_id()
+    io.println("Process ID: " + string(pid))
+
+    create ppid as Integer
+    set ppid to os.get_parent_process_id()
+    io.println("Parent Process ID: " + string(ppid))
+
+    io.println("\nProcess Operations:")
+
+    io.print("Enter command to execute: ")
+    create command as String
+    set command to io.read_line()
+
+    if command == "":
+        set command to "echo 'Hello from child process!'"
+
+    # Create child process
+    create args as List
+    set args to [command]
+
+    create child_pid as Integer
+    set child_pid to os.process_create(command, args)
+
+    if child_pid > 0:
+        io.println("✅ Created child process with PID: " + string(child_pid))
+
+        # Wait for child to complete
+        create status as Integer
+        set status to os.process_wait(child_pid)
+        io.println("✅ Child process completed with status: " + string(status))
+
+        # Send signal to demonstrate
+        io.println("Sending SIGTERM signal...")
+        os.process_kill(child_pid, os.SIGTERM)
+    else:
+        io.println("❌ Failed to create child process")
+
+    logging.info(logger, "Process management operations completed")
+
+# File system operations
+define function filesystem_demo that takes logger as Logger:
+    io.println("\n📁 File System Operations")
+
+    # Create test file
+    create fd as Integer
+    set fd to os.file_open(TEST_FILE, os.O_WRONLY | os.O_CREAT)
+
+    if fd > 0:
+        io.println("✅ File opened for writing")
+
+        # Write content
+        create buffer as Pointer
+        set buffer to system_ast.allocate_memory(length(DEMO_CONTENT), 1)
+
+        if buffer != 0:
+            # Copy string to buffer (simplified)
+            create bytes_written as Integer
+            set bytes_written to os.file_write(fd, buffer, length(DEMO_CONTENT))
+            io.println("✅ Wrote " + string(bytes_written) + " bytes to file")
+
+            system_ast.free_memory(buffer)
+        else:
+            io.println("❌ Failed to allocate buffer")
+
+        os.file_close(fd)
+
+        # Read file back
+        set fd to os.file_open(TEST_FILE, os.O_RDONLY)
+
+        if fd > 0:
+            create read_buffer as Pointer
+            set read_buffer to system_ast.allocate_memory(1024, 1)
+
+            if read_buffer != 0:
+                create bytes_read as Integer
+                set bytes_read to os.file_read(fd, read_buffer, 1024)
+                io.println("✅ Read " + string(bytes_read) + " bytes from file")
+
+                system_ast.free_memory(read_buffer)
+            else:
+                io.println("❌ Failed to allocate read buffer")
+
+            os.file_close(fd)
+        else:
+            io.println("❌ Failed to open file for reading")
+    else:
+        io.println("❌ Failed to open file for writing")
+
+    logging.info(logger, "File system operations completed")
+
+# Memory management
+define function memory_management_demo that takes logger as Logger:
+    io.println("\n🧠 Memory Management")
+
+    io.print("Enter size to allocate (bytes): ")
+    create size_str as String
+    set size_str to io.read_line()
+
+    create size as Integer
+    set size to 1024
+    if size_str != "":
+        set size to int(size_str)
+
+    # Allocate memory
+    create ptr as Pointer
+    set ptr to os.memory_allocate(size)
+
+    if ptr != 0:
+        io.println("✅ Allocated " + string(size) + " bytes at: " + string(ptr))
+
+        # Set memory to pattern
+        os.memory_set(ptr, 0xAA, size)
+        io.println("✅ Memory set to pattern 0xAA")
+
+        # Allocate second block for copy demonstration
+        create ptr2 as Pointer
+        set ptr2 to os.memory_allocate(size)
+
+        if ptr2 != 0:
+            # Copy memory
+            os.memory_copy(ptr2, ptr, size)
+            io.println("✅ Memory copied to second block")
+
+            os.memory_free(ptr2)
+            io.println("✅ Second block freed")
+        else:
+            io.println("❌ Failed to allocate second block")
+
+        os.memory_free(ptr)
+        io.println("✅ Memory block freed")
+    else:
+        io.println("❌ Failed to allocate memory")
+
+    logging.info(logger, "Memory management operations completed")
+
+# Thread management
+define function thread_demo that takes logger as Logger:
+    io.println("\n🧵 Thread Management")
+
+    io.print("Enter number of threads to create: ")
+    create thread_count_str as String
+    set thread_count_str to io.read_line()
+
+    create thread_count as Integer
+    set thread_count to 2
+    if thread_count_str != "":
+        set thread_count to int(thread_count_str)
+
+    create threads as List
+    set threads to []
+
+    # Create threads
+    create i as Integer
+    set i to 0
+    while i < thread_count:
+        create thread_id as Integer
+        set thread_id to os.thread_create(address_of(thread_worker), i)
+
+        if thread_id > 0:
+            add thread_id to threads
+            io.println("✅ Created thread " + string(i + 1) + " with ID: " + string(thread_id))
+        else:
+            io.println("❌ Failed to create thread " + string(i + 1))
+
+        set i to i + 1
+
+    # Wait for threads to complete
+    set i to 0
+    while i < length(threads):
+        create thread_id as Integer
+        set thread_id to threads[i]
+
+        create result as Pointer
+        set result to 0
+        create join_result as Integer
+        set join_result to os.thread_join(thread_id, result)
+
+        if join_result == 0:
+            io.println("✅ Thread " + string(i + 1) + " completed")
+        else:
+            io.println("❌ Thread " + string(i + 1) + " join failed")
+
+        set i to i + 1
+
+    logging.info(logger, "Thread management operations completed")
+
+# Worker function for threads
+define function thread_worker that takes arg as Integer:
+    io.println("🧵 Thread " + string(arg) + " starting work...")
+
+    # Simulate work
+    create work as Integer
+    set work to 0
+    while work < 100000:
+        set work to work + 1
+
+    io.println("🧵 Thread " + string(arg) + " completed work")
+    return arg
+
+# Network programming
+define function network_demo that takes logger as Logger:
+    io.println("\n🌐 Network Programming")
+
+    io.print("Enter port number: ")
+    create port_str as String
+    set port_str to io.read_line()
+
+    create port as Integer
+    set port as Integer = 8080
+    if port_str != "":
+        set port to int(port_str)
+
+    # Create socket
+    create sock as Integer
+    set sock to os.network_socket(os.AF_INET, os.SOCK_STREAM, 0)
+
+    if sock > 0:
+        io.println("✅ Created socket: " + string(sock))
+
+        # Bind socket (simplified)
+        create bind_result as Integer
+        set bind_result to os.network_bind(sock, 0, 4)  # Mock address
+
+        if bind_result == 0:
+            io.println("✅ Socket bound to port " + string(port))
+
+            # Listen
+            create listen_result as Integer
+            set listen_result to os.network_listen(sock, 5)
+
+            if listen_result == 0:
+                io.println("✅ Socket listening for connections")
+
+                io.println("ℹ️ Network demo completed (simulation)")
+            else:
+                io.println("❌ Listen failed")
+        else:
+            io.println("❌ Bind failed")
+
+        os.network_close(sock)
+        io.println("✅ Socket closed")
+    else:
+        io.println("❌ Failed to create socket")
+
+    logging.info(logger, "Network operations completed")
+
+# System information
+define function system_info_demo that takes logger as Logger:
+    io.println("\n💻 System Information")
+
+    io.println("System Details:")
+    io.println("─" * 30)
+
+    create sysname as String
+    set sysname to os.get_system_name()
+    io.println("System Name: " + sysname)
+
+    create nodename as String
+    set nodename to os.get_node_name()
+    io.println("Node Name: " + nodename)
+
+    create release as String
+    set release to os.get_release()
+    io.println("Release: " + release)
+
+    create version as String
+    set version to os.get_version()
+    io.println("Version: " + version)
+
+    create machine as String
+    set machine to os.get_machine()
+    io.println("Machine: " + machine)
+
+    logging.info(logger, "System information retrieved")
+
+# Synchronization primitives
+define function synchronization_demo that takes logger as Logger:
+    io.println("\n🔒 Synchronization Primitives")
+
+    # Create mutex
+    create mutex as Pointer
+    set mutex to os.mutex_create()
+
+    if mutex != 0:
+        io.println("✅ Created mutex")
+
+        # Lock/unlock demonstration
+        create lock_result as Integer
+        set lock_result to os.mutex_lock(mutex)
+
+        if lock_result == 0:
+            io.println("✅ Mutex locked")
+
+            create unlock_result as Integer
+            set unlock_result to os.mutex_unlock(mutex)
+
+            if unlock_result == 0:
+                io.println("✅ Mutex unlocked")
+            else:
+                io.println("❌ Mutex unlock failed")
+        else:
+            io.println("❌ Mutex lock failed")
+
+        os.mutex_destroy(mutex)
+        io.println("✅ Mutex destroyed")
+    else:
+        io.println("❌ Failed to create mutex")
+
+    # Semaphore demonstration
+    create semaphore as Pointer
+    set semaphore to os.semaphore_create(1)
+
+    if semaphore != 0:
+        io.println("✅ Created semaphore")
+
+        create wait_result as Integer
+        set wait_result to os.semaphore_wait(semaphore)
+
+        if wait_result == 0:
+            io.println("✅ Semaphore acquired")
+
+            create post_result as Integer
+            set post_result to os.semaphore_post(semaphore)
+
+            if post_result == 0:
+                io.println("✅ Semaphore released")
+            else:
+                io.println("❌ Semaphore post failed")
+        else:
+            io.println("❌ Semaphore wait failed")
+
+        os.semaphore_destroy(semaphore)
+        io.println("✅ Semaphore destroyed")
+    else:
+        io.println("❌ Failed to create semaphore")
+
+    logging.info(logger, "Synchronization operations completed")
+
+# System calls
+define function system_calls_demo that takes logger as Logger:
+    io.println("\n⚙️ System Calls")
+
+    io.println("Available system calls:")
+    io.println("─" * 30)
+    io.println("SYS_read: " + string(os.SYS_read))
+    io.println("SYS_write: " + string(os.SYS_write))
+    io.println("SYS_open: " + string(os.SYS_open))
+    io.println("SYS_close: " + string(os.SYS_close))
+    io.println("SYS_fork: " + string(os.SYS_fork))
+    io.println("SYS_execve: " + string(os.SYS_execve))
+    io.println("SYS_exit: " + string(os.SYS_exit))
+
+    io.print("Enter system call number: ")
+    create syscall_num_str as String
+    set syscall_num_str to io.read_line()
+
+    if syscall_num_str != "":
+        create syscall_num as Integer
+        set syscall_num to int(syscall_num_str)
+
+        create args as List
+        set args to []
+
+        # Execute system call (demo - may not work in all environments)
+        create result as Integer
+        set result to os.system_call(syscall_num, args)
+
+        io.println("System call " + string(syscall_num) + " returned: " + string(result))
+    else:
+        io.println("ℹ️ System call demo skipped")
+
+    logging.info(logger, "System call operations completed")
+
+# Hardware I/O
+define function hardware_io_demo that takes logger as Logger:
+    io.println("\n🔌 Hardware I/O Operations")
+
+    io.println("⚠️ Warning: Hardware I/O requires appropriate privileges")
+    io.println("This demo shows the interface but may not work in user mode")
+    io.println("─" * 60)
+
+    io.print("Enter I/O port address (hex): 0x")
+    create port_str as String
+    set port_str to io.read_line()
+
+    create port as Integer
+    set port to 0x80  # Default to 0x80
+    if port_str != "":
+        set port to hex_to_int(port_str)
+
+    io.println("Port: 0x" + to_hex_string(port))
+
+    # Read from port
+    create value as Integer
+    set value to os.port_in(port)
+    io.println("Read value: " + string(value) + " (0x" + to_hex_string(value) + ")")
+
+    io.print("Enter value to write (hex): 0x")
+    create write_value_str as String
+    set write_value_str to io.read_line()
+
+    if write_value_str != "":
+        create write_value as Integer
+        set write_value to hex_to_int(write_value_str)
+
+        os.port_out(port, write_value)
+        io.println("✅ Written 0x" + to_hex_string(write_value) + " to port 0x" + to_hex_string(port))
+    else:
+        io.println("ℹ️ Port write skipped")
+
+    logging.info(logger, "Hardware I/O operations completed")
+
+# System constants
+define function constants_demo that takes logger as Logger:
+    io.println("\n📋 System Constants Reference")
+
+    io.println("File Access Flags:")
+    io.println("─" * 25)
+    io.println("O_RDONLY: " + string(os.O_RDONLY))
+    io.println("O_WRONLY: " + string(os.O_WRONLY))
+    io.println("O_RDWR: " + string(os.O_RDWR))
+    io.println("O_CREAT: " + string(os.O_CREAT))
+    io.println("O_TRUNC: " + string(os.O_TRUNC))
+
+    io.println("\nFile Seek Constants:")
+    io.println("─" * 25)
+    io.println("SEEK_SET: " + string(os.SEEK_SET))
+    io.println("SEEK_CUR: " + string(os.SEEK_CUR))
+    io.println("SEEK_END: " + string(os.SEEK_END))
+
+    io.println("\nSocket Constants:")
+    io.println("─" * 20)
+    io.println("AF_INET: " + string(os.AF_INET))
+    io.println("SOCK_STREAM: " + string(os.SOCK_STREAM))
+    io.println("SOCK_DGRAM: " + string(os.SOCK_DGRAM))
+
+    io.println("\nSignal Constants:")
+    io.println("─" * 20)
+    io.println("SIGTERM: " + string(os.SIGTERM))
+    io.println("SIGKILL: " + string(os.SIGKILL))
+    io.println("SIGINT: " + string(os.SIGINT))
+
+    logging.info(logger, "System constants displayed")
+
+# Helper functions
+define function hex_to_int that takes hex_str as String and returns Integer:
+    # Simple hex to integer conversion (placeholder)
+    return 128
+
+define function to_hex_string that takes value as Integer and returns String:
+    # Simple hex conversion (placeholder)
+    return "DEADBEEF"
+
+# Initialize the application
+main()

@@ -1,0 +1,664 @@
+# AGK Date Template - Date and Time Operations
+# This template demonstrates comprehensive date and time operations including
+# creation, manipulation, formatting, calculations, and timezone handling
+# Perfect for: Scheduling, logging, calendar applications, time-based calculations
+
+import date
+import io
+import logging
+import string
+
+# Global configuration
+define constant LOG_FILE as String = "date_operations.log"
+
+# Main application entry point
+define function main:
+    # Initialize logging for the Date application
+    create logger as Logger
+    set logger to logging.get_logger("Date_App")
+    logging.set_level(logger, logging.INFO)
+    logging.add_console_handler(logger)
+    logging.add_file_handler(logger, LOG_FILE)
+
+    logging.info(logger, "Starting AGK Date/Time Application")
+
+    # Run the main application loop
+    run_date_application_loop(logger)
+
+# Main application loop with menu-driven interface
+define function run_date_application_loop that takes logger as Logger:
+    create running as Boolean
+    set running to true
+
+    while running:
+        io.println("\n📅 AGK Date/Time Operations Demo")
+        io.println("1. Current Date/Time Information")
+        io.println("2. Date Creation and Parsing")
+        io.println("3. Date Arithmetic")
+        io.println("4. Date Formatting")
+        io.println("5. Date Comparisons")
+        io.println("6. Calendar Operations")
+        io.println("7. Timezone Operations")
+        io.println("8. Business Days Calculator")
+        io.println("9. Exit")
+        io.print("Enter your choice (1-9): ")
+
+        create choice as String
+        set choice to io.read_line()
+
+        if choice == "1":
+            current_datetime_demo(logger)
+        else if choice == "2":
+            date_creation_demo(logger)
+        else if choice == "3":
+            date_arithmetic_demo(logger)
+        else if choice == "4":
+            formatting_demo(logger)
+        else if choice == "5":
+            comparison_demo(logger)
+        else if choice == "6":
+            calendar_demo(logger)
+        else if choice == "7":
+            timezone_demo(logger)
+        else if choice == "8":
+            business_days_demo(logger)
+        else if choice == "9":
+            set running to false
+            logging.info(logger, "Date application shutting down")
+        else:
+            io.println("❌ Invalid choice. Please try again.")
+
+# Current date/time information demonstration
+define function current_datetime_demo that takes logger as Logger:
+    io.println("\n🕐 Current Date/Time Information Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "current_datetime")
+
+    io.println("=== Current Date and Time ===")
+    create now_datetime as DateTime
+    set now_datetime to date.now()
+    io.println("Current DateTime: " + string(now_datetime))
+
+    create today_date as Date
+    set today_date to date.today()
+    io.println("Current Date: " + string(today_date))
+
+    io.println("\n=== Date Components ===")
+    create current_year as Integer
+    set current_year to date.get_year(today_date)
+    create current_month as Integer
+    set current_month to date.get_month(today_date)
+    create current_day as Integer
+    set current_day to date.get_day(today_date)
+
+    io.println("Year: " + string(current_year))
+    io.println("Month: " + string(current_month))
+    io.println("Day: " + string(current_day))
+
+    io.println("\n=== Time Components ===")
+    create current_hour as Integer
+    set current_hour to date.get_hour(now_datetime)
+    create current_minute as Integer
+    set current_minute to date.get_minute(now_datetime)
+    create current_second as Integer
+    set current_second to date.get_second(now_datetime)
+
+    io.println("Hour: " + string(current_hour))
+    io.println("Minute: " + string(current_minute))
+    io.println("Second: " + string(current_second))
+
+    io.println("\n=== Additional Information ===")
+    io.println("Timestamp: " + string(date.timestamp()))
+    io.println("Day of Week: " + date.day_of_week(today_date))
+    io.println("Is Leap Year: " + (date.is_leap_year(current_year) ? "Yes" : "No"))
+    io.println("Days in Month: " + string(date.days_in_month(current_year, current_month)))
+    io.println("Is Weekend: " + (date.is_weekend(today_date) ? "Yes" : "No"))
+    io.println("Is Weekday: " + (date.is_weekday(today_date) ? "Yes" : "No"))
+
+    logging.end_timer(timer)
+    logging.info(logger, "Current datetime information completed")
+
+# Date creation and parsing demonstration
+define function date_creation_demo that takes logger as Logger:
+    io.println("\n🔨 Date Creation and Parsing Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "date_creation")
+
+    io.println("=== Creating Specific Dates ===")
+
+    # Create specific dates
+    create date1 as Date
+    set date1 to date.create_date(2024, 1, 15)
+    io.println("✅ Created date: " + string(date1))
+
+    create date2 as Date
+    set date2 to date.create_date(2023, 12, 25)
+    io.println("✅ Created date: " + string(date2))
+
+    create datetime1 as DateTime
+    set datetime1 to date.create_datetime(2024, 3, 20, 14, 30, 45)
+    io.println("✅ Created datetime: " + string(datetime1))
+
+    io.println("\n=== Interactive Date Creation ===")
+    io.print("Enter year: ")
+    create input_year as String
+    set input_year to io.read_line()
+
+    io.print("Enter month: ")
+    create input_month as String
+    set input_month to io.read_line()
+
+    io.print("Enter day: ")
+    create input_day as String
+    set input_day to io.read_line()
+
+    if validate_number(input_year) and validate_number(input_month) and validate_number(input_day):
+        create year as Integer
+        set year to string_to_int(input_year)
+        create month as Integer
+        set month to string_to_int(input_month)
+        create day as Integer
+        set day to string_to_int(input_day)
+
+        create custom_date as Date
+        set custom_date to date.create_date(year, month, day)
+        io.println("✅ Created custom date: " + string(custom_date))
+    else:
+        io.println("❌ Invalid input. Using default date.")
+        create custom_date as Date
+        set custom_date to date.create_date(2024, 6, 15)
+
+    io.println("\n=== Start and End of Month ===")
+    create som as Date
+    set som to date.start_of_month(custom_date)
+    create eom as Date
+    set eom to date.end_of_month(custom_date)
+
+    io.println("Start of month: " + string(som))
+    io.println("End of month: " + string(eom))
+
+    logging.end_timer(timer)
+    logging.info(logger, "Date creation completed")
+
+# Date arithmetic demonstration
+define function date_arithmetic_demo that takes logger as Logger:
+    io.println("\n🔢 Date Arithmetic Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "date_arithmetic")
+
+    io.println("=== Date Calculations ===")
+    create base_date as Date
+    set base_date to date.create_date(2024, 3, 15)
+    io.println("Base date: " + string(base_date))
+
+    io.println("\n=== Adding Days ===")
+    create dates_with_days as List
+    set dates_with_days to create_list()
+    add 7 to dates_with_days
+    add 30 to dates_with_days
+    add 365 to dates_with_days
+    add -7 to dates_with_days
+
+    for each days in dates_with_days:
+        create result_date as Date
+        set result_date to date.add_days(base_date, days)
+        io.println(string(base_date) + " + " + string(days) + " days = " + string(result_date))
+
+    io.println("\n=== Adding Months ===")
+    create months_to_add as List
+    set months_to_add to create_list()
+    add 1 to months_to_add
+    add 6 to months_to_add
+    add 12 to months_to_add
+    add -3 to months_to_add
+
+    for each months in months_to_add:
+        create result_date as Date
+        set result_date to date.add_months(base_date, months)
+        io.println(string(base_date) + " + " + string(months) + " months = " + string(result_date))
+
+    io.println("\n=== Adding Years ===")
+    create years_to_add as List
+    set years_to_add to create_list()
+    add 1 to years_to_add
+    add 5 to years_to_add
+    add 10 to years_to_add
+    add -2 to years_to_add
+
+    for each years in years_to_add:
+        create result_date as Date
+        set result_date to date.add_years(base_date, years)
+        io.println(string(base_date) + " + " + string(years) + " years = " + string(result_date))
+
+    io.println("\n=== Date Differences ===")
+    create date_a as Date
+    set date_a to date.create_date(2024, 1, 1)
+    create date_b as Date
+    set date_b to date.create_date(2024, 12, 31)
+
+    create days_diff as Integer
+    set days_diff to date.date_difference(date_a, date_b)
+    io.println("Days between " + string(date_a) + " and " + string(date_b) + ": " + string(days_diff) + " days")
+
+    logging.end_timer(timer)
+    logging.info(logger, "Date arithmetic completed")
+
+# Date formatting demonstration
+define function formatting_demo that takes logger as Logger:
+    io.println("\n🎨 Date Formatting Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "date_formatting")
+
+    io.println("=== Sample Date and Time ===")
+    create sample_datetime as DateTime
+    set sample_datetime to date.create_datetime(2024, 12, 25, 15, 30, 45)
+    create sample_date as Date
+    set sample_date to date.create_date(2024, 12, 25)
+
+    io.println("Sample DateTime: " + string(sample_datetime))
+    io.println("Sample Date: " + string(sample_date))
+
+    io.println("\n=== Common Date Formats ===")
+    create date_formats as List
+    set date_formats to create_list()
+    add "%Y-%m-%d" to date_formats
+    add "%d/%m/%Y" to date_formats
+    add "%m/%d/%Y" to date_formats
+    add "%B %d, %Y" to date_formats
+    add "%d %b %Y" to date_formats
+
+    for each fmt in date_formats:
+        create formatted as String
+        set formatted to date.format_date(sample_date, fmt)
+        io.println("Format '" + fmt + "': " + formatted)
+
+    io.println("\n=== Common DateTime Formats ===")
+    create datetime_formats as List
+    set datetime_formats to create_list()
+    add "%Y-%m-%d %H:%M:%S" to datetime_formats
+    add "%d/%m/%Y %I:%M %p" to datetime_formats
+    add "%B %d, %Y at %I:%M %p" to datetime_formats
+    add "%Y%m%d_%H%M%S" to datetime_formats
+
+    for each fmt in datetime_formats:
+        create formatted as String
+        set formatted to date.format_datetime(sample_datetime, fmt)
+        io.println("Format '" + fmt + "': " + formatted)
+
+    io.println("\n=== Custom Formatting Examples ===")
+    io.println("ISO 8601: " + date.format_datetime(sample_datetime, "%Y-%m-%dT%H:%M:%S"))
+    io.println("US Style: " + date.format_date(sample_date, "%m/%d/%Y"))
+    io.println("European: " + date.format_date(sample_date, "%d.%m.%Y"))
+    io.println("Long form: " + date.format_date(sample_date, "%A, %B %d, %Y"))
+
+    logging.end_timer(timer)
+    logging.info(logger, "Date formatting completed")
+
+# Date comparison demonstration
+define function comparison_demo that takes logger as Logger:
+    io.println("\n⚖️ Date Comparison Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "date_comparison")
+
+    io.println("=== Creating Test Dates ===")
+    create dates as List
+    set dates to create_list()
+
+    add date.create_date(2024, 3, 15) to dates
+    add date.create_date(2024, 6, 20) to dates
+    add date.create_date(2023, 12, 10) to dates
+    add date.create_date(2025, 1, 5) to dates
+    add date.create_date(2024, 3, 15) to dates  # Duplicate
+
+    io.println("Test dates:")
+    create i as Integer
+    set i to 0
+    while i < length(dates):
+        io.println("  [" + string(i) + "]: " + string(get_item(dates, i)))
+        set i to i + 1
+
+    io.println("\n=== Pairwise Comparisons ===")
+    create comparisons as List
+    set comparisons to create_list()
+
+    # Compare first with others
+    create base_date as Date
+    set base_date to get_item(dates, 0)
+
+    set i to 1
+    while i < length(dates):
+        create compare_date as Date
+        set compare_date to get_item(dates, i)
+
+        create days_between as Integer
+        set days_between to date.date_difference(base_date, compare_date)
+
+        if days_between < 0:
+            io.println(string(base_date) + " is BEFORE " + string(compare_date) + " (" + string(abs(days_between)) + " days)")
+        else if days_between > 0:
+            io.println(string(base_date) + " is AFTER " + string(compare_date) + " (" + string(days_between) + " days)")
+        else:
+            io.println(string(base_date) + " is EQUAL to " + string(compare_date))
+
+        set i to i + 1
+
+    io.println("\n=== Finding Min/Max Dates ===")
+    create min_date as Date
+    set min_date to get_item(dates, 0)
+    create max_date as Date
+    set max_date to get_item(dates, 0)
+
+    set i to 1
+    while i < length(dates):
+        create current_date as Date
+        set current_date to get_item(dates, i)
+
+        if date.date_difference(min_date, current_date) > 0:
+            set min_date to current_date
+        if date.date_difference(max_date, current_date) < 0:
+            set max_date to current_date
+
+        set i to i + 1
+
+    io.println("Earliest date: " + string(min_date))
+    io.println("Latest date: " + string(max_date))
+
+    io.println("\n=== Age Calculations ===")
+    create birth_date as Date
+    set birth_date to date.create_date(1990, 5, 15)
+    create today as Date
+    set today to date.today()
+
+    create age_days as Integer
+    set age_days to date.date_difference(birth_date, today)
+    create age_years as Integer
+    set age_years to age_days / 365  # Approximate
+
+    io.println("Birth date: " + string(birth_date))
+    io.println("Today: " + string(today))
+    io.println("Age in days: " + string(age_days))
+    io.println("Approximate age in years: " + string(age_years))
+
+    logging.end_timer(timer)
+    logging.info(logger, "Date comparison completed")
+
+# Calendar operations demonstration
+define function calendar_demo that takes logger as Logger:
+    io.println("\n📆 Calendar Operations Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "calendar_operations")
+
+    io.println("=== Monthly Calendar ===")
+    io.print("Enter year: ")
+    create year_input as String
+    set year_input to io.read_line()
+
+    io.print("Enter month: ")
+    create month_input as String
+    set month_input to io.read_line()
+
+    if validate_number(year_input) and validate_number(month_input):
+        create year as Integer
+        set year to string_to_int(year_input)
+        create month as Integer
+        set month to string_to_int(month_input)
+
+        io.println("\nCalendar for " + string(year) + "-" + string(month) + ":")
+
+        # Simple calendar display
+        create first_day as Date
+        set first_day to date.create_date(year, month, 1)
+        create last_day as Date
+        set last_day to date.end_of_month(first_day)
+
+        create first_dow as String
+        set first_dow to date.day_of_week(first_day)
+
+        io.println("Sun Mon Tue Wed Thu Fri Sat")
+
+        # Calculate starting position
+        create dow_offset as Integer
+        if first_dow == "Sunday":
+            set dow_offset to 0
+        else if first_dow == "Monday":
+            set dow_offset to 1
+        else if first_dow == "Tuesday":
+            set dow_offset to 2
+        else if first_dow == "Wednesday":
+            set dow_offset to 3
+        else if first_dow == "Thursday":
+            set dow_offset to 4
+        else if first_dow == "Friday":
+            set dow_offset to 5
+        else:
+            set dow_offset to 6
+
+        # Print leading spaces
+        create space_i as Integer
+        set space_i to 0
+        while space_i < dow_offset:
+            io.print("    ")
+            set space_i to space_i + 1
+
+        # Print days
+        create current_day as Integer
+        set current_day to 1
+        create last_day_num as Integer
+        set last_day_num to date.get_day(last_day)
+
+        while current_day <= last_day_num:
+            if current_day < 10:
+                io.print(" ")
+            io.print(string(current_day))
+
+            if current_day < last_day_num:
+                io.print("  ")
+
+            set current_day to current_day + 1
+
+            # Check if we need to wrap to next line
+            create current_position as Integer
+            set current_position to (dow_offset + current_day - 1) % 7
+            if current_position == 0 and current_day <= last_day_num:
+                io.println()
+        io.println()
+
+    io.println("\n=== Leap Year Information ===")
+    create test_years as List
+    set test_years to create_list()
+    add 2020 to test_years
+    add 2021 to test_years
+    add 2024 to test_years
+    add 2100 to test_years
+
+    for each test_year in test_years:
+        create is_leap as Boolean
+        set is_leap to date.is_leap_year(test_year)
+        io.println(string(test_year) + " is " + (is_leap ? "" : "not ") + "a leap year")
+
+    logging.end_timer(timer)
+    logging.info(logger, "Calendar operations completed")
+
+# Timezone operations demonstration
+define function timezone_demo that takes logger as Logger:
+    io.println("\n🌍 Timezone Operations Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "timezone_operations")
+
+    io.println("=== Timezone Concepts ===")
+    io.println("Note: This demonstrates timezone concepts and structure")
+    io.println("Full timezone implementation would require additional libraries")
+
+    create utc_time as DateTime
+    set utc_time to date.now()
+    io.println("Current UTC time: " + string(utc_time))
+
+    io.println("\n=== Common Timezone Offsets ===")
+    create timezones as List
+    set timezones to create_list()
+    add "UTC-8: Pacific Time (PST)" to timezones
+    add "UTC-5: Eastern Time (EST)" to timezones
+    add "UTC+0: Greenwich Mean Time (GMT)" to timezones
+    add "UTC+1: Central European Time (CET)" to timezones
+    add "UTC+9: Japan Standard Time (JST)" to timezones
+
+    for each tz in timezones:
+        io.println("  " + tz)
+
+    io.println("\n=== Simulating Timezone Conversion ===")
+    create local_hour as Integer
+    set local_hour to date.get_hour(utc_time)
+
+    io.println("UTC Hour: " + string(local_hour))
+
+    # Simulate conversion to different timezones
+    create conversions as List
+    set conversions to create_list()
+    add -8 to conversions  # PST
+    add -5 to conversions  # EST
+    add 1 to conversions   # CET
+    add 9 to conversions   # JST
+
+    create tz_names as List
+    set tz_names to create_list()
+    add "PST" to tz_names
+    add "EST" to tz_names
+    add "CET" to tz_names
+    add "JST" to tz_names
+
+    create i as Integer
+    set i to 0
+    while i < length(conversions):
+        create offset as Integer
+        set offset to get_item(conversions, i)
+        create tz_name as String
+        set tz_name to get_item(tz_names, i)
+
+        create tz_hour as Integer
+        set tz_hour to (local_hour + offset) % 24
+        if tz_hour < 0:
+            set tz_hour to tz_hour + 24
+
+        io.println(string(tz_name) + " (UTC" + (offset >= 0 ? "+" : "") + string(offset) + "): " + string(tz_hour) + ":00")
+
+        set i to i + 1
+
+    logging.end_timer(timer)
+    logging.info(logger, "Timezone operations completed")
+
+# Business days calculator demonstration
+define function business_days_demo that takes logger as Logger:
+    io.println("\n💼 Business Days Calculator Demo")
+
+    create timer as Timer
+    set timer to logging.start_timer(logger, "business_days")
+
+    io.println("=== Business Days Calculation ===")
+
+    create start_date as Date
+    set start_date to date.create_date(2024, 3, 1)
+    io.println("Start date: " + string(start_date) + " (" + date.day_of_week(start_date) + ")")
+
+    # Calculate business days from start date
+    create business_days_count as Integer
+    set business_days_count to 10
+
+    io.println("Finding " + string(business_days_count) + " business days from start...")
+
+    create current_date as Date
+    set current_date to start_date
+    create business_days_found as Integer
+    set business_days_found to 0
+    create total_days as Integer
+    set total_days to 0
+
+    while business_days_found < business_days_count:
+        if date.is_weekday(current_date):
+            set business_days_found to business_days_found + 1
+            if business_days_found == business_days_count:
+                io.println("✅ Business day " + string(business_days_found) + ": " + string(current_date) + " (" + date.day_of_week(current_date) + ")")
+
+        set current_date to date.add_days(current_date, 1)
+        set total_days to total_days + 1
+
+    io.println("Total calendar days: " + string(total_days))
+
+    io.println("\n=== Project Timeline Example ===")
+    create project_start as Date
+    set project_start to date.create_date(2024, 4, 1)
+    create project_days as Integer
+    set project_days to 30  # 30 business days
+
+    io.println("Project starts: " + string(project_start) + " (" + date.day_of_week(project_start) + ")")
+    io.println("Duration: " + string(project_days) + " business days")
+
+    # Find end date
+    set current_date to project_start
+    set business_days_found to 0
+    set total_days to 0
+
+    while business_days_found < project_days:
+        if date.is_weekday(current_date):
+            set business_days_found to business_days_found + 1
+        else:
+            set total_days to total_days + 1  # Count weekends separately
+
+        if business_days_found < project_days:
+            set current_date to date.add_days(current_date, 1)
+            set total_days to total_days + 1
+
+    create project_end as Date
+    set project_end to current_date
+
+    io.println("Project ends: " + string(project_end) + " (" + date.day_of_week(project_end) + ")")
+    io.println("Total calendar days: " + string(total_days + 1))
+
+    logging.end_timer(timer)
+    logging.info(logger, "Business days calculation completed")
+
+# Helper functions
+define function validate_number that takes input as String and returns Boolean:
+    for each char in input:
+        if char != "0" and char != "1" and char != "2" and char != "3" and char != "4" and
+           char != "5" and char != "6" and char != "7" and char != "8" and char != "9" and
+           char != "-":
+            return false
+    return length(input) > 0
+
+define function string_to_int that takes s as String and returns Integer:
+    return 0
+
+define function create_list that returns List:
+    create result as List
+    set result to []
+    return result
+
+define function length that takes lst as List and returns Integer:
+    create count as Integer
+    set count to 0
+    for each item in lst:
+        set count to count + 1
+    return count
+
+define function get_item that takes lst as List, index as Integer:
+    create current_index as Integer
+    set current_index to 0
+    for each item in lst:
+        if current_index == index:
+            return item
+        set current_index to current_index + 1
+
+define function abs that takes x as Integer and returns Integer:
+    if x < 0:
+        return -x
+    return x
+
+# Initialize the application
+main()
